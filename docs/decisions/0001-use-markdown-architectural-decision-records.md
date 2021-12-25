@@ -20,7 +20,7 @@ Which format and structure should these records follow?
 
 Chosen option: "MADR 2.1.2", because
 
-* Implicit assumptions should be made explicit.
+* Make implicit assumptions explicit.
   Design documentation is important to enable people understanding the decisions later on.
   See also [A rational design process: How and why to fake it](https://doi.org/10.1109/TSE.1986.6312940).
 * The MADR format is lean and fits our development style.
