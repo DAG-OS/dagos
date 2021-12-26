@@ -12,6 +12,7 @@ Describes the relevant requirements and the driving forces that software archite
 
 == Requirements Overview
 
+////
 [role="arc42help"]
 ****
 .Contents
@@ -29,9 +30,29 @@ If requirements documents exist this overview should refer to these documents.
 
 Keep these excerpts as short as possible. Balance readability of this document with potential redundancy w.r.t to requirements documents.
 ****
+////
+
+The main goal of this system is to provide development teams with the tools to create shared environments for various purposes.
+Such purposes may include creating shared
+
+* development environments,
+* staging environments, or
+* deployment environments.
+
+////
+[options="header",cols="12%,~"]
+.Requirements
+|===
+|ID |Description
+
+|REQ-0001
+|If at all possible, any actions the system takes should be idempotent.
+|===
+////
 
 == Quality Goals
 
+////
 [role="arc42help"]
 ****
 .Contents
@@ -44,9 +65,24 @@ If you as an architect do not know how the quality of your work will be judged â
 .Form
 A table with quality goals and concrete scenarios, ordered by priorities
 ****
+////
+
+The following architecture quality goals are major influences for the design of the system.
+
+[options="header",cols="15%,~,~"]
+.Quality goals
+|===
+|Quality goal|Description|Scenarios
+
+|Simplicity | |
+|Customizability | |
+|Extensibility | |
+|Maintainability | |
+|===
 
 == Stakeholders
 
+////
 [role="arc42help"]
 ****
 .Contents
@@ -66,10 +102,32 @@ These stakeholders determine the extent and the level of detail of your work and
 .Form
 Table with role names, person names, and their expectations with respect to the architecture and its documentation.
 ****
+////
 
-[options="header",cols="1,2,2"]
+The following stakeholders and their respective expectations influence the design of the system.
+
+[options="header",cols="20%,~"]
+.Stakeholders
 |===
-|Role/Name|Contact|Expectations
-| _<Role-1>_ | _<Contact-1>_ | _<Expectation-1>_
-| _<Role-2>_ | _<Contact-2>_ | _<Expectation-2>_
+|Role |Expectations
+
+|Environment creator
+a|
+* Defining a shared environment is simple.
+** Common, configurable building blocks exist.
+** Adding custom building blocks is simple.
+** Extending common building blocks is possible?
+* Extending environments is possible.
+* Combining environments is possible.
+
+|Environment user
+a|
+* Using a shared environment is simple.
+** After choosing an environment and downloading it, deploying it to the chosen context, e.g., a VM or WSL, is (semi)-automatic.
+** They require no further setup.
+* It's possible to deploy them in various contexts, e.g.,
+** a bare metal installation of an operating system,
+** a virtual machine,
+** a container engine like Docker or Podman, or
+** a WSL instance.
 |===
