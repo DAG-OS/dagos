@@ -1,7 +1,0 @@
-= Decision Records
-
-This directory documents significant decisions made throughout the lifetime of this project.
-See below for a list of them.
-
-* link:0001-use-markdown-architectural-decision-records.md[ADR-0001] - Use Markdown Architectural Decision Records
-* link:0002-use-vale-to-lint-documentation.md[ADR-0002] - Use Vale to lint documentation

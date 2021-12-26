@@ -1,5 +1,5 @@
 [[section-runtime-view]]
-== Runtime View
+= Runtime View
 
 
 [role="arc42help"]
@@ -30,15 +30,15 @@ Choose one of many notations for describing scenarios, e.g.
 
 ****
 
-=== <Runtime Scenario 1>
+== <Runtime Scenario 1>
 
 
 * _<insert runtime diagram or textual description of the scenario>_
 * _<insert description of the notable aspects of the interactions between the
 building block instances depicted in this diagram.>_
 
-=== <Runtime Scenario 2>
+== <Runtime Scenario 2>
 
-=== ...
+== ...
 
-=== <Runtime Scenario n>
+== <Runtime Scenario n>

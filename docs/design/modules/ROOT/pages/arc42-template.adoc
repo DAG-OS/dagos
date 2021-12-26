@@ -43,6 +43,7 @@ For documentation of your own system you use better the _plain_ version.
 // numbering from here on
 :numbered:
 
+:leveloffset: +1
 <<<<
 // 1. Introduction and Goals
 include::01_introduction_and_goals.adoc[]

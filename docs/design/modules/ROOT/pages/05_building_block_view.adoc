@@ -1,7 +1,7 @@
 [[section-building-block-view]]
 
 
-== Building Block View
+= Building Block View
 
 [role="arc42help"]
 ****
@@ -34,7 +34,7 @@ Thus it contains the white box description of selected building blocks of level 
 *Level 3* zooms into selected building blocks of level 2, and so on.
 ****
 
-=== Whitebox Overall System
+== Whitebox Overall System
 
 [role="arc42help"]
 ****
@@ -91,7 +91,7 @@ Its headline is the name of the black box.
 ****
 
 
-==== <Name black box 1>
+=== <Name black box 1>
 
 [role="arc42help"]
 ****
@@ -122,24 +122,24 @@ _<(optional) Open Issues/Problems/Risks>_
 
 
 
-==== <Name black box 2>
+=== <Name black box 2>
 
 _<black box template>_
 
-==== <Name black box n>
+=== <Name black box n>
 
 _<black box template>_
 
 
-==== <Name interface 1>
+=== <Name interface 1>
 
 ...
 
-==== <Name interface m>
+=== <Name interface m>
 
 
 
-=== Level 2
+== Level 2
 
 [role="arc42help"]
 ****
@@ -150,7 +150,7 @@ Please prefer relevance over completeness. Specify important, surprising, risky,
 Leave out normal, simple, boring or standardized parts of your system
 ****
 
-==== White Box _<building block 1>_
+=== White Box _<building block 1>_
 
 [role="arc42help"]
 ****
@@ -159,21 +159,21 @@ Leave out normal, simple, boring or standardized parts of your system
 
 _<white box template>_
 
-==== White Box _<building block 2>_
+=== White Box _<building block 2>_
 
 
 _<white box template>_
 
 ...
 
-==== White Box _<building block m>_
+=== White Box _<building block m>_
 
 
 _<white box template>_
 
 
 
-=== Level 3
+== Level 3
 
 [role="arc42help"]
 ****
@@ -184,7 +184,7 @@ part of arc42 for additional levels.
 ****
 
 
-==== White Box <_building block x.1_>
+=== White Box <_building block x.1_>
 
 [role="arc42help"]
 ****
@@ -195,12 +195,12 @@ Specifies the internal structure of _building block x.1_.
 _<white box template>_
 
 
-==== White Box <_building block x.2_>
+=== White Box <_building block x.2_>
 
 _<white box template>_
 
 
 
-==== White Box <_building block y.1_>
+=== White Box <_building block y.1_>
 
 _<white box template>_

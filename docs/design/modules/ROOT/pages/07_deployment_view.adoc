@@ -1,7 +1,5 @@
 [[section-deployment-view]]
-
-
-== Deployment View
+= Deployment View
 
 [role="arc42help"]
 ****
@@ -34,7 +32,7 @@ when your infrastructure is more complex.
 * When your (hardware) stakeholders prefer other kinds of diagrams rather than the deployment diagram, let them use any kind that is able to show nodes and channels of the infrastructure.
 ****
 
-=== Infrastructure Level 1
+== Infrastructure Level 1
 
 [role="arc42help"]
 ****
@@ -62,7 +60,7 @@ Mapping of Building Blocks to Infrastructure::
 _<description of the mapping>_
 
 
-=== Infrastructure Level 2
+== Infrastructure Level 2
 
 [role="arc42help"]
 ****
@@ -71,16 +69,16 @@ Here you can include the internal structure of (some) infrastructure elements fr
 Please copy the structure from level 1 for each selected element.
 ****
 
-==== _<Infrastructure Element 1>_
+=== _<Infrastructure Element 1>_
 
 _<diagram + explanation>_
 
-==== _<Infrastructure Element 2>_
+=== _<Infrastructure Element 2>_
 
 _<diagram + explanation>_
 
 ...
 
-==== _<Infrastructure Element n>_
+=== _<Infrastructure Element n>_
 
 _<diagram + explanation>_
