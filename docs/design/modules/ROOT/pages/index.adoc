@@ -1,0 +1,6 @@
+== image:arc42-logo.png[arc42] Design Documentation
+
+This document provides the design documentation for DAGOS.
+It's based on the http://www.arc42.de[arc42 template] created by Dr. Peter Hruschka & Dr. Gernot Starke.
+
+include::../nav.adoc[]
