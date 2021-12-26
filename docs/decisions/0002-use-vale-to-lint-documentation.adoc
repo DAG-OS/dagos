@@ -1,27 +1,28 @@
-# Use Vale to lint documentation
+= Use Vale to lint documentation
 
 * Status: :accepted:
 * Date: 2021-12-25
 
-## Context and Problem Statement
+== Context and Problem Statement
 
 Documentation is an integral part of any software project made for a group of people.
-Creating succint and consistent documentation is non-trivial.
+Creating succinct and consistent documentation is non-trivial.
 Is it possible to support developers in creating such documentation?
 
-## Decision Drivers <!-- optional -->
+// optional
+== Decision Drivers
 
 * Tool maturity
 * Extensibility
 * Configuration cost
 * Ease of use
 
-## Considered Options
+== Considered Options
 
-* [Vale](https://github.com/errata-ai/vale)
-* Other linters mentioned in this [blog post](https://earthly.dev/blog/markdown-lint/)
+* https://github.com/errata-ai/vale[Vale]
+* Other linters mentioned in this https://earthly.dev/blog/markdown-lint/[blog post]
 
-## Decision Outcome
+== Decision Outcome
 
 Chosen option: "Vale", because
 
@@ -31,6 +32,6 @@ Chosen option: "Vale", because
 * the cost of configuring the linter is low.
 * it's fast.
 
-### Compliance
+=== Compliance
 
 For now a pre-commit hook runs on every commit to check for any extreme violations of the chosen style guides.
