@@ -8,4 +8,8 @@ include::decisions/0001-use-markdown-architectural-decision-records.adoc[]
 
 include::decisions/0002-use-vale-to-lint-documentation.adoc[]
 
+include::decisions/0003-use-arc42-template-for-design-documentation.adoc[]
+
+include::decisions/0004-use-antora-for-structuring-and-serving-documentation.adoc[]
+
 :leveloffset: -1

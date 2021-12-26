@@ -1,0 +1,25 @@
+= Use Antora for publishing documentation
+
+* Status: :accepted:
+* Date: 2021-12-26
+
+== Context and Problem Statement
+
+Documentation for a software project such as this must be available online for users.
+Which tool should we use for this purpose?
+
+== Considered Options
+
+* https://www.antora.org[Antora]
+* https://www.sphinx-doc.org/en/master/[Sphinx Doc]
+* GitLab Wiki
+* GitLab repository
+
+== Decision Outcome
+
+Chosen option: "Antora", because
+
+* it's simple to set up.
+* uses a straigtforward folder structure.
+* scalable to various documents and products from different repositories.
+* it uses AsciiDoc which is more feature complete than markdown.

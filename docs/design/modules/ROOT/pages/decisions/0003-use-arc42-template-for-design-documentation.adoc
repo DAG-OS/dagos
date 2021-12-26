@@ -1,0 +1,32 @@
+= Use arc42 template for design documentation
+
+* Status: :accepted:
+* Date: 2021-12-26
+
+== Context and Problem Statement
+
+A documentation template brings structure, best practices, and familiarity to the table.
+Which documentation template should we choose for design documentation?
+
+== Decision Drivers
+
+* Maturity
+* Simplicity
+
+== Considered Options
+
+* http://www.arc42.de[arc42 template]
+
+== Decision Outcome
+
+Chosen option: "arc42 template", because
+
+* it's mature.
+* it's simple.
+* it's available in various languages.
+* it integrates well with decision records.
+* it's well known.
+
+=== Compliance
+
+Compliance to this decision cannot be automatically verified.
