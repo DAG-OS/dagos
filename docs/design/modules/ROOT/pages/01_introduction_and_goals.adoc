@@ -1,5 +1,5 @@
 [[section-introduction-and-goals]]
-= Introduction and Goals
+= Introduction and goals
 
 [role="arc42help"]
 ****
@@ -10,7 +10,7 @@ Describes the relevant requirements and the driving forces that software archite
 * relevant stakeholders and their expectations
 ****
 
-== Requirements Overview
+== Requirements overview
 
 ////
 [role="arc42help"]
@@ -33,24 +33,23 @@ Keep these excerpts as short as possible. Balance readability of this document w
 ////
 
 The main goal of this system is to provide development teams with the tools to create shared environments for various purposes.
-Such purposes may include creating shared
+Such purposes may include creating shared development  environments, staging environments, or deployment environments.
 
-* development environments,
-* staging environments, or
-* deployment environments.
+The system provides a framework for provisioning software components on supported operating system baselines to achieve this goal.
+It may include common software components to bootstrap the environment definition process.
 
 ////
 [options="header",cols="12%,~"]
 .Requirements
 |===
-|ID |Description
+|ID|Description
 
 |REQ-0001
 |If at all possible, any actions the system takes should be idempotent.
 |===
 ////
 
-== Quality Goals
+== Quality goals
 
 ////
 [role="arc42help"]
@@ -67,17 +66,40 @@ A table with quality goals and concrete scenarios, ordered by priorities
 ****
 ////
 
-The following architecture quality goals are major influences for the design of the system.
+The following architecture quality goals are major influences for the design of the system ordered by priority.
 
-[options="header",cols="15%,~,~"]
+[options="header",cols="1,4,4"]
 .Quality goals
 |===
 |Quality goal|Description|Scenarios
 
-|Simplicity | |
-|Customizability | |
-|Extensibility | |
-|Maintainability | |
+|Simplicity
+|The resulting software should be simple to use and reason about.
+a|It's clear
+
+* where things belong,
+* how to configure things, and
+* how to use things.
+
+|Customizability
+|Every user of the system will have their own requirements and preferences.
+The system must be customizable to fit their needs.
+|Users may prefer a certain vendor, require a specific version, or want to configure a software component in a specific way.
+
+|Extensibility
+|No matter how varied or how customizable the common software components are, users will always require something more.
+It must be possible to extend the system to meet this need.
+a| A user requires
+
+* a software component that is not (yet) provided by the system,
+* a specific version of a common software component that is not (yet) offered, or
+* supplementary steps during the provisioning of a software component.
+
+|Maintainability
+|The maintenance of the system architecture and the created environments is a major concern.
+The usage of the system highly depends on its reliability.
+Both for the system itself but also the products it creates.
+|Production use cases may require the provisioning of an environment years after its creation.
 |===
 
 == Stakeholders
@@ -109,7 +131,10 @@ The following stakeholders and their respective expectations influence the desig
 [options="header",cols="20%,~"]
 .Stakeholders
 |===
-|Role |Expectations
+|Role|Expectations
+
+// Maintainers?
+// Quality managers?
 
 |Environment creator
 a|

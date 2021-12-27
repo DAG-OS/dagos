@@ -3,7 +3,19 @@
 = Glossary
 
 [glossary]
-VM:: Virtual Machine.
+Environment::
+A collection of software components to provision as a unit.
+Software component::
++
+A piece of software provisioned within an environment. Examples:
+
+* clang
+* curl
+* Go
+* Java
+
+VM::
+Virtual Machine.
 WSL::
 Windows Subystem for Linux.
 +
