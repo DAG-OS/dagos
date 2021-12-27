@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "asciidoctor.asciidoctor-vscode",
+        "errata-ai.vale-server",
+        "esbenp.prettier-vscode",
+        "jebbs.plantuml",
+        "redhat.vscode-yaml",
+        "valentjn.vscode-ltex",
+    ]
+}
