@@ -1,4 +1,5 @@
 {
     "vale.core.useCLI": true,
     "vale.valeCLI.config": "${workspaceFolder}/.vale.ini",
+    "c4.diagram.plantuml.enabled": true,
 }

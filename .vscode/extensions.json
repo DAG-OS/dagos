@@ -5,6 +5,7 @@
         "esbenp.prettier-vscode",
         "jebbs.plantuml",
         "redhat.vscode-yaml",
+        "systemticks.c4-dsl-extension",
         "valentjn.vscode-ltex",
     ]
 }
