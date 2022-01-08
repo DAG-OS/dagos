@@ -2,10 +2,11 @@
 name = "dagos"
 version = "0.1.0"
 description = ""
+license = "MIT"
 authors = ["Lucas Resch <lucas.resch@gmx.de>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7"
 click = "^8.0.3"
 click-option-group = "^0.5.3"
 

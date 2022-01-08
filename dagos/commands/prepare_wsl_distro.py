@@ -77,12 +77,12 @@ def get_image_name(backend, container_id):
     return image
 
 
-@click.command(no_args_is_help=True)
+@click.command(name="prepare", no_args_is_help=True)
 @optgroup.group("Export selection", cls=RequiredMutuallyExclusiveOptionGroup)
 @optgroup.option("--container-id", help="A container ID.")
 @optgroup.option("--image", help="A fully qualified container image.")
 @click.option("--output", default="/tmp/dagos-export", help="Output directory on disk.")
-def export(image, container_id, output):
+def prepare_wsl_distro(image, container_id, output):
     """
     Export a container or container image.
     """

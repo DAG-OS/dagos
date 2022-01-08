@@ -1,7 +1,8 @@
 import click
 import logging
 
-from dagos.export.export import export
+import dagos.commands.import_wsl_distro
+import dagos.commands.prepare_wsl_distro
 
 
 @click.group()
@@ -19,4 +20,5 @@ def main(verbose):
     )
 
 
-main.add_command(export)
+main.add_command(dagos.commands.import_wsl_distro.import_wsl_distro)
+main.add_command(dagos.commands.prepare_wsl_distro.prepare_wsl_distro)
