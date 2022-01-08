@@ -67,7 +67,7 @@ def get_image_name(backend, container_id):
     return image
 
 
-@click.command()
+@click.command(no_args_is_help=True)
 @optgroup.group(
     "Container export selection",
     cls=RequiredMutuallyExclusiveOptionGroup,
