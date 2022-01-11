@@ -1,8 +1,9 @@
 import click
 import logging
-
 import dagos.commands.import_wsl_distro
 import dagos.commands.prepare_wsl_distro
+
+from rich.logging import RichHandler
 
 
 @click.group()
@@ -10,13 +11,14 @@ import dagos.commands.prepare_wsl_distro
     "--verbose", "-v", is_flag=True, default=False, help="Enter verbose mode."
 )
 def main(verbose):
-    logging.addLevelName(logging.WARNING, "WARN")
-    logging.addLevelName(logging.CRITICAL, "FATAL")
-    log_format = "{asctime} [{levelname:<5s}] {message}"
+    log_format = "{message}"
+    date_format = "%Y-%m-%d %H:%M:%S"
     logging.basicConfig(
         level=logging.DEBUG if verbose else logging.INFO,
         format=log_format,
+        datefmt=date_format,
         style="{",
+        handlers=[RichHandler(rich_tracebacks=True)],
     )
 
 

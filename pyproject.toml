@@ -9,6 +9,7 @@ authors = ["Lucas Resch <lucas.resch@gmx.de>"]
 python = "^3.7"
 click = "^8.0.3"
 click-option-group = "^0.5.3"
+rich = "^11.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
