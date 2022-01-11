@@ -45,7 +45,7 @@ def unregister_distro(name):
         stderr=subprocess.STDOUT,
     )
     if run_result.returncode != 0:
-        logging.critical(
+        logging.error(
             f"Failed to unregister '{name}' distro:\n{run_result.stderr.decode('utf-8')}"
         )
         exit(1)
