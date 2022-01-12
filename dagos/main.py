@@ -1,7 +1,7 @@
 import click
 import logging
-import dagos.commands.import_wsl_distro
-import dagos.commands.prepare_wsl_distro
+
+from dagos.commands.wsl.group import wsl
 
 from rich.logging import RichHandler
 
@@ -22,5 +22,4 @@ def main(verbose):
     )
 
 
-main.add_command(dagos.commands.import_wsl_distro.import_wsl_distro)
-main.add_command(dagos.commands.prepare_wsl_distro.prepare_wsl_distro)
+main.add_command(wsl)
