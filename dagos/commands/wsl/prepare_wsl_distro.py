@@ -15,8 +15,8 @@ class ExportError(Exception):
 
 @click.command(name="prepare", no_args_is_help=True)
 @optgroup.group("Export selection", cls=RequiredMutuallyExclusiveOptionGroup)
-@optgroup.option("--container-id", help="A container ID.")
-@optgroup.option("--image", help="A fully qualified container image.")
+@optgroup.option("-c", "--container", help="A container name or ID.")
+@optgroup.option("-i", "--image", help="A fully qualified container image.")
 @click.option(
     "-o",
     "--output",
@@ -24,25 +24,27 @@ class ExportError(Exception):
     type=click.Path(exists=True),
     help="Output directory on disk.",
 )
-def prepare_wsl_distro(image, container_id, output):
+def prepare_wsl_distro(image, container, output):
     """
-    Export a container or container image.
+    Export the filesystem contents of a container or container image to a tar archive.
+
+    The resulting archive is ready for import as a WSL distro, e.g., via `dagos wsl import`.
     """
     container_engine = get_container_engine()
 
     delete_container = True
-    if container_id:
+    if container:
         delete_container = False
-        image = get_image_name(container_engine, container_id)
+        image = get_image_name(container_engine, container)
     else:
-        container_id = start_container(container_engine, image)
+        container = start_container(container_engine, image)
 
     image_name = re.sub("(:|/)", "_", image)
     archive = f"{output}/{image_name}.tar"
-    logging.debug(f"Exporting '{container_id}' to '{archive}'")
+    logging.debug(f"Exporting '{container}' to '{archive}'")
     with console.status("Exporting...", spinner="material"):
         subprocess.run(
-            [container_engine, "export", "--output", archive, container_id],
+            [container_engine, "export", "--output", archive, container],
             check=True,
         )
     logging.info("Successfully exported container")
@@ -50,13 +52,13 @@ def prepare_wsl_distro(image, container_id, output):
     # TODO: Package additional files together with exported tar file
 
     if delete_container:
-        logging.debug(f"Removing container '{container_id}'")
+        logging.debug(f"Removing container '{container}'")
         subprocess.run(
-            [container_engine, "rm", container_id],
+            [container_engine, "rm", container],
             check=True,
             stdout=subprocess.DEVNULL,
         )
-        logging.info(f"Removed container '{container_id}'")
+        logging.info(f"Removed container '{container}'")
 
     # TODO: Remove temporary files
 
@@ -105,17 +107,24 @@ def start_container(container_engine, image):
     return container_id
 
 
-def get_image_name(container_engine, container_id):
+def get_image_name(container_engine, container):
     container_exists = subprocess.run(
-        [container_engine, "container", "exists", container_id]
+        [container_engine, "container", "exists", container]
     )
     if container_exists.returncode != 0:
-        logging.error(f"No container exists with provided ID '{container_id}'!")
+        logging.error(f"No container exists with provided ID '{container}'!")
         exit(1)
+
     image = (
         subprocess.run(
-            f"{container_engine} ps --all --filter 'id={container_id}' | awk -F '[[:space:]]+' '$1 ~ /{container_id}/ {{ print $2 }}'",
-            shell=True,
+            [
+                "podman",
+                "container",
+                "inspect",
+                container,
+                "--format",
+                r"{{.ImageName}}",
+            ],
             check=True,
             capture_output=True,
         )
@@ -123,14 +132,5 @@ def get_image_name(container_engine, container_id):
         .strip()
     )
 
-    try:
-        if len(image) == 0:
-            raise ExportError(
-                f"Failed to get image name for container '{container_id}'!"
-            )
-    except ExportError:
-        console.print_exception()
-        exit(1)
-
-    logging.debug(f"Image for container '{container_id}' is '{image}'")
+    logging.debug(f"Image for container '{container}' is '{image}'")
     return image
