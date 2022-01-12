@@ -7,7 +7,6 @@ import subprocess
 
 from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
 from dagos.console import console
-from pathlib import Path
 
 
 class ExportError(Exception):
@@ -18,7 +17,13 @@ class ExportError(Exception):
 @optgroup.group("Export selection", cls=RequiredMutuallyExclusiveOptionGroup)
 @optgroup.option("--container-id", help="A container ID.")
 @optgroup.option("--image", help="A fully qualified container image.")
-@click.option("--output", default="/tmp/dagos-export", help="Output directory on disk.")
+@click.option(
+    "-o",
+    "--output",
+    default=".",
+    type=click.Path(exists=True),
+    help="Output directory on disk.",
+)
 def prepare_wsl_distro(image, container_id, output):
     """
     Export a container or container image.
@@ -32,10 +37,6 @@ def prepare_wsl_distro(image, container_id, output):
     else:
         container_id = start_container(container_engine, image)
 
-    logging.debug("Creating output directory")
-    Path(output).mkdir(parents=True, exist_ok=True)
-    logging.info("Created output directory")
-
     image_name = re.sub("(:|/)", "_", image)
     archive = f"{output}/{image_name}.tar"
     logging.debug(f"Exporting '{container_id}' to '{archive}'")
@@ -44,6 +45,7 @@ def prepare_wsl_distro(image, container_id, output):
             [container_engine, "export", "--output", archive, container_id],
             check=True,
         )
+    logging.info("Successfully exported container")
 
     # TODO: Package additional files together with exported tar file
 
