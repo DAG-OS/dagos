@@ -15,11 +15,12 @@ from pathlib import Path
 @click.option(
     "--archive",
     required=True,
+    type=click.Path(exists=True),
     help="Archive path to import, both .tar and .tar.gz are supported.",
 )
 @click.option(
-    "--force",
     "-f",
+    "--force",
     is_flag=True,
     default=False,
     help="""
@@ -68,11 +69,6 @@ def check_if_distro_exists(name, force):
 
 def check_archive_validity(archive):
     archive_path = Path(archive)
-    if archive_path.exists():
-        logging.debug("Provided archive exists")
-    else:
-        logging.error(f"No archive exists at '{archive}'")
-        exit(1)
     accepted_suffixes = [".tar", ".tar.gz"]
     if archive_path.suffix in accepted_suffixes:
         logging.debug("Provided archive has correct file extension")
