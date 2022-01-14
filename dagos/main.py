@@ -1,8 +1,8 @@
 import click
 import logging
 
+from dagos.commands.manage.group import manage
 from dagos.commands.wsl.group import wsl
-
 from rich.logging import RichHandler
 
 
@@ -22,4 +22,5 @@ def main(verbose):
     )
 
 
+main.add_command(manage)
 main.add_command(wsl)
