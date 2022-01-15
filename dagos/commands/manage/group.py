@@ -55,8 +55,14 @@ class ManageCLI(click.MultiCommand):
         ns = {}
         fn = ctx.obj[cmd_name] / "cli.py"
         with open(fn) as f:
-            code = compile(f.read(), fn, "exec")
-            eval(code, ns, ns)
+            try:
+                code = compile(f.read(), fn, "exec")
+                eval(code, ns, ns)
+            except ModuleNotFoundError:
+                logging.debug(
+                    f"Required dependencies for '{cmd_name}' component are not installed"
+                )
+                return None
         return ns["cli"]
 
 
