@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "dagos"
-version = "0.1.1"
-description = "A CLI for defining and deploying software environments."
+version = "0.1.2"
+description = "A CLI for managing software environments."
 license = "MIT"
 authors = ["Lucas Resch <lucas.resch@gmx.de>"]
 maintainers = ["Lucas Resch <lucas.resch@gmx.de>"]
@@ -16,7 +16,6 @@ rich = "^11.0.0"
 pytest = "^5.2"
 black = "^21.12b0"
 pre-commit = "^2.16.0"
-twine = "^3.7.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
