@@ -23,6 +23,9 @@ pytest = "^5.2"
 black = "^21.12b0"
 pre-commit = "^2.16.0"
 
+[tool.poetry.scripts]
+dagos = "dagos.cli:dagos"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

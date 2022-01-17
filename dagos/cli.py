@@ -10,7 +10,7 @@ from rich.logging import RichHandler
 @click.option(
     "--verbose", "-v", is_flag=True, default=False, help="Enter verbose mode."
 )
-def main(verbose):
+def dagos(verbose):
     log_format = "{message}"
     date_format = "%Y-%m-%d %H:%M:%S"
     logging.basicConfig(
@@ -22,5 +22,5 @@ def main(verbose):
     )
 
 
-main.add_command(manage)
-main.add_command(wsl)
+dagos.add_command(manage)
+dagos.add_command(wsl)
