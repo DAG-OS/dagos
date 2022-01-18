@@ -1,10 +1,23 @@
 import click
 import logging
+import time
 
 from . import __version__
 from dagos.commands.manage.group import manage
 from dagos.commands.wsl.group import wsl
 from rich.logging import RichHandler
+
+
+def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None:
+    if not value or ctx.resilient_parsing:
+        return
+    start = time.perf_counter()
+
+    def print_elapsed_time():
+        stop = time.perf_counter()
+        logging.info(f"Elapsed time: {stop-start:0.3f} seconds")
+
+    ctx.call_on_close(print_elapsed_time)
 
 
 @click.group()
@@ -16,7 +29,13 @@ from rich.logging import RichHandler
     version=__version__,
     message="%(prog)s version %(version)s",
 )
-def dagos(verbose):
+@click.option(
+    "--timer/--no-timer",
+    default=True,
+    help="Print execution time upon completion.",
+    callback=timer_callback,
+)
+def dagos(verbose: bool, timer: bool):
     log_format = "{message}"
     date_format = "%Y-%m-%d %H:%M:%S"
     logging.basicConfig(
