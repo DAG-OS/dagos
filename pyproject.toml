@@ -8,6 +8,7 @@ maintainers = ["Lucas Resch <lucas.resch@gmx.de>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
+
 click = "^8.0.3"
 click-option-group = "^0.5.3"
 rich = "^11.0.0"
@@ -19,9 +20,14 @@ ansible-runner = {version = "^2.1.1", optional = true}
 ansible = ["ansible", "ansible-runner"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
 black = "^21.12b0"
 pre-commit = "^2.16.0"
+pytest = "^5.2"
+
+[tool.black]
+# "You should include all Python versions that you want your code to run under."
+# Source: https://github.com/psf/black/issues/751
+target-version = ['py37', 'py38', 'py39', 'py310']
 
 [tool.poetry.scripts]
 dagos = "dagos.cli:dagos"
