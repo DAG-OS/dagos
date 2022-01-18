@@ -1,9 +1,10 @@
-import click
 import logging
 import os
+from pathlib import Path
+
+import click
 
 from dagos.utils import wsl_utils
-from pathlib import Path
 
 
 @click.command(name="import")

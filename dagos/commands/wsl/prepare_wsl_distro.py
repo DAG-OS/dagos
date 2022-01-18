@@ -1,11 +1,11 @@
-import click
 import logging
 import re
 import shutil
 import subprocess
 
+import click
+from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 
-from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
 from dagos.console import console
 
 

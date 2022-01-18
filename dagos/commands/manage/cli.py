@@ -1,9 +1,9 @@
-import click
 import logging
 import typing as t
-
-from click.core import Command, Context
 from pathlib import Path
+
+import click
+from click.core import Command, Context
 
 component_search_paths = [
     # user

@@ -1,8 +1,8 @@
+import logging
+from pathlib import Path
+
 import ansible_runner
 import click
-import logging
-
-from pathlib import Path
 
 inventory = "localhost ansible_connection=local"
 roles_path = Path.home() / ".ansible" / "roles"

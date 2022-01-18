@@ -29,6 +29,9 @@ pytest = "^5.2"
 # Source: https://github.com/psf/black/issues/751
 target-version = ['py37', 'py38', 'py39', 'py310']
 
+[tool.isort]
+profile = "black"
+
 [tool.poetry.scripts]
 dagos = "dagos.cli:dagos"
 

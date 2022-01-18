@@ -1,11 +1,13 @@
-import click
 import logging
 import time
 
-from . import __version__
+import click
+from rich.logging import RichHandler
+
 from dagos.commands.manage.cli import manage
 from dagos.commands.wsl.cli import wsl
-from rich.logging import RichHandler
+
+from . import __version__
 
 
 def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None:
