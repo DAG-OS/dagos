@@ -1,59 +1,33 @@
 import logging
 import typing as t
-from pathlib import Path
 
 import click
 from click.core import Command, Context
 
-component_search_paths = [
-    # user
-    Path.home() / ".dagos" / "components",
-    # system (linux)
-    Path("/opt/dagos/components"),
-    # dagos
-    Path(__file__).parent / "components",
-]
-
-
-def find_components() -> t.Dict[str, Path]:
-    logging.debug(
-        f"Looking for software components in {len(component_search_paths)} places"
-    )
-    components = {}
-    for search_path in component_search_paths:
-        if not search_path.exists():
-            logging.debug(f"Component search path '{search_path}' does not exist")
-            continue
-
-        logging.debug(f"Looking for software components in '{search_path}'")
-        for file in search_path.iterdir():
-            if file.is_dir():
-                if file.name in components:
-                    logging.warning(
-                        f"Ignoring duplicate software component '{file.name}' at '{file}'"
-                    )
-                else:
-                    logging.debug(f"Found software component '{file.name}' at '{file}'")
-                    components[file.name] = file
-    return components
+from .component_scanning import find_component, find_components
 
 
 class ManageCLI(click.MultiCommand):
     def list_commands(self, ctx: Context) -> t.List[str]:
+        logging.debug("Listing 'manage' commands")
         ctx.obj = find_components()
         commands = []
         for name in sorted(ctx.obj):
-            cli = ctx.obj[name] / "cli.py"
+            cli = ctx.obj[name].cli
             if cli.exists():
                 commands.append(name)
         commands.sort()
         return commands
 
     def get_command(self, ctx: Context, cmd_name: str) -> t.Optional[Command]:
+        logging.debug(f"Getting command '{cmd_name}'")
         if ctx.obj is None:
-            ctx.obj = find_components()
+            ctx.obj = find_component(cmd_name)
+            component = ctx.obj
+        else:
+            component = ctx.obj[cmd_name]
         ns = {}
-        fn = ctx.obj[cmd_name] / "cli.py"
+        fn = component.cli
         with open(fn) as f:
             try:
                 code = compile(f.read(), fn, "exec")
