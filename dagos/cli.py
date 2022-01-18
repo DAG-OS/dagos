@@ -3,8 +3,8 @@ import logging
 import time
 
 from . import __version__
-from dagos.commands.manage.group import manage
-from dagos.commands.wsl.group import wsl
+from dagos.commands.manage.cli import manage
+from dagos.commands.wsl.cli import wsl
 from rich.logging import RichHandler
 
 
