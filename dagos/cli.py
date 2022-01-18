@@ -1,6 +1,7 @@
 import click
 import logging
 
+from . import __version__
 from dagos.commands.manage.group import manage
 from dagos.commands.wsl.group import wsl
 from rich.logging import RichHandler
@@ -9,6 +10,11 @@ from rich.logging import RichHandler
 @click.group()
 @click.option(
     "--verbose", "-v", is_flag=True, default=False, help="Enter verbose mode."
+)
+@click.version_option(
+    prog_name="dagos",
+    version=__version__,
+    message="%(prog)s version %(version)s",
 )
 def dagos(verbose):
     log_format = "{message}"
