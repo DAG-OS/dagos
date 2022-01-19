@@ -33,12 +33,12 @@ class SoftwareComponent:
 def scan_folder_for_component_files(folder: Path, component: SoftwareComponent) -> None:
     for component_file in folder.iterdir():
         if not hasattr(component, "cli") and component_file.name == "cli.py":
-            logging.debug(
+            logging.trace(
                 f"Found CLI for '{component.name}' software component at '{component_file}'"
             )
             component.cli = component_file
         elif not hasattr(component, "config") and component_file.name == "config.yml":
-            logging.debug(
+            logging.trace(
                 f"Found configuration file for '{component.name}' software component at '{component_file}'"
             )
             component.config = component_file
@@ -53,26 +53,26 @@ def validate_component(component: SoftwareComponent) -> None:
 
 
 def find_components() -> t.Dict[str, SoftwareComponent]:
-    logging.debug(
+    logging.trace(
         f"Looking for software components in {len(component_search_paths)} places"
     )
     components = {}
     for search_path in component_search_paths:
         if not search_path.exists():
-            logging.debug(f"Component search path '{search_path}' does not exist")
+            logging.trace(f"Component search path '{search_path}' does not exist")
             continue
 
-        logging.debug(f"Looking for software components in '{search_path}'")
+        logging.trace(f"Looking for software components in '{search_path}'")
         for folder in search_path.iterdir():
             if folder.is_dir():
                 if folder.name in components:
                     component = components[folder.name]
-                    logging.debug(
+                    logging.trace(
                         f"Found another folder for software component '{folder.name}' at '{folder}'"
                     )
                 else:
                     component = SoftwareComponent(folder.name)
-                    logging.debug(
+                    logging.trace(
                         f"Found software component '{folder.name}' at '{folder}'"
                     )
                 components[folder.name] = scan_folder_for_component_files(
@@ -84,18 +84,18 @@ def find_components() -> t.Dict[str, SoftwareComponent]:
 
 
 def find_component(name: str) -> SoftwareComponent:
-    logging.debug(
+    logging.trace(
         f"Looking for '{name}' software component in {len(component_search_paths)} places"
     )
     component = SoftwareComponent(name)
     for search_path in component_search_paths:
         if not search_path.exists():
-            logging.debug(f"Component search path '{search_path}' does not exist")
+            logging.trace(f"Component search path '{search_path}' does not exist")
             continue
 
         for folder in search_path.iterdir():
             if folder.is_dir() and folder.name == name:
-                logging.debug(f"Found '{name}' software component at '{folder}'")
+                logging.trace(f"Found '{name}' software component at '{folder}'")
                 component = scan_folder_for_component_files(folder, component)
 
     validate_component(component)

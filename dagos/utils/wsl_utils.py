@@ -33,7 +33,7 @@ def get_installed_distros():
             is_running=True if columns[2] == "Running" else False,
             version=columns[3],
         )
-        logging.debug(distro)
+        logging.trace(distro)
         distros.append(distro)
     return distros
 

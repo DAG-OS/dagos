@@ -24,7 +24,7 @@ def install():
     """
     Install Git.
     """
-    logging.debug("Installing Git")
+    logging.info("Installing Git")
     ansible_runner.run(
         role="dagos.git",
         roles_path=str(roles_path),
@@ -39,7 +39,7 @@ def configure(ctx: click.Context):
     """
     Configure Git.
     """
-    logging.debug("Configuring Git")
+    logging.info("Configuring Git")
 
     component: SoftwareComponent = ctx.obj
     if component.config.exists():

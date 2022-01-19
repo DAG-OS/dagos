@@ -2,10 +2,10 @@ import logging
 import time
 
 import click
-from rich.logging import RichHandler
 
 from dagos.commands.manage.cli import manage
 from dagos.commands.wsl.cli import wsl
+from dagos.logging import configure_logging
 
 from . import __version__
 
@@ -24,7 +24,10 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
 
 @click.group()
 @click.option(
-    "--verbose", "-v", is_flag=True, default=False, help="Enter verbose mode."
+    "--verbose",
+    "-v",
+    count=True,
+    help="Enter verbose mode. Increase verbosity with -vv.",
 )
 @click.version_option(
     prog_name="dagos",
@@ -37,16 +40,8 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
     help="Print execution time upon completion.",
     callback=timer_callback,
 )
-def dagos(verbose: bool, timer: bool):
-    log_format = "{message}"
-    date_format = "%Y-%m-%d %H:%M:%S"
-    logging.basicConfig(
-        level=logging.DEBUG if verbose else logging.INFO,
-        format=log_format,
-        datefmt=date_format,
-        style="{",
-        handlers=[RichHandler(rich_tracebacks=True)],
-    )
+def dagos(verbose: int, timer: bool):
+    configure_logging(verbose)
 
 
 dagos.add_command(manage)

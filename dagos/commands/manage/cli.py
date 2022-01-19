@@ -9,7 +9,7 @@ from .component_scanning import find_component, find_components
 
 class ManageCLI(click.MultiCommand):
     def list_commands(self, ctx: Context) -> t.List[str]:
-        logging.debug("Listing 'manage' commands")
+        logging.trace("Listing 'manage' commands")
         ctx.obj = find_components()
         commands = []
         for name in sorted(ctx.obj):
@@ -20,7 +20,7 @@ class ManageCLI(click.MultiCommand):
         return commands
 
     def get_command(self, ctx: Context, cmd_name: str) -> t.Optional[Command]:
-        logging.debug(f"Getting command '{cmd_name}'")
+        logging.trace(f"Getting command '{cmd_name}'")
         if ctx.obj is None:
             ctx.obj = find_component(cmd_name)
             component = ctx.obj
