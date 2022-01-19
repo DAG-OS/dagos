@@ -4,6 +4,8 @@ import typing as t
 import click
 from click.core import Command, Context
 
+from dagos.exceptions.software_components import UnsupportedPlatformException
+
 from .component_scanning import find_component, find_components
 
 
@@ -34,7 +36,12 @@ class ManageCLI(click.MultiCommand):
                 eval(code, ns, ns)
             except ModuleNotFoundError:
                 logging.debug(
-                    f"Required dependencies for '{cmd_name}' component are not installed"
+                    f"Required dependencies for '{cmd_name}' software component are not installed"
+                )
+                return None
+            except UnsupportedPlatformException as e:
+                logging.debug(
+                    f"Platform does not support '{cmd_name}' software component: {e}"
                 )
                 return None
         return ns["cli"]
