@@ -1,11 +1,18 @@
 {
     "recommendations": [
         "asciidoctor.asciidoctor-vscode",
+        "bungcip.better-toml",
         "errata-ai.vale-server",
         "esbenp.prettier-vscode",
+        "hbenl.vscode-test-explorer",
         "jebbs.plantuml",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "njpwerner.autodocstring",
         "redhat.vscode-yaml",
+        "sonarsource.sonarlint-vscode",
         "systemticks.c4-dsl-extension",
+        "timonwong.shellcheck",
         "valentjn.vscode-ltex",
     ]
 }
