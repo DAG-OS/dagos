@@ -22,6 +22,7 @@ repos:
         description: Validate Style Guide with Vale
         language: docker_image
         entry: docker.io/jdkato/vale
+        types: [asciidoc, markdown]
         pass_filenames: true
         always_run: false
         verbose: true
