@@ -1,17 +1,17 @@
 import logging
 import os
 import shutil
-import subprocess
 from pathlib import Path
 
 import click
 
 from dagos.commands.manage.component_scanning import SoftwareComponent
 from dagos.console import console
-from dagos.platform.utils import assert_windows
-from dagos.utils.file_utils import download_file
+from dagos.platform.utils import assert_command_available, assert_windows
+from dagos.utils import powershell_utils
 
 assert_windows()
+assert_command_available("choco")
 
 
 @click.group(name="vcxsrv", chain=True)
@@ -26,30 +26,20 @@ def cli():
 
 
 @cli.command()
-@click.pass_context
-def install(ctx: click.Context):
+@click.option(
+    "--attended",
+    is_flag=True,
+    default=False,
+    help="Pause after installation is done.",
+)
+def install(attended: bool):
     """Install VcXsrv."""
-    logging.info("Downloading the latest VcXsrv installer")
-    file = download_file(
-        "https://sourceforge.net/projects/vcxsrv/files/latest/download",
-    )
-
-    def cleanup():
-        logging.debug("Removing installer")
-        file.unlink()
-
-    ctx.call_on_close(cleanup)
-
-    logging.info("Running installer")
-    logging.info("You may be prompted by Windows to give permission")
     with console.status("Installing VcXsrv ...", spinner="material"):
-        result = subprocess.run([str(file), "/S"], shell=True, capture_output=True)
-
+        result = powershell_utils.run_as_admin("choco install vcxsrv --yes", attended)
     if result.returncode == 0:
         logging.info("Successfully finished installation")
     else:
-        errors = result.stderr.decode("utf-8")
-        logging.error(f"Failed VcXsrv installation: {errors}")
+        logging.error("Failed VcXsrv installation")
         exit(1)
 
 

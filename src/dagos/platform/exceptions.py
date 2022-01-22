@@ -5,7 +5,11 @@ from io import StringIO
 from .domain import OperatingSystem
 
 
-class UnsupportedOperatingSystem(Exception):
+class UnsupportedPlatformException(Exception):
+    """The current platform is unsupported."""
+
+
+class UnsupportedOperatingSystem(UnsupportedPlatformException):
     """The current operating system is unsupported."""
 
     def __init__(self, supported_systems: t.List[OperatingSystem] = None):
