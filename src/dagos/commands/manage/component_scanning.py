@@ -9,14 +9,12 @@ component_search_paths = [
     # system (linux)
     Path("/opt/dagos/components"),
     # dagos
-    Path(__file__).parent / "components",
+    Path(__file__).parent.parent.parent / "components",
 ]
 
 
 class SoftwareComponentScanException(Exception):
     """A base exception for all component scanning errors."""
-
-    pass
 
 
 class SoftwareComponent:
