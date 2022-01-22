@@ -53,6 +53,7 @@ def install(ctx: click.Context):
     else:
         errors = result.stderr.decode("utf-8")
         logging.error(f"Failed VcXsrv installation: {errors}")
+        exit(1)
 
 
 @cli.command()
