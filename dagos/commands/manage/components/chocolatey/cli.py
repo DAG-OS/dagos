@@ -1,16 +1,14 @@
 import logging
-import platform
 import subprocess
 from io import StringIO
 
 import click
 
 from dagos.commands.manage.component_scanning import SoftwareComponent
-from dagos.exceptions.software_components import UnsupportedPlatformException
+from dagos.platform.domain import OperatingSystem
+from dagos.platform.utils import assert_windows
 
-# Ensure this software component is only available on Windows
-if platform.system() != "Windows":
-    raise UnsupportedPlatformException("VcXsrv only runs on Windows!")
+assert_windows()
 
 
 @click.group(name="chocolatey", chain=True)

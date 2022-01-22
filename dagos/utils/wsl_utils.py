@@ -1,10 +1,9 @@
 import logging
-import os
-import shutil
 import subprocess
 from dataclasses import dataclass
 
 from dagos.console import console
+from dagos.platform.utils import assert_windows, is_command_available
 
 
 @dataclass
@@ -76,22 +75,8 @@ def distro_exists(name):
     return any(distro.name == name for distro in get_installed_distros())
 
 
-def is_on_windows():
-    return True if os.name == "nt" else False
-
-
-def assert_on_windows():
-    if not is_on_windows:
-        logging.error("This command is only available on Windows!")
-        exit(1)
-
-
-def is_wsl_installed():
-    return False if shutil.which("wsl") is None else True
-
-
 def assert_wsl_is_installed():
-    assert_on_windows()
-    if not is_wsl_installed():
+    assert_windows()
+    if not is_command_available("wsl"):
         logging.error("WSL must be installed but could not be found!")
         exit(1)

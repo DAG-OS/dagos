@@ -1,12 +1,12 @@
 import logging
 import re
-import shutil
 import subprocess
 
 import click
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 
 from dagos.console import console
+from dagos.platform.utils import is_command_available
 
 
 class ExportError(Exception):
@@ -69,7 +69,7 @@ def get_container_engine():
         f"Looking for a supported container engine: {', '.join(supported_container_engines)}"
     )
     for container_engine in supported_container_engines:
-        if shutil.which(container_engine):
+        if is_command_available(container_engine):
             logging.info(f"Using '{container_engine}' as container engine")
             return container_engine
     logging.error(
