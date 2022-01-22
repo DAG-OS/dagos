@@ -25,6 +25,8 @@ ansible = ["ansible", "ansible-runner"]
 black = "^21.12b0"
 pre-commit = "^2.17.0"
 pytest = "^6.2"
+pytest-cov = "^3.0.0"
+pytest-mock = "^3.6.1"
 tox-conda = "^0.9.1"
 tox-poetry = "^0.4.1"
 

@@ -1,8 +1,9 @@
 node_modules
 build
 .idea
-.tox
 
 # Python
 dist
 __pycache__
+.tox
+.coverage*
