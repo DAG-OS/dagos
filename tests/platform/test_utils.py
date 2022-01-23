@@ -16,17 +16,15 @@ def does_not_raise():
 
 
 @pytest.mark.parametrize(
-    "system,expectation",
+    "system,actual_system,expectation",
     [
-        ("Windows", True),
-        ("Linux", False),
-        ("", False),
-        (None, False),
+        (OperatingSystem.WINDOWS, "Windows", True),
+        (OperatingSystem.LINUX, "Windows", False),
     ],
 )
-def test_is_windows(mocker, system, expectation):
-    mocker.patch("platform.system", return_value=system)
-    assert utils.is_windows() == expectation
+def test_is_operating_system(mocker, system, actual_system, expectation):
+    mocker.patch("platform.system", return_value=actual_system)
+    assert utils.is_operating_system(system) == expectation
 
 
 @pytest.mark.parametrize(
@@ -79,3 +77,17 @@ def test_is_command_available(input, expected):
 def test_assert_command_available(input, expectation):
     with expectation:
         utils.assert_command_available(input)
+
+
+@pytest.mark.parametrize(
+    "system,effective_uid,expectation",
+    [
+        ("Linux", 0, True),
+        ("Linux", 1000, False),
+        ("Windows", 1234, False),
+    ],
+)
+def test_is_root(mocker, system, effective_uid, expectation):
+    mocker.patch("platform.system", return_value=system)
+    mocker.patch("os.geteuid", return_value=effective_uid)
+    assert utils.is_root() == expectation

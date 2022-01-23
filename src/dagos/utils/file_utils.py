@@ -17,12 +17,13 @@ def download_file(url: str) -> Path:
     logging.getLogger("urllib3").setLevel(logging.WARNING)
 
     logging.debug(f"Sending request to '{url}'")
+    # TODO: Sometimes the file name is only evident after following redirects ...
+    file_name = url.split("/")[-1]
+    path = Path(file_name)
     with requests.get(url, stream=True) as r:
-        path = Path(r.url.split("/")[-1])
         with console.status(f"Downloading '{path.name}' ...", spinner="material"):
             with path.open("wb") as f:
                 shutil.copyfileobj(r.raw, f)
 
     logging.debug(f"Successfully downloaded '{path.name}'")
-
     return path
