@@ -1,5 +1,6 @@
 {
     "recommendations": [
+        "alexkrechik.cucumberautocomplete",
         "asciidoctor.asciidoctor-vscode",
         "bungcip.better-toml",
         "errata-ai.vale-server",
@@ -14,5 +15,6 @@
         "systemticks.c4-dsl-extension",
         "timonwong.shellcheck",
         "valentjn.vscode-ltex",
+        "vtenentes.bdd",
     ]
 }
