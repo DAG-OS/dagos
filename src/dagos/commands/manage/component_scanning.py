@@ -27,6 +27,17 @@ class SoftwareComponent:
     def __init__(self, name: str) -> None:
         self.name = name
 
+    def validate(self) -> None:
+        """Check if the software component is valid.
+
+        Raises:
+            SoftwareComponentScanException: Raised if the component is invalid.
+        """
+        if not self.cli.exists():
+            raise SoftwareComponentScanException(
+                f"There is no CLI for '{self.name}' software component!"
+            )
+
 
 def scan_folder_for_component_files(folder: Path, component: SoftwareComponent) -> None:
     for component_file in folder.iterdir():
@@ -43,21 +54,13 @@ def scan_folder_for_component_files(folder: Path, component: SoftwareComponent) 
     return component
 
 
-def validate_component(component: SoftwareComponent) -> None:
-    if not component.cli.exists():
-        raise SoftwareComponentScanException(
-            f"Failed to find CLI for '{component.name}' software component!"
-        )
-
-
 def find_components() -> t.Dict[str, SoftwareComponent]:
     logging.trace(
         f"Looking for software components in {len(component_search_paths)} places"
     )
     components = {}
     for search_path in component_search_paths:
-        if not search_path.exists():
-            logging.trace(f"Component search path '{search_path}' does not exist")
+        if not is_valid_search_path(search_path):
             continue
 
         logging.trace(f"Looking for software components in '{search_path}'")
@@ -77,7 +80,7 @@ def find_components() -> t.Dict[str, SoftwareComponent]:
                     folder, component
                 )
 
-    validate_component(component)
+    component.validate()
     return components
 
 
@@ -87,8 +90,7 @@ def find_component(name: str) -> SoftwareComponent:
     )
     component = SoftwareComponent(name)
     for search_path in component_search_paths:
-        if not search_path.exists():
-            logging.trace(f"Component search path '{search_path}' does not exist")
+        if not is_valid_search_path(search_path):
             continue
 
         for folder in search_path.iterdir():
@@ -96,5 +98,12 @@ def find_component(name: str) -> SoftwareComponent:
                 logging.trace(f"Found '{name}' software component at '{folder}'")
                 component = scan_folder_for_component_files(folder, component)
 
-    validate_component(component)
+    component.validate()
     return component
+
+
+def is_valid_search_path(search_path: Path) -> bool:
+    if not search_path.exists():
+        logging.trace(f"Component search path '{search_path}' does not exist")
+        return False
+    return True
