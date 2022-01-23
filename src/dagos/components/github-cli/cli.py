@@ -1,7 +1,5 @@
 import logging
-import os
 import subprocess
-import tarfile
 from io import StringIO
 from pathlib import Path
 
@@ -9,7 +7,6 @@ import click
 
 import dagos.platform.utils as platform_utils
 import dagos.utils.file_utils as file_utils
-from dagos.console import console
 from dagos.platform.domain import OperatingSystem
 
 platform_utils.assert_operating_system([OperatingSystem.LINUX])
@@ -66,35 +63,8 @@ def install(ctx: click.Context):
     # TODO: How to handle installation in root protected folders?
     install_dir = Path("/opt/dagos/managed/github-cli")
 
-    extract_tar_archive(release_archive, install_dir)
+    file_utils.extract_tar_archive(release_archive, install_dir, strip_root_folder=True)
     github_cli = install_dir / "bin" / "gh"
     # TODO: Generalize and allow configuration?
     usr_local_bin = Path("/usr/local/bin")
-    add_executable_to_path(github_cli, usr_local_bin)
-
-
-def extract_tar_archive(archive, install_dir):
-    logging.debug("Untar downloaded archive")
-    with console.status(
-        f"Extracting archive to '{install_dir.name}' ...", spinner="material"
-    ):
-        with tarfile.open(archive) as tar:
-            for member in tar.getmembers():
-                member.name = member.name.partition("/")[2]
-                tar.extract(member, install_dir)
-
-
-def add_executable_to_path(executable: Path, dir_on_path: Path, exists_ok: bool = True):
-    symlink_target = dir_on_path / executable.name
-    if symlink_target.exists():
-        if exists_ok:
-            logging.trace(
-                f"Replacing existing '{executable.name}' symlink in '{symlink_target}'"
-            )
-            symlink_target.unlink()
-        else:
-            logging.error(
-                f"A '{executable.name}' executable is already in '{symlink_target}'..."
-            )
-            exit(1)
-    os.symlink(executable, symlink_target)
+    file_utils.add_executable_to_path(github_cli, usr_local_bin)
