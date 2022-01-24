@@ -18,18 +18,20 @@ rich = "^11.0.0"
 ansible = {version = "^4.10.0", optional = true}
 ansible-runner = {version = "^2.1.1", optional = true}
 
-[tool.poetry.extras]
-ansible = ["ansible", "ansible-runner"]
-
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
 pre-commit = "^2.17.0"
 pytest = "^6.2"
+pytest-bdd = "^5.0.0"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
-tox-conda = "^0.9.1"
 tox-poetry = "^0.4.1"
-pytest-bdd = "^5.0.0"
+
+tox-conda = {version = "^0.9.1", optional = true}
+
+[tool.poetry.extras]
+ansible = ["ansible", "ansible-runner"]
+conda = ["tox-conda"]
 
 [tool.black]
 # "You should include all Python versions that you want your code to run under."

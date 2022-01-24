@@ -1,12 +1,16 @@
+@integration
 Feature: Using custom software components
 
-Scenario: Adding a custom software component to the DAG-OS CLI
-    Given I have a custom software component called "test"
+Scenario: Adding a minimal software component
+    Given I have following YAML:
+        name: "vale"
+        action: "install"
+        via: "github"
+        repository: "https://github.com/errata-ai/vale"
+        pattern: "vale*Linux_64*.tar.gz"
 
-    When I store it in the search path
-    And call "dagos manage test --help"
+    When I store this YAML at "/opt/dagos/components/vale"
+    And call "dagos -vv manage vale install"
+    #OR call "dagos install vale"?
 
-    Then I should see the "test" help message
-
-#Scenario: Create custom software component
-#Scenario: Configure custom software component
+    Then Vale should be installed

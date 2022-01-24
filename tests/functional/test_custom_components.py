@@ -1,39 +1,37 @@
 """Using custom software components feature tests."""
 
+import subprocess
+from pathlib import Path
+
 from pytest_bdd import given, parsers, scenario, then, when
 
 
-@scenario(
-    "custom_components.feature", "Adding a custom software component to the DAG-OS CLI"
-)
-def test_adding_a_custom_software_component_to_the_dagos_cli():
-    """Adding a custom software component to the DAG-OS CLI."""
-    pass
+@scenario("custom_components.feature", "Adding a minimal software component")
+def test_adding_a_minimal_software_component():
+    """Adding a minimal software component."""
 
 
-@given(
-    parsers.parse('I have a custom software component called "{component:s}"'),
-    target_fixture="component",
-)
-def i_have_a_custom_software_component_called_test(component_name):
-    """I have a custom software component called "test"."""
-    print(component_name)
-    return component_name
+@given(parsers.parse("I have following YAML:\n{yaml}"), target_fixture="i_have_yaml")
+def i_have_yaml(yaml):
+    """I have a YAML based software component"""
+    return yaml
 
 
-@when("I store it in the search path")
-def i_store_it_in_the_search_path(component):
-    """I store it in the search path."""
-    raise NotImplementedError
+@when(parsers.parse('I store this YAML at "{path}"'))
+def i_store_this_yaml_in_a_software_component_search_path(i_have_yaml, path):
+    """I store this YAML in a software component search path."""
+    file = Path(path)
+    file.parent.mkdir(parents=True)
+    file.write_text(i_have_yaml)
 
 
-@when('call "dagos manage test --help"')
-def call_dagos_manage_test_help():
-    """call "dagos manage test --help"."""
-    raise NotImplementedError
+@when(parsers.parse('call "{dagos_command}"'))
+def call_dagos_manage_vale_install(dagos_command):
+    """call dagos to install component."""
+    subprocess.check_call(dagos_command, shell=True)
 
 
-@then('I should see the "test" help message')
-def i_should_see_the_test_help_message():
-    """I should see the "test" help message."""
-    raise NotImplementedError
+@then("DAG-OS should install my software component")
+def dagos_should_install_my_software_component():
+    """DAG-OS should install my software component."""
+    subprocess.check_call(["vale", "--version"])
