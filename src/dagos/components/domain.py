@@ -8,8 +8,8 @@ class SoftwareComponent:
     """A representation of a software component."""
 
     name: str
-    cli: None | Path
-    config: None | Path
+    cli: t.Optional[Path]
+    config: t.Optional[Path]
     actions: t.List[Path] = []
 
     def __init__(self, name: str) -> None:
@@ -21,7 +21,7 @@ class SoftwareComponent:
         Raises:
             SoftwareComponentScanException: Raised if the component is invalid.
         """
-        if not self.cli.exists() and len(self.actions) == 0:
+        if self.cli == None or not self.cli.exists() and len(self.actions) == 0:
             raise SoftwareComponentScanException(
-                f"There is no CLI for '{self.name}' software component!"
+                f"{self.name}: Invalid! Either there is no CLI or no actions!"
             )

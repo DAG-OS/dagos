@@ -5,7 +5,7 @@ import click
 from click.core import Command, Context
 
 from dagos.components.scanning import component_scanner
-from dagos.platform.exceptions import UnsupportedOperatingSystem
+from dagos.platform.exceptions import UnsupportedPlatformException
 
 
 class ManageCLI(click.MultiCommand):
@@ -31,14 +31,17 @@ class ManageCLI(click.MultiCommand):
         fn = component.cli
         with open(fn) as f:
             try:
-                code = compile(f.read(), fn, "exec")
-                eval(code, ns, ns)
-            except ModuleNotFoundError:
-                logging.debug(
-                    f"Required dependencies for '{cmd_name}' software component are not installed"
-                )
-                return None
-            except UnsupportedOperatingSystem as e:
+                try:
+                    code = compile(f.read(), fn, "exec")
+                    eval(code, ns, ns)
+                except ModuleNotFoundError as e:
+                    if "ansible" in e.msg:
+                        raise UnsupportedPlatformException(
+                            "Install DAG-OS 'ansible' extras!"
+                        )
+                    logging.trace(f"Unhandled ModuleNotFoundError!")
+                    raise UnsupportedPlatformException(e)
+            except UnsupportedPlatformException as e:
                 logging.debug(f"Disabling '{cmd_name}' software component: {e}")
                 return None
         return ns["cli"]

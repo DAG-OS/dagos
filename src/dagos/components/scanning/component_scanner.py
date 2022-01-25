@@ -11,7 +11,7 @@ component_search_paths = [
     # system (linux)
     Path("/opt/dagos/components"),
     # dagos
-    Path(__file__).parent.parent.parent / "components",
+    Path(__file__).parent.parent.parent / "components" / "common",
 ]
 
 
