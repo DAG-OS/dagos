@@ -23,7 +23,7 @@ jobs:
         uses: abatilo/actions-poetry@v2.1.4
 
       - name: Install dependencies.
-        run: poetry install -E conda
+        run: poetry install
 
       - name: Run Tox.
         run: poetry run tox

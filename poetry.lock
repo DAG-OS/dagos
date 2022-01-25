@@ -677,7 +677,7 @@ name = "tox-conda"
 version = "0.9.1"
 description = "tox plugin that provides integration with conda"
 category = "dev"
-optional = true
+optional = false
 python-versions = ">=3.5"
 
 [package.dependencies]
@@ -761,12 +761,11 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 
 [extras]
 ansible = ["ansible", "ansible-runner"]
-conda = []
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "1ff99d298457619d9557167aeebb69ad0fa65fe7b4132d2a2570ba178a3c8684"
+content-hash = "9440a1e086d96a5fe91ee2e880b2ec7dcd0a57f791ba2745df6c2d1daeaba37c"
 
 [metadata.files]
 ansible = [
