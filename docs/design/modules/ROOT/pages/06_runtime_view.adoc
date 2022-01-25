@@ -67,7 +67,9 @@ dagos -> components: create list of
 loop for each search path
     dagos -> fs: does search path exist?
 
-    alt search path exists
+    alt search path does not exist
+        dagos -> dagos: ignore search path
+    else search path exists
         dagos -> fs ++: get folders in search path
         return folders
         loop for each folder in search path
@@ -88,8 +90,6 @@ loop for each search path
                 end
             end
         end
-    else search path does not exist
-        dagos -> dagos: ignore search path
     end
 
     dagos -> components ++: check validity
