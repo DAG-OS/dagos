@@ -4,15 +4,14 @@ import typing as t
 import click
 from click.core import Command, Context
 
+from dagos.components.scanning import component_scanner
 from dagos.platform.exceptions import UnsupportedOperatingSystem
-
-from .component_scanning import find_component, find_components
 
 
 class ManageCLI(click.MultiCommand):
     def list_commands(self, ctx: Context) -> t.List[str]:
         logging.trace("Listing 'manage' commands")
-        ctx.obj = find_components()
+        ctx.obj = component_scanner.find_components()
         commands = []
         for name in sorted(ctx.obj):
             cli = ctx.obj[name].cli
@@ -24,7 +23,7 @@ class ManageCLI(click.MultiCommand):
     def get_command(self, ctx: Context, cmd_name: str) -> t.Optional[Command]:
         logging.trace(f"Getting command '{cmd_name}'")
         if ctx.obj is None:
-            ctx.obj = find_component(cmd_name)
+            ctx.obj = component_scanner.find_component(cmd_name)
             component = ctx.obj
         else:
             component = ctx.obj[cmd_name]

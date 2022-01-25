@@ -5,13 +5,13 @@ from pathlib import Path
 
 import click
 
-from dagos.commands.manage.component_scanning import SoftwareComponent
+import dagos.platform.utils as platform_utils
+from dagos.components.domain import SoftwareComponent
 from dagos.console import console
-from dagos.platform.utils import assert_command_available, assert_windows
 from dagos.utils import powershell_utils
 
-assert_windows()
-assert_command_available("choco")
+platform_utils.assert_windows()
+platform_utils.assert_command_available("choco")
 
 
 @click.group(name="vcxsrv", chain=True)

@@ -2,11 +2,11 @@ import logging
 
 import click
 
-from dagos.commands.manage.component_scanning import SoftwareComponent
-from dagos.platform.utils import assert_windows
+import dagos.platform.utils as platform_utils
+from dagos.components.domain import SoftwareComponent
 from dagos.utils import powershell_utils
 
-assert_windows()
+platform_utils.assert_windows()
 
 
 @click.group(name="chocolatey", chain=True)

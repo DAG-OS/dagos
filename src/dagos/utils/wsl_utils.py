@@ -2,8 +2,8 @@ import logging
 import subprocess
 from dataclasses import dataclass
 
+import dagos.platform.utils as platform_utils
 from dagos.console import console
-from dagos.platform.utils import assert_windows, is_command_available
 
 
 @dataclass
@@ -76,7 +76,7 @@ def distro_exists(name):
 
 
 def assert_wsl_is_installed():
-    assert_windows()
-    if not is_command_available("wsl"):
+    platform_utils.assert_windows()
+    if not platform_utils.is_command_available("wsl"):
         logging.error("WSL must be installed but could not be found!")
         exit(1)

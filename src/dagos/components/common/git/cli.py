@@ -5,7 +5,7 @@ import ansible_runner
 import click
 import yaml
 
-from dagos.commands.manage.component_scanning import SoftwareComponent
+from dagos.components.domain import SoftwareComponent
 
 inventory = "localhost ansible_connection=local"
 roles_path = Path.home() / ".ansible" / "roles"
