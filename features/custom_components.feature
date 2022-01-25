@@ -9,7 +9,7 @@ Scenario: Adding a minimal software component
         repository: "https://github.com/errata-ai/vale"
         pattern: "vale*Linux_64*.tar.gz"
 
-    When I store this YAML at "/opt/dagos/components/vale"
+    When I store this YAML at "/opt/dagos/components/vale/install.yml"
     And call "dagos -vv manage vale install"
     #OR call "dagos install vale"?
 
