@@ -17,12 +17,13 @@ def i_have_yaml(yaml):
     return yaml
 
 
-@when(parsers.parse('I store this YAML at "{path}"'))
+@when(parsers.parse('I store this YAML at "{path}"'), target_fixture="path")
 def i_store_this_yaml_in_a_software_component_search_path(i_have_yaml, path):
     """I store this YAML in a software component search path."""
     file = Path(path)
     file.parent.mkdir(parents=True)
     file.write_text(i_have_yaml)
+    return file
 
 
 @when(parsers.parse('call "{dagos_command}"'))
@@ -32,6 +33,8 @@ def call_dagos_manage_vale_install(dagos_command):
 
 
 @then("DAG-OS should install my software component")
-def dagos_should_install_my_software_component():
+def dagos_should_install_my_software_component(path: Path):
     """DAG-OS should install my software component."""
     subprocess.check_call(["vale", "--version"])
+    path.unlink()
+    path.parent.rmdir()

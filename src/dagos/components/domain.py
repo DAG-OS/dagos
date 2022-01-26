@@ -21,7 +21,10 @@ class SoftwareComponent:
         Raises:
             SoftwareComponentScanException: Raised if the component is invalid.
         """
-        if self.cli == None or not self.cli.exists() and len(self.actions) == 0:
+        cli_is_valid = True if hasattr(self, "cli") and self.cli.exists() else False
+        has_actions = True if len(self.actions) > 0 else False
+
+        if not cli_is_valid and not has_actions:
             raise SoftwareComponentScanException(
-                f"{self.name}: Invalid! Either there is no CLI or no actions!"
+                f"{self.name}: There is neither a valid CLI nor actions!"
             )
