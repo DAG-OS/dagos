@@ -2,10 +2,12 @@ import platform
 import typing as t
 from io import StringIO
 
+from dagos.exceptions import DagosException
+
 from .domain import OperatingSystem
 
 
-class UnsupportedPlatformException(Exception):
+class UnsupportedPlatformException(DagosException):
     """The current platform is unsupported."""
 
 
