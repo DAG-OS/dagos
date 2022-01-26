@@ -1,8 +1,11 @@
 {
     "asciidoc.use_kroki": true,
+    "c4.diagram.plantuml.enabled": true,
+    "files.exclude": {
+        "**/__pycache__": true
+    },
     "vale.core.useCLI": true,
     "vale.valeCLI.config": "${workspaceFolder}/.vale.ini",
-    "c4.diagram.plantuml.enabled": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.python",
         "editor.formatOnSave": true,
