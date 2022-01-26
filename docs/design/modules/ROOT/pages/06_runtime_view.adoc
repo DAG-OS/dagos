@@ -5,14 +5,15 @@
 [role="arc42help"]
 ****
 .Contents
-The runtime view describes concrete behavior and interactions of the system’s building blocks in form of scenarios from the following areas:
+The runtime view describes concrete behavior and interactions of the system's building blocks in form of scenarios from the following areas:
 
 * important use cases or features: how do building blocks execute them?
 * interactions at critical external interfaces: how do building blocks cooperate with users and neighboring systems?
 * operation and administration: launch, start-up, stop
 * error and exception scenarios
 
-Remark: The main criterion for the choice of possible scenarios (sequences, workflows) is their *architectural relevance*. It is *not* important to describe a large number of scenarios. You should rather document a representative selection.
+Remark: The main criterion for the choice of possible scenarios (sequences, workflows) is their *architectural relevance*.
+It's *not* important to describe a large number of scenarios. You should rather document a representative selection.
 
 .Motivation
 You should understand how (instances of) building blocks of your system perform their job and communicate at runtime.
@@ -27,18 +28,78 @@ Choose one of many notations for describing scenarios, e.g.
 * BPMN or EPCs (event process chains)
 * state machines
 * ...
-
 ****
 
-== <Runtime Scenario 1>
+== Software Component Scanning
 
+DAG-OS aims to achive its quality goals of customizability and extensibility by providing the means to configure existing software components or provide entirely new ones at runtime.
+Dedicated folders containing one or more files constitue individual software components.
+The folder's name defines the software component name.
 
-* _<insert runtime diagram or textual description of the scenario>_
-* _<insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.>_
+At runtime DAG-OS scans for software components in an ordered set of _search paths_.
+Each search path could contain a folder for the same component.
+If this is the case, DAG-OS combines the found files but ignores duplicates ones.
+That way it's possible to overwrite specific files of a software component by adding files in an earlier search path.
+DAG-OS uses the following list of search paths:
 
-== <Runtime Scenario 2>
+1. `~/.dagos/components`
+2. `/opt/dagos/components`
+3. `<python installation>/site-packages/dagos/components/common`
 
-== ...
+The following diagram depicts this process in more detail.
 
-== <Runtime Scenario n>
+// TODO: Extract and include image
+.Software component scanning at runtime
+[plantuml]
+....
+@startuml
+
+actor "User" as user
+
+database "Filesystem" as fs
+
+create participant "DAG-OS CLI" as dagos
+user -> dagos ++: dagos manage --help
+
+create collections "Software Components" as components
+dagos -> components: create list of
+
+loop for each search path
+    dagos -> fs: does search path exist?
+
+    alt search path exists
+        dagos -> fs ++: get folders in search path
+        return folders
+        loop for each folder in search path
+            alt folder name seen for first time
+                dagos -> components ++: add component
+            else component already exists
+                dagos -> components: get existing component
+            end
+            return component
+            dagos -> fs ++: get files in folder
+            return files
+            loop for each file in folder
+                alt file not yet seen for this component
+                    dagos -> components ++: add file to component
+                    return
+                else file already added
+                    dagos -> dagos: ignore file
+                end
+            end
+        end
+    else search path does not exist
+        dagos -> dagos: ignore search path
+    end
+
+    dagos -> components ++: check validity
+    return
+end
+
+return list found (valid) components
+
+destroy components
+destroy dagos
+
+@enduml
+....

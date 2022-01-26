@@ -3,6 +3,14 @@
 = Glossary
 
 [glossary]
+CLI::
+Command Line Interface.
+Click::
++
+[quote, 'https://click.palletsprojects.com/[Click documentation]']
+____
+Click is a Python package for creating beautiful command line interfaces in a composable way with as little code as necessary.
+____
 Environment::
 A collection of software components to provision as a unit.
 Software component::
