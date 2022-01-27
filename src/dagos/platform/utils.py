@@ -39,3 +39,8 @@ def is_root() -> bool:
     # TODO: Implement for other operating systems
     logging.error("Unable to determine if executing user has root privileges")
     return False
+
+
+def assert_root_privileges() -> None:
+    if not is_root():
+        raise UnsupportedPlatformException(f"This action requires root privileges!")

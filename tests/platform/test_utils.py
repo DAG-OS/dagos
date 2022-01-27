@@ -91,3 +91,18 @@ def test_is_root(mocker, system, effective_uid, expectation):
     mocker.patch("platform.system", return_value=system)
     mocker.patch("os.geteuid", return_value=effective_uid)
     assert utils.is_root() == expectation
+
+
+@pytest.mark.parametrize(
+    "system,effective_uid,expectation",
+    [
+        ("Linux", 0, does_not_raise()),
+        ("Linux", 1000, pytest.raises(UnsupportedPlatformException)),
+        ("Windows", 1234, pytest.raises(UnsupportedPlatformException)),
+    ],
+)
+def test_assert_root_privileges(mocker, system, effective_uid, expectation):
+    mocker.patch("platform.system", return_value=system)
+    mocker.patch("os.geteuid", return_value=effective_uid)
+    with expectation:
+        utils.assert_root_privileges()

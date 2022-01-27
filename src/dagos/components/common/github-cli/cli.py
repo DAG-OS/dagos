@@ -35,9 +35,7 @@ def install(ctx: click.Context):
 
     Requires sudo privileges and `curl` to be available.
     """
-    if not platform_utils.is_root():
-        logging.error("This command requires sudo privileges!")
-        exit(1)
+    platform_utils.assert_root_privileges()
 
     logging.debug("Retriving download link for latest release")
     command = StringIO()
