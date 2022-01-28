@@ -10,6 +10,11 @@ RUN apt update -y \
         python3-pip \
         sudo
 
+RUN curl -sSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh --output /tmp/miniconda-installer.sh \
+    && sh /tmp/miniconda-installer.sh -b -p $HOME/miniconda \
+    && ln -s $HOME/miniconda/bin/conda /usr/local/bin \
+    && rm /tmp/miniconda-installer.sh
+
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 - \
     && ln -s /root/.poetry/bin/poetry /usr/local/bin
 
