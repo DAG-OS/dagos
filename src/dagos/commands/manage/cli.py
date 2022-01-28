@@ -13,10 +13,10 @@ class ManageCLI(click.MultiCommand):
         logging.trace("Listing 'manage' commands")
         ctx.obj = component_scanner.find_components()
         commands = []
-        for name in sorted(ctx.obj):
-            cli = ctx.obj[name].cli
-            if cli.exists():
+        for name, component in ctx.obj.items():
+            if component.has_cli() or component.has_actions():
                 commands.append(name)
+
         commands.sort()
         return commands
 
@@ -27,24 +27,31 @@ class ManageCLI(click.MultiCommand):
             component = ctx.obj
         else:
             component = ctx.obj[cmd_name]
-        ns = {}
-        fn = component.cli
-        with open(fn) as f:
-            try:
+
+        if component.has_cli():
+            ns = {}
+            fn = component.cli
+            with open(fn) as f:
                 try:
-                    code = compile(f.read(), fn, "exec")
-                    eval(code, ns, ns)
-                except ModuleNotFoundError as e:
-                    if "ansible" in e.msg:
-                        raise UnsupportedPlatformException(
-                            "Install DAG-OS 'ansible' extras!"
-                        )
-                    logging.trace(f"Unhandled ModuleNotFoundError!")
-                    raise UnsupportedPlatformException(e)
-            except UnsupportedPlatformException as e:
-                logging.debug(f"Disabling '{cmd_name}' software component: {e}")
-                return None
-        return ns["cli"]
+                    try:
+                        code = compile(f.read(), fn, "exec")
+                        eval(code, ns, ns)
+                    except ModuleNotFoundError as e:
+                        if "ansible" in e.msg:
+                            raise UnsupportedPlatformException(
+                                "Install DAG-OS 'ansible' extras!"
+                            )
+                        logging.trace(f"Unhandled ModuleNotFoundError!")
+                        raise UnsupportedPlatformException(e)
+                except UnsupportedPlatformException as e:
+                    logging.debug(f"Disabling '{cmd_name}' software component: {e}")
+                    return None
+            return ns["cli"]
+        elif component.has_actions():
+            commands = []
+            for action in component.actions:
+                commands.append(action.get_click_command())
+            return click.Group(name=component.name, commands=commands)
 
 
 @click.command(cls=ManageCLI)
