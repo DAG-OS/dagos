@@ -42,7 +42,9 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--cov=dagos --cov-report=term-missing:skip-covered"
-bdd_features_base_dir = "features"
+required_plugins = [
+    "pytest-bdd",
+]
 markers = [
     "integration"
 ]
