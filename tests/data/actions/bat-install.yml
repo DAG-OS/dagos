@@ -1,0 +1,9 @@
+---
+name: "bat"
+action: "install"
+via: "github_cli"
+repository: "sharkdp/bat"
+pattern: "bat-*-x86_64-unknown-linux-gnu.tar.gz"
+install_dir: "/opt/bat"
+strip_root_folder: true
+binary: bat
