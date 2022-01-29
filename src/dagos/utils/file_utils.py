@@ -1,12 +1,16 @@
+import atexit
 import logging
 import os
 import shutil
 import tarfile
+import tempfile
+import zipfile
 from pathlib import Path
 
 import requests
 
 from dagos.console import console
+from dagos.exceptions import DagosException
 
 
 def download_file(url: str) -> Path:
@@ -37,7 +41,7 @@ def download_file(url: str) -> Path:
     return path
 
 
-def extract_tar_archive(
+def extract_archive(
     archive: Path, output_dir: Path, strip_root_folder: bool = False
 ) -> None:
     """Extract provided archive to provided output folder.
@@ -50,13 +54,35 @@ def extract_tar_archive(
     with console.status(
         f"Extracting '{archive.name}' to '{output_dir.name}' ...", spinner="material"
     ):
-        with tarfile.open(archive) as tar:
-            if strip_root_folder:
-                for member in tar.getmembers():
-                    member.name = member.name.partition("/")[2]
-                    tar.extract(member, output_dir)
-            else:
-                tar.extractall(output_dir)
+        if tarfile.is_tarfile(archive):
+            _extract_tar_archive(archive, output_dir, strip_root_folder)
+        elif zipfile.is_zipfile(archive):
+            _extract_zip_archive(archive, output_dir, strip_root_folder)
+        else:
+            raise DagosException(f"Unhandled archive type: {archive.name}")
+
+
+def _extract_tar_archive(
+    archive: Path, output_dir: Path, strip_root_folder: bool = False
+) -> None:
+
+    with tarfile.open(archive) as tar:
+        if strip_root_folder:
+            for member in tar.getmembers():
+                member.name = member.name.partition("/")[2]
+                tar.extract(member, output_dir)
+        else:
+            tar.extractall(output_dir)
+
+
+def _extract_zip_archive(
+    archive: Path, output_dir: Path, strip_root_folder: bool = False
+) -> None:
+    with zipfile.ZipFile(archive) as zip:
+        if strip_root_folder:
+            raise NotImplementedError()
+        else:
+            zip.extractall(output_dir)
 
 
 def add_executable_to_path(
@@ -82,3 +108,24 @@ def add_executable_to_path(
             )
             exit(1)
     os.symlink(executable, symlink_target)
+
+
+def create_temp_dir(remove_at_exit: bool = True) -> Path:
+    """Create a temporary directory.
+
+    Args:
+        remove_at_exit (bool, optional): If True, delete directory when
+            application exists. Defaults to True.
+
+    Returns:
+        Path: The path to the created directory.
+    """
+    temp_dir = Path(tempfile.mkdtemp())
+
+    def remove_temp_dir():
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+    if remove_at_exit:
+        atexit.register(remove_temp_dir)
+
+    return temp_dir

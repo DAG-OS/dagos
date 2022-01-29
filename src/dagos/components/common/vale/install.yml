@@ -6,3 +6,4 @@ repository: "https://github.com/errata-ai/vale"
 pattern: "vale*Linux_64*.tar.gz"
 # TODO: Resolve home dir in install_dir values
 install_dir: "/home/dev/software/vale"
+binary: "vale"

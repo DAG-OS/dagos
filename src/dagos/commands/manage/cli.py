@@ -28,6 +28,10 @@ class ManageCLI(click.MultiCommand):
         else:
             component = ctx.obj[cmd_name]
 
+        commands = []
+        if component.has_actions():
+            for action in component.actions:
+                commands.append(action.get_click_command())
         if component.has_cli():
             ns = {}
             fn = component.cli
@@ -46,11 +50,12 @@ class ManageCLI(click.MultiCommand):
                 except UnsupportedPlatformException as e:
                     logging.debug(f"Disabling '{cmd_name}' software component: {e}")
                     return None
-            return ns["cli"]
+            cli = ns["cli"]
+            if len(commands) > 0:
+                for command in commands:
+                    cli.add_command(command)
+            return cli
         elif component.has_actions():
-            commands = []
-            for action in component.actions:
-                commands.append(action.get_click_command())
             return click.Group(name=component.name, commands=commands)
 
 

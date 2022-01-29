@@ -1,0 +1,9 @@
+---
+name: "github_cli"
+action: "install"
+via: "github_cli"
+repository: "cli/cli"
+pattern: "gh*linux_amd64.tar.gz"
+install_dir: "/home/dev/software/github_cli"
+binary: "bin/gh"
+strip_root_folder: true

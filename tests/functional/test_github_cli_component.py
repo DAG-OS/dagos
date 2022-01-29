@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -33,12 +34,6 @@ def i_call_dagos_manage_github_install(dagos_command):
     subprocess.check_call(dagos_command, shell=True)
 
 
-@then("GitHub CLI should be installed")
-def github_cli_should_be_installed():
-    """GitHub CLI should be installed."""
-    subprocess.check_call(["gh", "--version"])
-
-
 @given(parsers.parse("I have following YAML:\n{yaml}"), target_fixture="i_have_yaml")
 def i_have_yaml(yaml):
     """I have a YAML based software component"""
@@ -50,7 +45,7 @@ def i_have_yaml(yaml):
 def i_store_this_yaml_in_a_software_component_search_path(i_have_yaml, path):
     """I store this YAML in a software component search path."""
     file = Path(path)
-    file.parent.mkdir(parents=True)
+    file.parent.mkdir(parents=True, exist_ok=True)
     file.write_text(i_have_yaml)
     return file
 
@@ -61,9 +56,7 @@ def call_dagos_manage_vale_install(dagos_command):
     subprocess.check_call(dagos_command, shell=True)
 
 
-@then("DAG-OS should install my software component")
-def dagos_should_install_my_software_component(path: Path):
+@then(parsers.parse('"{command}" should be installed'), target_fixture="command")
+def dagos_should_install_my_software_component(command):
     """DAG-OS should install my software component."""
-    path.unlink()
-    path.parent.rmdir()
-    subprocess.check_call(["vale", "--version"])
+    assert shutil.which(command) != None
