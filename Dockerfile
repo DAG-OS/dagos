@@ -3,8 +3,6 @@ FROM ubuntu:hirsute
 RUN apt update -y \
     && apt install -y --no-install-recommends \
         curl \
-        grep \
-        jq \
         podman \
         python3 \
         python3-pip \

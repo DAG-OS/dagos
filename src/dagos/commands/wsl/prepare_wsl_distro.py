@@ -78,11 +78,11 @@ def get_container_engine():
     exit(1)
 
 
-def start_container(container_engine, image):
+def start_container(container_engine, image, name="dagos-export"):
     logging.debug("Starting container from provided image")
     with console.status("Starting container...", spinner="material"):
         run_result = subprocess.run(
-            f"{container_engine} run -t {image} sh -c 'ls / > /dev/null'",
+            f"{container_engine} run -t --name={name} {image} sh -c 'ls / > /dev/null'",
             shell=True,
             stderr=subprocess.PIPE,
         )
