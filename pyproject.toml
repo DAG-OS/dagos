@@ -49,6 +49,12 @@ markers = [
     "integration"
 ]
 
+[tool.coverage.paths]
+source = [
+    "src/",
+    "/root/dagos/src",
+]
+
 [tool.poetry.scripts]
 dagos = "dagos.cli:dagos"
 
