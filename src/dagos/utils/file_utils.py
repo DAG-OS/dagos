@@ -9,7 +9,7 @@ from pathlib import Path
 
 import requests
 
-from dagos.console import console
+from dagos.console import spinner
 from dagos.exceptions import DagosException
 
 
@@ -33,11 +33,13 @@ def download_file(url: str) -> Path:
     file_name = url.split("/")[-1]
     path = Path(file_name)
     with requests.get(url, stream=True) as r:
-        with console.status(f"Downloading '{path.name}' ...", spinner="material"):
+        with spinner(
+            f"Downloading '{path.name}' ...",
+            f"Successfully downloaded '{path.name}'",
+            logging.DEBUG,
+        ):
             with path.open("wb") as f:
                 shutil.copyfileobj(r.raw, f)
-
-    logging.debug(f"Successfully downloaded '{path.name}'")
     return path
 
 
@@ -51,9 +53,7 @@ def extract_archive(
         output_dir (Path): The output folder.
         strip_root_folder (bool, optional): If True, strip the root folder within the archive. Defaults to False.
     """
-    with console.status(
-        f"Extracting '{archive.name}' to '{output_dir.name}' ...", spinner="material"
-    ):
+    with spinner(f"Extracting '{archive.name}' to '{output_dir.name}' ..."):
         if tarfile.is_tarfile(archive):
             _extract_tar_archive(archive, output_dir, strip_root_folder)
         elif zipfile.is_zipfile(archive):

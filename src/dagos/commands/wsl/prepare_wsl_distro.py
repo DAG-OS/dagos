@@ -6,7 +6,7 @@ import click
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 
 import dagos.platform.utils as platform_utils
-from dagos.console import console
+from dagos.console import spinner
 
 
 class ExportError(Exception):
@@ -42,12 +42,11 @@ def prepare_wsl_distro(image, container, output):
     image_name = re.sub("(:|/)", "_", image)
     archive = f"{output}/{image_name}.tar"
     logging.debug(f"Exporting '{container}' to '{archive}'")
-    with console.status("Exporting...", spinner="material"):
+    with spinner("Exporting...", "Successfully exported container"):
         subprocess.run(
             [container_engine, "export", "--output", archive, container],
             check=True,
         )
-    logging.info("Successfully exported container")
 
     # TODO: Package additional files together with exported tar file
 
@@ -80,7 +79,7 @@ def get_container_engine():
 
 def start_container(container_engine, image, name="dagos-export"):
     logging.debug("Starting container from provided image")
-    with console.status("Starting container...", spinner="material"):
+    with spinner("Starting container..."):
         run_result = subprocess.run(
             f"{container_engine} run -t --name={name} {image} sh -c 'ls / > /dev/null'",
             shell=True,

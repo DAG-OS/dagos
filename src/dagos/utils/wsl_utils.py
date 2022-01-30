@@ -3,7 +3,7 @@ import subprocess
 from dataclasses import dataclass
 
 import dagos.platform.utils as platform_utils
-from dagos.console import console
+from dagos.console import spinner
 
 
 @dataclass
@@ -52,7 +52,7 @@ def unregister_distro(name):
 
 def import_distro(name, install_location, archive, version):
     logging.info("Starting the WSL import")
-    with console.status("Importing...", spinner="material"):
+    with spinner("Importing..."):
         run_result = subprocess.run(
             [
                 "wsl",

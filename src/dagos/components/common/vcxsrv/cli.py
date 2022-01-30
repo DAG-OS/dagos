@@ -7,7 +7,7 @@ import click
 
 import dagos.platform.utils as platform_utils
 from dagos.components.domain import SoftwareComponent
-from dagos.console import console
+from dagos.console import spinner
 from dagos.utils import powershell_utils
 
 platform_utils.assert_windows()
@@ -34,7 +34,7 @@ def cli():
 )
 def install(attended: bool):
     """Install VcXsrv."""
-    with console.status("Installing VcXsrv ...", spinner="material"):
+    with spinner("Installing VcXsrv ..."):
         result = powershell_utils.run_as_admin("choco install vcxsrv --yes", attended)
     if result.returncode == 0:
         logging.info("Successfully finished installation")
