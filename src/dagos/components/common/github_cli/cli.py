@@ -12,7 +12,6 @@ def cli():
     Manage GitHub CLI.
 
     The GitHub CLI is useful for interacting with GitHub from the command line.
-    DAG-OS may use it for downloading software components hosted there.
     Project home: https://github.com/cli/cli
     """
     pass
