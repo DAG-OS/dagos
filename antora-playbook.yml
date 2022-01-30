@@ -1,5 +1,5 @@
 site:
-  title: DAGOS Documentation
+  title: DAG-OS Documentation
   url: https://dag-os.gitlab.io/dagos
   start_page: design::index.adoc
 content:
@@ -7,6 +7,9 @@ content:
     - url: ./
       start_paths:
         - docs/design
+asciidoc:
+  extensions:
+    - asciidoctor-kroki
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable

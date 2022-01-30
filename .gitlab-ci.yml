@@ -1,11 +1,12 @@
 image:
-  name: antora/antora:3.0.0
+  name: antora/antora:3.0.1
 pages:
   stage: deploy
   cache:
     paths:
       - .cache/
   script:
+    - npm install
     - antora --fetch --cache-dir .cache/antora --attribute page-pagination= --to-dir public antora-playbook.yml
   artifacts:
     paths:
