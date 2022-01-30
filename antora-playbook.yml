@@ -1,0 +1,12 @@
+site:
+  title: DAGOS Documentation
+  url: https://dag-os.gitlab.io/dagos
+  start_page: design::index.adoc
+content:
+  sources:
+    - url: ./
+      start_paths:
+        - docs/design
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
