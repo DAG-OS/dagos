@@ -65,11 +65,11 @@ create collections "Software Components" as components
 dagos -> components: create list of
 
 loop for each search path
-    dagos -> fs: does search path exist?
-
+    dagos -> fs ++: does search path exist?
     alt search path does not exist
-        dagos -> dagos: ignore search path
+        dagos <-- fs: no
     else search path exists
+        dagos <-- fs --: yes
         dagos -> fs ++: get folders in search path
         return folders
         loop for each folder in search path
