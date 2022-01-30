@@ -121,11 +121,6 @@ def create_temp_dir(remove_at_exit: bool = True) -> Path:
         Path: The path to the created directory.
     """
     temp_dir = Path(tempfile.mkdtemp())
-
-    def remove_temp_dir():
-        shutil.rmtree(temp_dir, ignore_errors=True)
-
     if remove_at_exit:
-        atexit.register(remove_temp_dir)
-
+        atexit.register(lambda: shutil.rmtree(temp_dir, ignore_errors=True))
     return temp_dir
