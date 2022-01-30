@@ -48,58 +48,8 @@ DAG-OS uses the following list of search paths:
 
 The following diagram depicts this process in more detail.
 
-// TODO: Extract and include image
 .Software component scanning at runtime
-[plantuml]
-....
-@startuml
-
-actor "User" as user
-
-database "Filesystem" as fs
-
-create participant "DAG-OS CLI" as dagos
-user -> dagos ++: dagos manage --help
-
-create collections "Software Components" as components
-dagos -> components: create list of
-
-loop for each search path
-    dagos -> fs ++: does search path exist?
-    alt search path does not exist
-        dagos <-- fs: no
-    else search path exists
-        dagos <-- fs --: yes
-        dagos -> fs ++: get folders in search path
-        return folders
-        loop for each folder in search path
-            alt folder name seen for first time
-                dagos -> components ++: add component
-            else component already exists
-                dagos -> components: get existing component
-            end
-            return component
-            dagos -> fs ++: get files in folder
-            return files
-            loop for each file in folder
-                alt file not yet seen for this component
-                    dagos -> components ++: add file to component
-                    return
-                else file already added
-                    dagos -> dagos: ignore file
-                end
-            end
-        end
-    end
-
-    dagos -> components ++: check validity
-    return
-end
-
-return list found (valid) components
-
-destroy components
-destroy dagos
-
-@enduml
-....
+[plantuml,svg]
+----
+include::example$software-component-scan-sequence.puml[]
+----
