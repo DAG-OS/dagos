@@ -2,7 +2,7 @@ import logging
 import typing as t
 from pathlib import Path
 
-from dagos.components.common.github_cli.actions import GitHubCliInstallAction
+from dagos.actions.github import GitHubInstallAction
 from dagos.components.domain import SoftwareComponent
 
 # TODO: Make this list configurable
@@ -30,9 +30,7 @@ def scan_folder_for_component_files(
             component.config = component_file
         elif component_file.name == "install.yml":
             logging.trace(f"{component.name}: Found action at '{component_file}'")
-            component.actions.append(
-                GitHubCliInstallAction.parse_action(component_file)
-            )
+            component.actions.append(GitHubInstallAction.parse_action(component_file))
     return component
 
 

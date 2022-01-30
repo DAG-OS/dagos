@@ -13,8 +13,8 @@ from dagos.exceptions import DagosException
 from dagos.utils import file_utils
 
 
-class GitHubCliInstallAction(Action):
-    """Install a software component from GitHub using the GitHub CLI."""
+class GitHubInstallAction(Action):
+    """Install a software component via a GitHub release."""
 
     name: str
     repository: str
@@ -33,7 +33,7 @@ class GitHubCliInstallAction(Action):
         except yaml.YAMLError as e:
             raise SoftwareComponentScanException("YAML is invalid", e)
 
-        action = GitHubCliInstallAction()
+        action = GitHubInstallAction()
         # TODO: Add error handling
         action.name = yaml_content["name"]
         action.repository = yaml_content["repository"]
@@ -91,24 +91,21 @@ class GitHubCliInstallAction(Action):
         return matching_assets[0]
 
     def execute_action(self) -> None:
+        # TODO: Check if root privileges are required
         logging.debug("Querying GitHub for latest release")
-        url = GitHubCliInstallAction._parse_repository_url(self.repository)
+        url = GitHubInstallAction._parse_repository_url(self.repository)
         response = requests.get(url)
         release_json = response.json()
 
         logging.debug("Parsing API response for matching asset")
-        asset = GitHubCliInstallAction._parse_matching_asset(release_json, self.pattern)
+        asset = GitHubInstallAction._parse_matching_asset(release_json, self.pattern)
 
         # TODO: Print how long ago it was published (look at timeago?)
         logging.info(
             f"Downloading release {release_json['name']} published at {release_json['published_at']}"
         )
         archive = file_utils.download_file(asset["browser_download_url"])
-
-        def remove_archive():
-            archive.unlink()
-
-        atexit.register(remove_archive)
+        atexit.register(lambda: archive.unlink())
 
         # TODO: Is there a need to check if its an archive?
         # TODO: Generalize to extract also zip archives
