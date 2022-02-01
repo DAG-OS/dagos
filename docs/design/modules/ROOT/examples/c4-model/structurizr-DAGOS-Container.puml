@@ -1,0 +1,29 @@
+@startuml
+title DAG-OS - Containers
+
+top to bottom direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+System_Ext(FileSystem, "File System", "The local file system", $tags="Element+Software System")
+Person_Ext(EnvironmentUser, "Environment User", "", $tags="Element+Person")
+System_Ext(Ansible, "Ansible", "Radically simple IT automation", $tags="Element+Software System")
+Person_Ext(EnvironmentCreator, "Environment Creator", "", $tags="Element+Person")
+System_Ext(WSL, "WSL", "A GNU/Linux environment run directly on Windows", $tags="Element+Software System")
+System_Ext(ContainerEngine, "Container Engine", "OCI-compliant container engine, such as Docker or Podman", $tags="Element+Software System")
+
+System_Boundary("DAGOS_boundary", "DAG-OS") {
+  Container(DAGOS.CommandLineInterface, "Command Line Interface", "Python", "Provide an interface for managing software components and environments", $tags="Element+Container")
+}
+
+Rel_D(EnvironmentCreator, DAGOS.CommandLineInterface, "Prepare WSL distros", $tags="Relationship")
+Rel_D(EnvironmentUser, DAGOS.CommandLineInterface, "Import prepared WSL distros", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface, ContainerEngine, "Export containers or images", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface, WSL, "Configure instances or import distros", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface, Ansible, "Wrap installed roles", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface, FileSystem, "Scan for software components and environments", $tags="Relationship")
+
+SHOW_LEGEND()
+@enduml

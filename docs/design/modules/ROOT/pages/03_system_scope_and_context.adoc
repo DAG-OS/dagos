@@ -1,7 +1,28 @@
 [[section-system-scope-and-context]]
 = System Scope and Context
 
+The following link:https://c4model.com/[C4 model] diagrams outline the high-level scope and context of the DAG-OS system.
+These diagrams shows system on different levels of detail along with its users and neighboring systems.
 
+.DAG-OS system context diagram
+[plantuml,png]
+----
+include::example$c4-model/structurizr-DAGOS-SystemContext.puml[]
+----
+
+.DAG-OS container diagram
+[plantuml,png]
+----
+include::example$c4-model/structurizr-DAGOS-Container.puml[]
+----
+
+.DAG-OS CLI component diagram
+[plantuml,png]
+----
+include::example$c4-model/structurizr-DAGOS-CommandLineInterface-Component.puml[]
+----
+
+////
 [role="arc42help"]
 ****
 .Contents
@@ -19,7 +40,6 @@ Various options:
 * Context diagrams
 * Lists of communication partners and their interfaces.
 ****
-
 
 == Business Context
 
@@ -64,3 +84,4 @@ together with a mapping table showing the relationships between channels and inp
 **<optionally: Explanation of technical interfaces>**
 
 **<Mapping Input/Output to Channels>**
+////

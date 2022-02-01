@@ -2,18 +2,20 @@ workspace {
 
     !identifiers hierarchical
 
+    !constant CLICK_COMMAND "Click Command"
+
     model {
         user = person "Environment User"
         creator = person "Environment Creator"
 
         enterprise DAG-OS {
-            dagos = softwareSystem "DAG-OS" "A tool for managing software environments" {
+            dagos = softwareSystem "DAG-OS" "A tool for managing software components and environments" {
                 cli = container "Command Line Interface" "Provide an interface for managing software components and environments" "Python" {
                     group "CLI commands" {
-                        wsl = component "wsl" "Configure WSL instances or import prepared software environments as a WSL distro"
-                        manage = component "manage" "Manage a dynamic set of software components, such as Git, LaTeX, or Zsh"
+                        wsl = component "wsl" "Configure WSL instances or import prepared software environments as a WSL distro" "${CLICK_COMMAND}"
+                        manage = component "manage" "Manage a dynamic set of software components, such as Git, LaTeX, or Zsh" "${CLICK_COMMAND}"
                     }
-                    scanner = component "Component Scanner" "Scan the system for software components"
+                    scanner = component "Component Scanner" "Scan the system for software components" "Python Module"
                 }
             }
         }
@@ -22,6 +24,8 @@ workspace {
             docker = container "Docker"
             podman = container "Podman"
         }
+
+        fs = softwareSystem "File System" "The local file system"
 
         ansible = softwareSystem "Ansible" "Radically simple IT automation"
         bash = softwareSystem "Bash" "An sh-compatible command language interpreter"
@@ -41,6 +45,7 @@ workspace {
         dagos.cli.manage -> dagos.cli.scanner "Find available software components"
 
         dagos.cli.scanner -> ansible "Wrap installed roles"
+        dagos.cli.scanner -> fs "Scan for software components and environments"
     }
 
     views {

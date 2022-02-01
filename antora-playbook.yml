@@ -8,6 +8,8 @@ content:
       start_paths:
         - docs/design
 asciidoc:
+  attributes:
+    kroki-fetch-diagram: true
   extensions:
     - asciidoctor-kroki
 ui:

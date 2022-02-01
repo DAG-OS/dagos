@@ -49,7 +49,7 @@ DAG-OS uses the following list of search paths:
 The following diagram depicts this process in more detail.
 
 .Software component scanning at runtime
-[plantuml,svg]
+[plantuml,png]
 ----
 include::example$software-component-scan-sequence.puml[]
 ----

@@ -32,8 +32,8 @@ Keep these excerpts as short as possible. Balance readability of this document w
 ****
 ////
 
-The main goal of this system is to provide development teams with the tools to create shared environments for various purposes.
-Such purposes may include creating shared development  environments, staging environments, or deployment environments.
+The main goal of this system is to provide individuals or development teams with the tools to create shared software environments for various purposes.
+Such purposes may include creating shared development environments, staging environments, or deployment environments.
 
 The system provides a framework for provisioning software components on supported operating system baselines to achieve this goal.
 It may include common software components to bootstrap the environment definition process.
@@ -45,7 +45,10 @@ It may include common software components to bootstrap the environment definitio
 |ID|Description
 
 |REQ-0001
-|If at all possible, any actions the system takes should be idempotent.
+|If at all possible, any actions the system takes should be *idempotent*.
+
+|REQ-0002
+|The system should log any actions it takes in a dedicated place to support basic auditing and debugging purposes.
 |===
 ////
 
@@ -78,8 +81,8 @@ The following architecture quality goals are major influences for the design of 
 a|It's clear
 
 * where things belong,
-* how to configure things, and
-* how to use things.
+* how to configure them, and
+* how to use them.
 
 |Customizability
 |Every user of the system will have their own requirements and preferences.
@@ -148,7 +151,7 @@ a|
 |Environment user
 a|
 * Using a shared environment is simple.
-** After choosing an environment and downloading it, deploying it to the chosen context, e.g., a VM or WSL, is (semi)-automatic.
+** After choosing an environment and downloading it deploying it to the chosen context, e.g., a VM or WSL, is (semi)-automatic.
 ** They require no further setup.
 * It's possible to deploy them in various contexts, e.g.,
 ** a bare metal installation of an operating system,

@@ -1,0 +1,28 @@
+@startuml
+title DAG-OS - System Context
+
+top to bottom direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Enterprise_Boundary(enterprise, "DAG-OS") {
+  System(DAGOS, "DAG-OS", "A tool for managing software components and environments", $tags="Element+Software System")
+}
+
+Person_Ext(EnvironmentUser, "Environment User", "", $tags="Element+Person")
+System_Ext(FileSystem, "File System", "The local file system", $tags="Element+Software System")
+System_Ext(Ansible, "Ansible", "Radically simple IT automation", $tags="Element+Software System")
+System_Ext(WSL, "WSL", "A GNU/Linux environment run directly on Windows", $tags="Element+Software System")
+Person_Ext(EnvironmentCreator, "Environment Creator", "", $tags="Element+Person")
+System_Ext(ContainerEngine, "Container Engine", "OCI-compliant container engine, such as Docker or Podman", $tags="Element+Software System")
+
+Rel_D(EnvironmentCreator, DAGOS, "Prepare WSL distros", $tags="Relationship")
+Rel_D(EnvironmentUser, DAGOS, "Import prepared WSL distros", $tags="Relationship")
+Rel_D(DAGOS, ContainerEngine, "Export containers or images", $tags="Relationship")
+Rel_D(DAGOS, WSL, "Configure instances or import distros", $tags="Relationship")
+Rel_D(DAGOS, Ansible, "Wrap installed roles", $tags="Relationship")
+Rel_D(DAGOS, FileSystem, "Scan for software components and environments", $tags="Relationship")
+
+SHOW_LEGEND()
+@enduml

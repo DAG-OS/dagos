@@ -1,0 +1,36 @@
+@startuml
+title DAG-OS - Command Line Interface - Components
+
+top to bottom direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+System_Ext(FileSystem, "File System", "The local file system", $tags="Element+Software System")
+System_Ext(Ansible, "Ansible", "Radically simple IT automation", $tags="Element+Software System")
+Person_Ext(EnvironmentUser, "Environment User", "", $tags="Element+Person")
+Person_Ext(EnvironmentCreator, "Environment Creator", "", $tags="Element+Person")
+System_Ext(WSL, "WSL", "A GNU/Linux environment run directly on Windows", $tags="Element+Software System")
+System_Ext(ContainerEngine, "Container Engine", "OCI-compliant container engine, such as Docker or Podman", $tags="Element+Software System")
+
+Container_Boundary("DAGOS.CommandLineInterface_boundary", "Command Line Interface") {
+  Boundary(group_0, "CLI commands") {
+    Component(DAGOS.CommandLineInterface.wsl, "wsl", "Click Command", "Configure WSL instances or import prepared software environments as a WSL distro", $tags="Element+Component")
+    Component(DAGOS.CommandLineInterface.manage, "manage", "Click Command", "Manage a dynamic set of software components, such as Git, LaTeX, or Zsh", $tags="Element+Component")
+  }
+
+  Component(DAGOS.CommandLineInterface.ComponentScanner, "Component Scanner", "Python Module", "Scan the system for software components", $tags="Element+Component")
+}
+
+Rel_D(EnvironmentCreator, DAGOS.CommandLineInterface.wsl, "Prepare WSL distros", $tags="Relationship")
+Rel_D(EnvironmentUser, DAGOS.CommandLineInterface.wsl, "Import prepared WSL distros", $tags="Relationship")
+Rel_D(EnvironmentUser, DAGOS.CommandLineInterface.manage, "Manage individual software components", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface.wsl, ContainerEngine, "Export containers or images", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface.wsl, WSL, "Configure instances or import distros", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface.manage, DAGOS.CommandLineInterface.ComponentScanner, "Find available software components", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface.ComponentScanner, Ansible, "Wrap installed roles", $tags="Relationship")
+Rel_D(DAGOS.CommandLineInterface.ComponentScanner, FileSystem, "Scan for software components and environments", $tags="Relationship")
+
+SHOW_LEGEND()
+@enduml
