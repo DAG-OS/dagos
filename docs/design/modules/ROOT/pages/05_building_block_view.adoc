@@ -1,8 +1,10 @@
 [[section-building-block-view]]
-
-
 = Building Block View
 
+This section provides a view of the individual building blocks that make up the DAG-OS system.
+It starts with an overview of the system and then zooms into individual parts later on.
+
+////
 [role="arc42help"]
 ****
 .Content
@@ -33,9 +35,11 @@ Thus it contains the white box description of selected building blocks of level 
 
 *Level 3* zooms into selected building blocks of level 2, and so on.
 ****
+////
 
-== Whitebox Overall System
+== Container Level
 
+////
 [role="arc42help"]
 ****
 Here you describe the decomposition of the overall system using the following white box template. It contains
@@ -50,26 +54,42 @@ Here you describe the decomposition of the overall system using the following wh
 
 
  * (optional:) important interfaces, that are not explained in the black box templates of a building block, but are important for understanding the white box.
-Since there are so many ways to specify interfaces why do not provide a specific template for them.
+Since there are so many ways to specify interfaces we do not provide a specific template for them.
  In the worst case you have to specify and describe syntax, semantics, protocols, error handling,
  restrictions, versions, qualities, necessary compatibilities and many things more.
 In the best case you will get away with examples or simple signatures.
-
 ****
+////
 
-_**<Overview Diagram>**_
+The following C4 container diagram zooms into the system context diagram shown in the xref:03_system_scope_and_context.adoc[System Scope and Context] section.
+It shows the individual containers that make up the DAG-OS system and how they interact with users and neighboring systems.
+
+.DAG-OS container diagram
+[plantuml,png]
+----
+include::example$c4-model/structurizr-DAGOS-Container.puml[]
+----
 
 Motivation::
 
-_<text explanation>_
-
+The DAG-OS system shall provide simple yet robust tools to define, provision, and manage software environments and software components.
+Even though we aim for simplicity, targeted users are comfortable on the command line and primarily interact with DAG-OS via a CLI.
 
 Contained Building Blocks::
-_<Description of contained building block (black boxes)>_
+
+The main building block of the system is an extendable CLI.
+It provides the tools to define, provision, and manage software environments and software components.
 
 Important Interfaces::
-_<Description of important interfaces>_
 
+The DAG-OS CLI heavily interacts with the local filesystem to scan for user configuration and extensions, as well as for provisioning and managing local software components and environments.
++
+It also integrates with container engines and WSL for provisioning reusable software environments that users may share.
++
+The CLI also integrates with existing provisioning tools such as Ansible or existing shell scripts.
+
+////
+So far the below is too detailed but who knows, it might become more relevant in the future.
 [role="arc42help"]
 ****
 Insert your explanations of black boxes from level 1:
@@ -84,8 +104,6 @@ responsibility according to the following schema:
 | _<black box 2>_ | _<Text>_
 |===
 
-
-
 If you use a list of black box descriptions then you fill in a separate black box template for every important building block .
 Its headline is the name of the black box.
 ****
@@ -96,7 +114,7 @@ Its headline is the name of the black box.
 [role="arc42help"]
 ****
 Here you describe <black box 1>
-according the the following black box template:
+according the following black box template:
 
 * Purpose/Responsibility
 * Interface(s), when they are not extracted as separate paragraphs. This interfaces may include qualities and performance characteristics.
@@ -118,29 +136,11 @@ _<(Optional) Directory/File Location>_
 _<(Optional) Fulfilled Requirements>_
 
 _<(optional) Open Issues/Problems/Risks>_
+////
 
+== Component Level
 
-
-
-=== <Name black box 2>
-
-_<black box template>_
-
-=== <Name black box n>
-
-_<black box template>_
-
-
-=== <Name interface 1>
-
-...
-
-=== <Name interface m>
-
-
-
-== Level 2
-
+////
 [role="arc42help"]
 ****
 Here you can specify the inner structure of (some) building blocks from level 1 as white boxes.
@@ -149,9 +149,19 @@ You have to decide which building blocks of your system are important enough to 
 Please prefer relevance over completeness. Specify important, surprising, risky, complex or volatile building blocks.
 Leave out normal, simple, boring or standardized parts of your system
 ****
+////
 
-=== White Box _<building block 1>_
+=== White Box CLI
 
+The following component diagrams shows the internals of the DAG-OS CLI.
+
+.DAG-OS CLI component diagram
+[plantuml,png]
+----
+include::example$c4-model/structurizr-DAGOS-CommandLineInterface-Component.puml[]
+----
+
+////
 [role="arc42help"]
 ****
 ...describes the internal structure of _building block 1_.
@@ -161,16 +171,13 @@ _<white box template>_
 
 === White Box _<building block 2>_
 
-
 _<white box template>_
 
 ...
 
 === White Box _<building block m>_
 
-
 _<white box template>_
-
 
 
 == Level 3
@@ -183,7 +190,6 @@ When you need more detailed levels of your architecture please copy this
 part of arc42 for additional levels.
 ****
 
-
 === White Box <_building block x.1_>
 
 [role="arc42help"]
@@ -191,16 +197,14 @@ part of arc42 for additional levels.
 Specifies the internal structure of _building block x.1_.
 ****
 
-
 _<white box template>_
-
 
 === White Box <_building block x.2_>
 
 _<white box template>_
 
-
-
 === White Box <_building block y.1_>
 
 _<white box template>_
+
+////
