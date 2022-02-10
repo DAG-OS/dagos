@@ -2,7 +2,7 @@ import logging
 import time
 
 import click
-import rich
+import rich_click
 
 from dagos.commands.manage.cli import manage
 from dagos.commands.wsl.cli import wsl
@@ -11,6 +11,9 @@ from dagos.exceptions import DagosException
 from dagos.logging import configure_logging
 
 from . import __version__
+
+click.Command.format_help = rich_click.rich_format_help
+click.Group.format_help = rich_click.rich_format_help
 
 
 def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None:
