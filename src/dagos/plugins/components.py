@@ -11,10 +11,10 @@ class CommandType(Enum):
 
     MANAGE = "manage"
     INSTALL = "install"
+    UNINSTALL = "uninstall"
+    UPDATE = "update"
     CONFIGURE = "configure"
     VERIFY = "verify"
-    UPDATE = "update"
-    UNINSTALL = "uninstall"
 
 
 class Command(ABC):
@@ -174,10 +174,11 @@ rich_click.core.COMMAND_GROUPS = {
     "dagos": [
         {
             "name": "Software Component Commands",
-            "commands": ["manage", "install", "uninstall", "configure"],
+            "commands": [type.value for type in CommandType],
         },
     ]
 }
+rich_click.core.COMMANDS_PANEL_TITLE = "General Commands"
 
 
 def test():
