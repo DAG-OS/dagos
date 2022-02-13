@@ -1,70 +1,39 @@
+from __future__ import annotations
+
 import typing as t
-from abc import ABC
 
 import click
 import rich_click
 
-from .commands import Command, CommandType, InstallCommand
+from .commands import Command, CommandRegistry, CommandType
 
 
-class SoftwareComponent(ABC):
-    pass
+class SoftwareComponentRegistry(type):
+    """A metaclass responsible for registering constructed software components."""
 
+    components: t.List[SoftwareComponent] = []
 
-class SoftwareComponentManager(object):
-    """Manages available software components."""
-
-    def __init__(self) -> None:
-        self.components = []
-
-    def register(self, component: SoftwareComponent) -> None:
-        """Register provided software component. Avoids registering duplicates.
-
-        Args:
-            component (SoftwareComponent): The software component to register.
+    def __call__(cls, *args: t.Any, **kwds: t.Any) -> t.Any:
+        """The registry hooks into the object construction lifecycle to register
+        constructed software components. It also registers the manage command
+        group to the command registry.
         """
-        if component not in self.components:
-            self.components.append(component)
+        component = super().__call__(*args, **kwds)
 
-    def deregister(self, component: SoftwareComponent) -> None:
-        """Deregisters proovided software component.
-
-        Args:
-            component (SoftwareComponent): The software component to deregister."
-        """
-        if component in self.components:
-            self.components.remove(component)
-
-    def build_command_groups(self) -> t.List[click.Group]:
-        """Build Click groups for each command type.
-
-        Returns:
-            t.List[click.Group]: Click command groups sorted by type.
-        """
-        groups = []
-
-        for type in CommandType:
-            group = click.Group(
-                name=type.value, help=f"{type.value.capitalize()} software components."
+        if not cls in cls.components:
+            cls.components.append(component)
+            CommandRegistry.add_command(
+                CommandType.MANAGE, component.build_manage_command_group()
             )
-            for component in self.components:
-                if type == CommandType.MANAGE:
-                    group.add_command(component.build_manage_command_group())
-                elif not component.commands[type.name] == None:
-                    group.add_command(component.get_command(type).build(component.name))
-            if len(group.commands) > 0:
-                groups.append(group)
 
-        return groups
+        return component
 
 
-class SoftwareComponent(ABC):
+class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
     """Base class for software components."""
 
-    def __init__(self, manager: SoftwareComponentManager, name: str) -> None:
-        self.manager = manager
-        self.manager.register(self)
-        self.name = name
+    def __init__(self, name: str) -> None:
+        self.name: str = name
         self.commands = {}
         for type in CommandType:
             self.commands[type.name] = None
@@ -106,23 +75,32 @@ class SoftwareComponent(ABC):
         group = click.Group(name=self.name, help=help_text)
         for command in self.commands.values():
             if not command == None:
-                group.add_command(command.build())
+                group.add_command(command.build(command.type.value))
         return group
 
 
-class InstallIntelliJCommand(InstallCommand):
+class InstallIntelliJCommand(Command):
     """Install the IntelliJ IDE."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:
+        super().__init__(CommandType.INSTALL, parent)
 
     def execute(self) -> None:
         print("Installing the idea")
 
 
+class UninstallIntelliJCommand(Command):
+    def __init__(self, parent: SoftwareComponent) -> None:
+        super().__init__(CommandType.UNINSTALL, parent)
+
+
 class IntelliJSoftwareComponent(SoftwareComponent):
     """Manage the IntelliJ IDE."""
 
-    def __init__(self, manager: SoftwareComponentManager) -> None:
-        super().__init__(manager, "idea")
-        self.add_command(InstallIntelliJCommand())
+    def __init__(self) -> None:
+        super().__init__("idea")
+        self.add_command(InstallIntelliJCommand(self))
+        self.add_command(UninstallIntelliJCommand(self))
 
 
 rich_click.core.COMMAND_GROUPS = {
@@ -137,10 +115,9 @@ rich_click.core.COMMANDS_PANEL_TITLE = "General Commands"
 
 
 def test():
-    manager = SoftwareComponentManager()
-    IntelliJSoftwareComponent(manager)
+    IntelliJSoftwareComponent()
 
     group = click.Group("dagos")
-    for command_group in manager.build_command_groups():
+    for command_group in CommandRegistry.commands.values():
         group.add_command(command_group)
     return group
