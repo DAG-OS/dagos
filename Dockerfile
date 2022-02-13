@@ -3,6 +3,7 @@ FROM python:3-slim
 RUN apt update -y \
     && apt install -y --no-install-recommends \
         curl \
+        git \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh --output /tmp/miniconda-installer.sh \
