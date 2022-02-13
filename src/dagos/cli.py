@@ -1,12 +1,13 @@
 import logging
 import time
+from pathlib import Path
 
 import click
 import rich_click
 
-from dagos.commands.manage.cli import manage
 from dagos.commands.wsl.cli import wsl
-from dagos.components.scanning import component_scanner
+from dagos.core.commands import CommandRegistry, CommandType
+from dagos.core.component_scanner import SoftwareComponentScanner
 from dagos.exceptions import DagosException
 from dagos.logging import configure_logging
 
@@ -14,6 +15,16 @@ from . import __version__
 
 click.Command.format_help = rich_click.rich_format_help
 click.Group.format_help = rich_click.rich_format_help
+
+rich_click.core.COMMAND_GROUPS = {
+    "dagos": [
+        {
+            "name": "Software Component Commands",
+            "commands": [type.value for type in CommandType],
+        },
+    ]
+}
+rich_click.core.COMMANDS_PANEL_TITLE = "General Commands"
 
 
 def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None:
@@ -28,7 +39,7 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
     ctx.call_on_close(print_elapsed_time)
 
 
-@click.group(invoke_without_command=True)
+@click.group()
 @click.option(
     "--verbose",
     "-v",
@@ -48,20 +59,27 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
 )
 @click.pass_context
 def dagos_cli(ctx: click.Context, verbose: int, timer: bool):
-    configure_logging(verbose)
-    # TODO: Think about doing this once and cache the result
-    # components = component_scanner.find_components()
-    # ctx.obj = components
+    """"""
 
-    # for value in components.values():
-    #     if len(value.actions) > 0:
-    #         rich.inspect(value.actions[0])
-    #         dagos_cli.add_command(value.actions[0].get_click_command())
-    # click.echo(ctx.get_help())
+
+# TODO: Make this list configurable
+component_search_paths = [
+    # user
+    Path.home() / ".dagos" / "components",
+    # system (linux)
+    Path("/opt/dagos/components"),
+    # dagos
+    Path(__file__).parent / "components",
+]
 
 
 def dagos():
     try:
+        configure_logging(2)
+        SoftwareComponentScanner().scan(component_search_paths)
+        for command_group in CommandRegistry.commands.values():
+            dagos_cli.add_command(command_group)
+        dagos_cli.add_command(wsl)
         dagos_cli()
     except DagosException as e:
         logging.error(e)
@@ -69,7 +87,3 @@ def dagos():
     except Exception as e:
         logging.exception(e)
         exit(1)
-
-
-dagos_cli.add_command(manage)
-dagos_cli.add_command(wsl)

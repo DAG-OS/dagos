@@ -1,19 +1,19 @@
 import atexit
 import fnmatch
 import logging
+import typing as t
 from pathlib import Path
 
-import click
 import requests
 import yaml
 
-from dagos.components.domain import Action
-from dagos.components.exceptions import SoftwareComponentScanException
-from dagos.exceptions import DagosException
+from dagos.core.commands import Command, CommandType
+from dagos.core.components import SoftwareComponent
+from dagos.exceptions import DagosException, SoftwareComponentScanException
 from dagos.utils import file_utils
 
 
-class GitHubInstallAction(Action):
+class GitHubInstallCommand(Command):
     """Install a software component via a GitHub release."""
 
     name: str
@@ -21,10 +21,13 @@ class GitHubInstallAction(Action):
     pattern: str
     install_dir: str
     binary: str
-    strip_root_folder: bool
+    strip_root_folder: bool = False
+
+    def __init__(self, parent: SoftwareComponent) -> None:
+        super().__init__(CommandType.INSTALL, parent)
 
     @staticmethod
-    def parse_action(path: Path):
+    def parse(path: Path):
         if not path.exists():
             raise SoftwareComponentScanException("Action file does not exist")
         try:
@@ -33,19 +36,19 @@ class GitHubInstallAction(Action):
         except yaml.YAMLError as e:
             raise SoftwareComponentScanException("YAML is invalid", e)
 
-        action = GitHubInstallAction()
+        command = GitHubInstallCommand()
         # TODO: Add error handling
-        action.name = yaml_content["name"]
-        action.repository = yaml_content["repository"]
-        action.pattern = yaml_content["pattern"]
-        action.install_dir = yaml_content["install_dir"]
+        command.name = yaml_content["name"]
+        command.repository = yaml_content["repository"]
+        command.pattern = yaml_content["pattern"]
+        command.install_dir = yaml_content["install_dir"]
         if "binary" in yaml_content:
-            action.binary = yaml_content["binary"]
+            command.binary = yaml_content["binary"]
         if "strip_root_folder" in yaml_content:
-            action.strip_root_folder = yaml_content["strip_root_folder"]
+            command.strip_root_folder = yaml_content["strip_root_folder"]
         else:
-            action.strip_root_folder = False
-        return action
+            command.strip_root_folder = False
+        return command
 
     @staticmethod
     def _parse_repository_url(repository: str) -> str:
@@ -90,15 +93,15 @@ class GitHubInstallAction(Action):
             raise DagosException("Found too many matching assets for provided pattern!")
         return matching_assets[0]
 
-    def execute_action(self) -> None:
+    def execute(self) -> None:
         # TODO: Check if root privileges are required
         logging.debug("Querying GitHub for latest release")
-        url = GitHubInstallAction._parse_repository_url(self.repository)
+        url = GitHubInstallCommand._parse_repository_url(self.repository)
         response = requests.get(url)
         release_json = response.json()
 
         logging.debug("Parsing API response for matching asset")
-        asset = GitHubInstallAction._parse_matching_asset(release_json, self.pattern)
+        asset = GitHubInstallCommand._parse_matching_asset(release_json, self.pattern)
 
         # TODO: Print how long ago it was published (look at timeago?)
         logging.info(
@@ -117,11 +120,3 @@ class GitHubInstallAction(Action):
             # TODO: Generalize adding to path
             usr_local_bin = Path("/usr/local/bin")
             file_utils.add_executable_to_path(install_path / self.binary, usr_local_bin)
-
-    def get_click_command(self) -> click.Command:
-        return click.Command(
-            name="install",
-            no_args_is_help=False,
-            callback=self.execute_action,
-            help=f"Install {self.name}.",
-        )

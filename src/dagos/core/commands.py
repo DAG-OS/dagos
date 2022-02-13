@@ -48,7 +48,7 @@ class CommandRegistry(type):
             type (CommandType): The command type.
             command (click.Command | click.Group): The command to register.
         """
-        if not hasattr(cls.commands, type.name):
+        if not type.name in cls.commands:
             cls.commands[type.name] = click.Group(
                 name=type.value,
                 help=f"{type.value.capitalize()} software components.",
@@ -77,6 +77,8 @@ class Command(object, metaclass=CommandRegistry):
         Returns:
             click.Command: A Click command to be used in a CLI.
         """
+        # TODO: Allow overriding, especially inheritance chains
+        #       Maybe use __doc__ of last class in hierarchy?
         help_text = (
             self.__doc__
             if self.__doc__

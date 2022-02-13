@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import typing as t
+from pathlib import Path
 
 import click
-import rich_click
+
+from dagos.exceptions import SoftwareComponentScanException
 
 from .commands import Command, CommandRegistry, CommandType
 
@@ -32,11 +34,15 @@ class SoftwareComponentRegistry(type):
 class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
     """Base class for software components."""
 
+    cli: t.Optional[Path]
+    config: t.Optional[Path]
+
     def __init__(self, name: str) -> None:
         self.name: str = name
-        self.commands = {}
+        self.commands: t.Dict[str, Command] = {}
         for type in CommandType:
             self.commands[type.name] = None
+        self.folders: t.List[Path] = []
 
     def add_command(self, command: Command) -> None:
         """Add provided command to this software component.
@@ -78,46 +84,12 @@ class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
                 group.add_command(command.build(command.type.value))
         return group
 
-
-class InstallIntelliJCommand(Command):
-    """Install the IntelliJ IDE."""
-
-    def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.INSTALL, parent)
-
-    def execute(self) -> None:
-        print("Installing the idea")
-
-
-class UninstallIntelliJCommand(Command):
-    def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.UNINSTALL, parent)
-
-
-class IntelliJSoftwareComponent(SoftwareComponent):
-    """Manage the IntelliJ IDE."""
-
-    def __init__(self) -> None:
-        super().__init__("idea")
-        self.add_command(InstallIntelliJCommand(self))
-        self.add_command(UninstallIntelliJCommand(self))
-
-
-rich_click.core.COMMAND_GROUPS = {
-    "dagos": [
-        {
-            "name": "Software Component Commands",
-            "commands": [type.value for type in CommandType],
-        },
-    ]
-}
-rich_click.core.COMMANDS_PANEL_TITLE = "General Commands"
-
-
-def test():
-    IntelliJSoftwareComponent()
-
-    group = click.Group("dagos")
-    for command_group in CommandRegistry.commands.values():
-        group.add_command(command_group)
-    return group
+    def validate(self) -> None:
+        if hasattr(self, "cli"):
+            cli_is_valid = self.cli.exists()
+        else:
+            cli_is_valid = False
+        if not cli_is_valid:
+            raise SoftwareComponentScanException(
+                f"{self.name}: There is neither a valid CLI nor actions!"
+            )
