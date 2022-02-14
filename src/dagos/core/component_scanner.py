@@ -26,7 +26,8 @@ class SoftwareComponentScanner(object):
     def _scan_folder(self, folder: Path) -> None:
         for file in folder.iterdir():
             if file.is_file and file.suffix == ".py":
-                module = self._load_module(folder.name, file)
+                module_name = f"dagos.components.external.{folder.name}"
+                module = self._load_module(module_name, file)
                 classes = inspect.getmembers(module, inspect.isclass)
                 self._find_software_components(classes)
 
