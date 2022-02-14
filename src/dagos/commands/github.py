@@ -1,7 +1,6 @@
 import atexit
 import fnmatch
 import logging
-import typing as t
 from pathlib import Path
 
 import requests
@@ -50,8 +49,7 @@ class GitHubInstallCommand(Command):
             command.strip_root_folder = False
         return command
 
-    @staticmethod
-    def _parse_repository_url(repository: str) -> str:
+    def _parse_repository_url(self) -> str:
         """
         The provided repository should either include the whole URL,
         i.e., https://github.com/<slug> or github.com/<slug>, or only the slug,
@@ -60,14 +58,13 @@ class GitHubInstallCommand(Command):
         The slug is everything after the github.com part when pointing to the
         main page of a repository.
         """
-        if "github.com" in repository:
-            repository_slug = repository.partition("github.com/")[2]
+        if "github.com" in self.repository:
+            repository_slug = self.repository.partition("github.com/")[2]
         else:
-            repository_slug = repository
+            repository_slug = self.repository
         return f"""https://api.github.com/repos/{repository_slug}/releases/latest"""
 
-    @staticmethod
-    def _parse_matching_asset(release_json, pattern):
+    def _parse_matching_asset(self, release_json):
         """Parse the asset matching provided pattern from the API call result.
 
         Args:
@@ -83,7 +80,7 @@ class GitHubInstallCommand(Command):
         """
         matching_assets = []
         for asset in release_json["assets"]:
-            if fnmatch.fnmatch(asset["name"], pattern):
+            if fnmatch.fnmatch(asset["name"], self.pattern):
                 matching_assets.append(asset)
         asset_count = len(matching_assets)
         logging.debug(f"Found {asset_count} assets")
@@ -96,12 +93,12 @@ class GitHubInstallCommand(Command):
     def execute(self) -> None:
         # TODO: Check if root privileges are required
         logging.debug("Querying GitHub for latest release")
-        url = GitHubInstallCommand._parse_repository_url(self.repository)
+        url = self._parse_repository_url()
         response = requests.get(url)
         release_json = response.json()
 
         logging.debug("Parsing API response for matching asset")
-        asset = GitHubInstallCommand._parse_matching_asset(release_json, self.pattern)
+        asset = self._parse_matching_asset(release_json)
 
         # TODO: Print how long ago it was published (look at timeago?)
         logging.info(
@@ -111,9 +108,7 @@ class GitHubInstallCommand(Command):
         atexit.register(lambda: archive.unlink())
 
         # TODO: Is there a need to check if its an archive?
-        # TODO: Generalize to extract also zip archives
-        # TODO: Resolve home directory (and other special path vars?) if it is contained in install_dir
-        install_path = Path(self.install_dir)
+        install_path = Path(self.install_dir).resolve()
         file_utils.extract_archive(archive, install_path, self.strip_root_folder)
 
         if hasattr(self, "binary"):
