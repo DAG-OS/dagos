@@ -13,3 +13,4 @@ class ValeSoftwareComponent(SoftwareComponent):
         install.pattern = "vale*Linux_64*.tar.gz"
         install.install_dir = "/home/dev/software/vale"
         install.binary = "vale"
+        self.add_command(install)
