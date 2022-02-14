@@ -1,8 +1,8 @@
-import logging
 import os
 from pathlib import Path
 
 import click
+from loguru import logger
 
 from dagos.utils import wsl_utils
 
@@ -59,10 +59,10 @@ def import_wsl_distro(name, archive, force):
 def check_if_distro_exists(name, force):
     if wsl_utils.distro_exists(name):
         if force:
-            logging.warning(f"Unregistering existing '{name}' distro")
+            logger.warning(f"Unregistering existing '{name}' distro")
             wsl_utils.unregister_distro(name)
         else:
-            logging.error(
+            logger.error(
                 f"There already exists a '{name}' distro! Use --force to continue."
             )
             exit(1)
@@ -72,9 +72,9 @@ def check_archive_validity(archive):
     archive_path = Path(archive)
     accepted_suffixes = [".tar", ".tar.gz"]
     if archive_path.suffix in accepted_suffixes:
-        logging.debug("Provided archive has correct file extension")
+        logger.debug("Provided archive has correct file extension")
     else:
-        logging.error(
+        logger.error(
             f"Provided archive must be one of {''.join(accepted_suffixes)}, but is '{archive_path.suffix}'"
         )
         exit(1)

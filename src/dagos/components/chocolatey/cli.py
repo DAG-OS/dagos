@@ -1,8 +1,8 @@
-import logging
 import typing as t
 from pathlib import Path
 
 import click
+from loguru import logger
 
 import dagos.platform.utils as platform_utils
 from dagos.core.commands import Command, CommandType
@@ -46,7 +46,7 @@ class InstallChocolateyCommand(Command):
         result = powershell_utils.run_as_admin(str(install_script), attended)
 
         if result.returncode == 0:
-            logging.info("Successfully installed Chocolatey")
+            logger.info("Successfully installed Chocolatey")
         else:
-            logging.error("Failed Chocolatey installation")
+            logger.error("Failed Chocolatey installation")
             exit(1)

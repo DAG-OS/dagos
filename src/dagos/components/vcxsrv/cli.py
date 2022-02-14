@@ -1,16 +1,15 @@
-import logging
 import os
 import shutil
 import typing as t
-from distutils.command.build import build
 from pathlib import Path
 
 import click
+from loguru import logger
 
 import dagos.platform.utils as platform_utils
-from dagos.console import spinner
 from dagos.core.commands import Command, CommandType
 from dagos.core.components import SoftwareComponent
+from dagos.logging import spinner
 from dagos.utils import powershell_utils
 
 platform_utils.assert_windows()
@@ -53,9 +52,9 @@ class InstallVcXsrvCommand(Command):
                 "choco install vcxsrv --yes", attended
             )
             if result.returncode == 0:
-                logging.info("Successfully finished installation")
+                logger.info("Successfully finished installation")
             else:
-                logging.error("Failed VcXsrv installation")
+                logger.error("Failed VcXsrv installation")
                 exit(1)
 
 
@@ -71,17 +70,17 @@ class ConfigureVcXsrvCommand(Command):
             f"C:/Users/{current_user}/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
         )
         if not auto_start.exists():
-            logging.error("Unable to find autostart directory!")
+            logger.error("Unable to find autostart directory!")
             exit(1)
 
         # TODO: Allow providing a configuration file via component configuration
         xlaunch_config = Path(__file__).parent / "config.xlaunch"
         if not xlaunch_config.exists():
-            logging.error("There is no configuration file present for VcXsrv!")
+            logger.error("There is no configuration file present for VcXsrv!")
             exit(1)
 
-        logging.info("Configuring VcXsrv to start on Windows startup")
+        logger.info("Configuring VcXsrv to start on Windows startup")
         auto_xlaunch_config = auto_start / "config.xlaunch"
         shutil.copyfile(xlaunch_config, auto_xlaunch_config)
 
-        logging.info(f"Run the X-server by running '{auto_xlaunch_config}'")
+        logger.info(f"Run the X-server by running '{auto_xlaunch_config}'")

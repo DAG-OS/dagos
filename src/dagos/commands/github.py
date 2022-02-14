@@ -1,10 +1,10 @@
 import atexit
 import fnmatch
-import logging
 from pathlib import Path
 
 import requests
 import yaml
+from loguru import logger
 
 from dagos.core.commands import Command, CommandType
 from dagos.core.components import SoftwareComponent
@@ -83,7 +83,7 @@ class GitHubInstallCommand(Command):
             if fnmatch.fnmatch(asset["name"], self.pattern):
                 matching_assets.append(asset)
         asset_count = len(matching_assets)
-        logging.debug(f"Found {asset_count} assets")
+        logger.debug(f"Found {asset_count} assets")
         if asset_count == 0:
             raise DagosException("Found zero matching assets for provided pattern!")
         if asset_count > 1:
@@ -92,16 +92,16 @@ class GitHubInstallCommand(Command):
 
     def execute(self) -> None:
         # TODO: Check if root privileges are required
-        logging.debug("Querying GitHub for latest release")
+        logger.debug("Querying GitHub for latest release")
         url = self._parse_repository_url()
         response = requests.get(url)
         release_json = response.json()
 
-        logging.debug("Parsing API response for matching asset")
+        logger.debug("Parsing API response for matching asset")
         asset = self._parse_matching_asset(release_json)
 
         # TODO: Print how long ago it was published (look at timeago?)
-        logging.info(
+        logger.info(
             f"Downloading release {release_json['name']} published at {release_json['published_at']}"
         )
         archive = file_utils.download_file(asset["browser_download_url"])

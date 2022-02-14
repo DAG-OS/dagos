@@ -1,8 +1,8 @@
-import logging
 from pathlib import Path
 
 import ansible_runner
 import yaml
+from loguru import logger
 
 from dagos.core.commands import Command, CommandType
 from dagos.core.components import SoftwareComponent
@@ -24,7 +24,7 @@ class InstallGitCommand(Command):
         super().__init__(CommandType.INSTALL, parent)
 
     def execute(self) -> None:
-        logging.info("Installing Git")
+        logger.info("Installing Git")
         ansible_runner.run(
             role="dagos.git",
             roles_path=str(roles_path),
@@ -38,7 +38,7 @@ class ConfigureGitCommand(Command):
         super().__init__(CommandType.CONFIGURE, parent)
 
     def execute(self) -> None:
-        logging.info("Configuring Git")
+        logger.info("Configuring Git")
 
         # TODO: Use configuration again
         # if self.parent.config.exists():

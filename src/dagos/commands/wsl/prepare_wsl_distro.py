@@ -1,12 +1,12 @@
-import logging
 import re
 import subprocess
 
 import click
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
+from loguru import logger
 
 import dagos.platform.utils as platform_utils
-from dagos.console import spinner
+from dagos.logging import spinner
 
 
 class ExportError(Exception):
@@ -41,7 +41,7 @@ def prepare_wsl_distro(image, container, output):
 
     image_name = re.sub("(:|/)", "_", image)
     archive = f"{output}/{image_name}.tar"
-    logging.debug(f"Exporting '{container}' to '{archive}'")
+    logger.debug(f"Exporting '{container}' to '{archive}'")
     with spinner("Exporting...", "Successfully exported container"):
         subprocess.run(
             [container_engine, "export", "--output", archive, container],
@@ -51,34 +51,34 @@ def prepare_wsl_distro(image, container, output):
     # TODO: Package additional files together with exported tar file
 
     if delete_container:
-        logging.debug(f"Removing container '{container}'")
+        logger.debug(f"Removing container '{container}'")
         subprocess.run(
             [container_engine, "rm", container],
             check=True,
             stdout=subprocess.DEVNULL,
         )
-        logging.info(f"Removed container '{container}'")
+        logger.info(f"Removed container '{container}'")
 
     # TODO: Remove temporary files
 
 
 def get_container_engine():
     supported_container_engines = ["podman", "docker"]
-    logging.debug(
+    logger.debug(
         f"Looking for a supported container engine: {', '.join(supported_container_engines)}"
     )
     for container_engine in supported_container_engines:
         if platform_utils.is_command_available(container_engine):
-            logging.info(f"Using '{container_engine}' as container engine")
+            logger.info(f"Using '{container_engine}' as container engine")
             return container_engine
-    logging.error(
+    logger.error(
         f"Please install a supported container engine ({', '.join(supported_container_engines)})"
     )
     exit(1)
 
 
 def start_container(container_engine, image, name="dagos-export"):
-    logging.debug("Starting container from provided image")
+    logger.debug("Starting container from provided image")
     with spinner("Starting container..."):
         run_result = subprocess.run(
             f"{container_engine} run -t --name={name} {image} sh -c 'ls / > /dev/null'",
@@ -86,12 +86,12 @@ def start_container(container_engine, image, name="dagos-export"):
             stderr=subprocess.PIPE,
         )
     if run_result.returncode != 0:
-        logging.error(
+        logger.error(
             f"Failed to start container for image '{image}':\n{run_result.stderr.decode('utf-8')}"
         )
         exit(1)
 
-    logging.debug("Grabbing container ID")
+    logger.debug("Grabbing container ID")
     container_id = (
         subprocess.run(
             f"{container_engine} ps --last 1 | awk -F '[[:space:]]+' '$2 ~ /{image}/ {{ print $1 }}'",
@@ -102,7 +102,7 @@ def start_container(container_engine, image, name="dagos-export"):
         .stdout.decode("utf-8")
         .strip()
     )
-    logging.info(f"Started container '{container_id}' from image '{image}'")
+    logger.info(f"Started container '{container_id}' from image '{image}'")
     return container_id
 
 
@@ -111,7 +111,7 @@ def get_image_name(container_engine, container):
         [container_engine, "container", "exists", container]
     )
     if container_exists.returncode != 0:
-        logging.error(f"No container exists with provided ID '{container}'!")
+        logger.error(f"No container exists with provided ID '{container}'!")
         exit(1)
 
     image = (
@@ -131,5 +131,5 @@ def get_image_name(container_engine, container):
         .strip()
     )
 
-    logging.debug(f"Image for container '{container}' is '{image}'")
+    logger.debug(f"Image for container '{container}' is '{image}'")
     return image

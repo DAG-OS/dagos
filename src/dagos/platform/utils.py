@@ -1,8 +1,9 @@
-import logging
 import os
 import platform
 import shutil
 import typing as t
+
+from loguru import logger
 
 from .domain import OperatingSystem
 from .exceptions import UnsupportedOperatingSystem, UnsupportedPlatformException
@@ -37,7 +38,7 @@ def is_root() -> bool:
     if is_operating_system(OperatingSystem.LINUX):
         return os.geteuid() == 0
     # TODO: Implement for other operating systems
-    logging.error("Unable to determine if executing user has root privileges")
+    logger.error("Unable to determine if executing user has root privileges")
     return False
 
 

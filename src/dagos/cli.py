@@ -1,9 +1,9 @@
-import logging
 import time
 from pathlib import Path
 
 import click
 import rich_click
+from loguru import logger
 
 from dagos.commands.wsl.cli import wsl
 from dagos.core.commands import CommandRegistry, CommandType
@@ -34,7 +34,7 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
 
     def print_elapsed_time():
         stop = time.perf_counter()
-        logging.info(f"Elapsed time: {stop-start:0.3f} seconds")
+        logger.info(f"Elapsed time: {stop-start:0.3f} seconds")
 
     ctx.call_on_close(print_elapsed_time)
 
@@ -59,7 +59,7 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
 )
 @click.pass_context
 def dagos_cli(ctx: click.Context, verbose: int, timer: bool):
-    """"""
+    configure_logging(verbose)
 
 
 # TODO: Make this list configurable
@@ -75,6 +75,7 @@ component_search_paths = [
 
 def dagos():
     try:
+        # TODO: Make initial verbosity level configurable
         configure_logging(2)
         SoftwareComponentScanner().scan(component_search_paths)
         for command_group in CommandRegistry.commands.values():
@@ -82,8 +83,8 @@ def dagos():
         dagos_cli.add_command(wsl)
         dagos_cli()
     except DagosException as e:
-        logging.error(e)
+        logger.error(e)
         exit(1)
     except Exception as e:
-        logging.exception(e)
+        logger.exception(e)
         exit(1)

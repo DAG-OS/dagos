@@ -1,88 +1,65 @@
 import logging
+from contextlib import contextmanager
 
+from loguru import logger
+from rich.console import Console
 from rich.logging import RichHandler
+from rich.theme import Theme
 
-from .console import console
+logging.addLevelName(5, "TRACE")
+logging.addLevelName(25, "SUCCESS")
+
+console = Console(
+    theme=Theme(
+        {
+            "logging.level.trace": "gray42",
+            "logging.level.debug": "white",
+            "logging.level.info": "bright_blue",
+            "logging.level.success": "green",
+            "logging.level.warning": "orange1",
+            "logging.level.error": "red",
+        }
+    )
+)
 
 
 def configure_logging(verbosity: int) -> None:
     log_format = "{message}"
     date_format = "%Y-%m-%d %H:%M:%S"
-    add_logging_level("TRACE", logging.DEBUG - 5)
 
     log_show_path = False
     log_show_time = False
     if verbosity == 0:
-        log_level = logging.INFO
+        log_level = "INFO"
     elif verbosity == 1:
-        log_level = logging.DEBUG
+        log_level = "DEBUG"
     else:
-        log_level = logging.TRACE
+        log_level = "TRACE"
         log_show_path = True
 
-    logging.basicConfig(
-        level=log_level,
-        format=log_format,
-        datefmt=date_format,
-        style="{",
-        handlers=[
-            RichHandler(
-                console=console,
-                rich_tracebacks=True,
-                show_path=log_show_path,
-                show_time=log_show_time,
-            )
-        ],
+    handler = RichHandler(
+        console=console,
+        rich_tracebacks=True,
+        show_path=log_show_path,
+        show_time=log_show_time,
+        log_time_format=date_format,
+        markup=True,
     )
 
+    logger.remove()
+    logger.add(handler, format=log_format, level=log_level)
 
-# This function was taken from https://stackoverflow.com/a/35804945 and slightly modified.
-def add_logging_level(level_name, level_num, method_name=None) -> None:
+
+@contextmanager
+def spinner(message: str, success_message: str = "", log_level: str = "INFO"):
+    """Display a spinner with provided text during long-running operations.
+
+    Args:
+        message (str): The message to show while spinning.
+        success_message (str, optional): An optional success message. Defaults to "".
+        log_level (str, optional): The log level to use for the success message. Defaults to INFO.
     """
-    Comprehensively adds a new logging level to the `logging` module and the
-    currently configured logging class.
-
-    `levelName` becomes an attribute of the `logging` module with the value
-    `levelNum`. `methodName` becomes a convenience method for both `logging`
-    itself and the class returned by `logging.getLoggerClass()` (usually just
-    `logging.Logger`). If `methodName` is not specified, `levelName.lower()` is
-    used.
-
-    To avoid accidental clobberings of existing attributes, this method will
-    raise an `AttributeError` if the level name is already an attribute of the
-    `logging` module or if the method name is already present
-
-    Example
-    -------
-    >>> addLoggingLevel('TRACE', logging.DEBUG - 5)
-    >>> logging.getLogger(__name__).setLevel("TRACE")
-    >>> logging.getLogger(__name__).trace('that worked')
-    >>> logging.trace('so did this')
-    >>> logging.TRACE
-    5
-
-    """
-    if not method_name:
-        method_name = level_name.lower()
-
-    if hasattr(logging, level_name):
-        raise AttributeError("{} already defined in logging module".format(level_name))
-    if hasattr(logging, method_name):
-        raise AttributeError("{} already defined in logging module".format(method_name))
-    if hasattr(logging.getLoggerClass(), method_name):
-        raise AttributeError("{} already defined in logger class".format(method_name))
-
-    # This method was inspired by the answers to Stack Overflow post
-    # http://stackoverflow.com/q/2183233/2988730, especially
-    # http://stackoverflow.com/a/13638084/2988730
-    def log_for_level(self, message, *args, **kwargs):
-        if self.isEnabledFor(level_num):
-            self._log(level_num, message, args, **kwargs)
-
-    def log_to_root(message, *args, **kwargs):
-        logging.log(level_num, message, *args, **kwargs)
-
-    logging.addLevelName(level_num, level_name)
-    setattr(logging, level_name, level_num)
-    setattr(logging.getLoggerClass(), method_name, log_for_level)
-    setattr(logging, method_name, log_to_root)
+    with console.status(message, spinner="material"):
+        yield
+        if success_message:
+            logger.log(log_level, success_message)

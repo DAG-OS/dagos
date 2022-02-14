@@ -1,9 +1,10 @@
-import logging
 import subprocess
 from dataclasses import dataclass
 
+from loguru import logger
+
 import dagos.platform.utils as platform_utils
-from dagos.console import spinner
+from dagos.logging import spinner
 
 
 @dataclass
@@ -32,7 +33,7 @@ def get_installed_distros():
             is_running=True if columns[2] == "Running" else False,
             version=columns[3],
         )
-        logging.trace(distro)
+        logger.trace(distro)
         distros.append(distro)
     return distros
 
@@ -44,14 +45,14 @@ def unregister_distro(name):
         stderr=subprocess.STDOUT,
     )
     if run_result.returncode != 0:
-        logging.error(
+        logger.error(
             f"Failed to unregister '{name}' distro:\n{run_result.stderr.decode('utf-8')}"
         )
         exit(1)
 
 
 def import_distro(name, install_location, archive, version):
-    logging.info("Starting the WSL import")
+    logger.info("Starting the WSL import")
     with spinner("Importing..."):
         run_result = subprocess.run(
             [
@@ -65,9 +66,9 @@ def import_distro(name, install_location, archive, version):
             ]
         )
     if run_result.returncode == 0:
-        logging.info(f"Successfully imported '{name}' distro")
+        logger.info(f"Successfully imported '{name}' distro")
     else:
-        logging.error(f"Failed to import '{name}'")
+        logger.error(f"Failed to import '{name}'")
         exit(1)
 
 
@@ -78,5 +79,5 @@ def distro_exists(name):
 def assert_wsl_is_installed():
     platform_utils.assert_windows()
     if not platform_utils.is_command_available("wsl"):
-        logging.error("WSL must be installed but could not be found!")
+        logger.error("WSL must be installed but could not be found!")
         exit(1)

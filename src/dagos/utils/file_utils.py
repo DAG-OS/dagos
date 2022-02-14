@@ -8,9 +8,10 @@ import zipfile
 from pathlib import Path
 
 import requests
+from loguru import logger
 
-from dagos.console import spinner
 from dagos.exceptions import DagosException
+from dagos.logging import spinner
 
 
 def download_file(url: str) -> Path:
@@ -28,7 +29,7 @@ def download_file(url: str) -> Path:
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
 
-    logging.debug(f"Sending request to '{url}'")
+    logger.debug(f"Sending request to '{url}'")
     # TODO: Sometimes the file name is only evident after following redirects ...
     file_name = url.split("/")[-1]
     path = Path(file_name)
@@ -36,7 +37,7 @@ def download_file(url: str) -> Path:
         with spinner(
             f"Downloading '{path.name}' ...",
             f"Successfully downloaded '{path.name}'",
-            logging.DEBUG,
+            "DEBUG",
         ):
             with path.open("wb") as f:
                 shutil.copyfileobj(r.raw, f)
@@ -98,12 +99,12 @@ def add_executable_to_path(
     symlink_target = dir_on_path / executable.name
     if symlink_target.exists():
         if exists_ok:
-            logging.trace(
+            logger.trace(
                 f"Replacing existing '{executable.name}' symlink in '{symlink_target}'"
             )
             symlink_target.unlink()
         else:
-            logging.error(
+            logger.error(
                 f"A '{executable.name}' executable is already in '{symlink_target}'..."
             )
             exit(1)

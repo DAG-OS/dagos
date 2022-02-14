@@ -11,6 +11,7 @@ python = "^3.7"
 
 click = "^8.0.3"
 click-option-group = "^0.5.3"
+loguru = "^0.6.0"
 PyYAML = "^6.0"
 requests = "^2.27.1"
 rich = "^11.0.0"
@@ -26,9 +27,8 @@ pytest = "^6.2"
 pytest-bdd = "^5.0.0"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
-tox-poetry = "^0.4.1"
-
 tox-conda = "^0.9.1"
+tox-poetry = "^0.4.1"
 
 [tool.poetry.extras]
 ansible = ["ansible", "ansible-runner"]
