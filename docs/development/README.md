@@ -2,6 +2,15 @@
 
 ## Development
 
+### Linux
+
+You may start a tmux session with [tmuxinator](https://github.com/tmuxinator/tmuxinator) by running following command in repository root.
+It uses the `.tmuxinator.yml` to start a tmux session.
+
+```console
+tmuxinator local
+```
+
 ### Windows
 
 Get path to repository in WSL, e.g.,
