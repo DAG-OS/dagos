@@ -1,3 +1,4 @@
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -28,3 +29,14 @@ def stop_container(container_name, container_engine):
 @then(parsers.parse('remove the "{container_name}" container'))
 def stop_container(container_name, container_engine):
     subprocess.check_call(f"{container_engine} rm {container_name}", shell=True)
+
+
+@then(parsers.parse('I see "{expected_output}"'))
+def i_see(expected_output, command_output: str):
+    assert expected_output in command_output
+
+
+@then(parsers.parse('I see a command "{command}" with the description "{description}"'))
+def i_see_command_with_description(command, description, command_output: str):
+    pattern = f"{command} +{description}"
+    assert re.search(pattern, command_output)
