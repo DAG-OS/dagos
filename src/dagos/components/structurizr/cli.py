@@ -3,17 +3,22 @@ from dagos.core.components import SoftwareComponent
 
 
 class StructurizrSoftwareComponent(SoftwareComponent):
-    """Manage Structurizr CLI.
+    """Manage the Structurizr CLI.
 
     Project home: https://github.com/structurizr/cli
     """
 
     def __init__(self) -> None:
         super().__init__("structurizr")
+        self.add_command(InstallStructurizrCommand(self))
 
-        install = GitHubInstallCommand(self)
-        install.repository = "structurizr/cli"
-        install.pattern = "*.zip"
-        install.install_dir = "/home/dev/software/structurizr/cli"
+
+class InstallStructurizrCommand(GitHubInstallCommand):
+    """Install the Structurizr CLI."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:
+        super().__init__(parent)
+        self.repository = "structurizr/cli"
+        self.pattern = "*.zip"
+        self.install_dir = "/home/dev/software/structurizr/cli"
         # TODO: Make structurizr CLI executable and put it on the path
-        self.add_command(install)

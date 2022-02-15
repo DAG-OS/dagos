@@ -15,13 +15,16 @@ class GitHubCliSoftwareComponent(SoftwareComponent):
 
     def __init__(self) -> None:
         super().__init__("github-cli")
+        self.add_command(InstallGitHubCliCommand(self))
 
-        install = GitHubInstallCommand(self)
-        # TODO: Allow providing these values via configuration
-        install.repository = "cli/cli"
-        install.pattern = "gh*linux_amd64.tar.gz"
-        install.strip_root_folder = True
-        install.install_dir = "/home/dev/software/github_cli"
-        install.binary = "bin/gh"
 
-        self.add_command(install)
+class InstallGitHubCliCommand(GitHubInstallCommand):
+    """Install the GitHub CLI."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:
+        super().__init__(parent)
+        self.repository = "cli/cli"
+        self.pattern = "gh*linux_amd64.tar.gz"
+        self.strip_root_folder = True
+        self.install_dir = "/home/dev/software/github_cli"
+        self.binary = "bin/gh"

@@ -77,8 +77,7 @@ class Command(object, metaclass=CommandRegistry):
         Returns:
             click.Command: A Click command to be used in a CLI.
         """
-        # TODO: Allow overriding, especially inheritance chains
-        #       Maybe use __doc__ of last class in hierarchy?
+        # TODO: Allow overriding
         help_text = (
             self.__doc__
             if self.__doc__

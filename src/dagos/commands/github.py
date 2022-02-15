@@ -15,6 +15,7 @@ from dagos.utils import file_utils
 class GitHubInstallCommand(Command):
     """Install a software component via a GitHub release."""
 
+    # TODO: Allow providing these values via configuration
     name: str
     repository: str
     pattern: str
