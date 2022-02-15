@@ -34,15 +34,18 @@ class SoftwareComponentRegistry(type):
 class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
     """Base class for software components."""
 
-    cli: t.Optional[Path]
-    config: t.Optional[Path]
+    name: str
+    folders: t.List[Path]
+    files: t.List[Path]
+    commands: t.Dict[str, Command]
 
     def __init__(self, name: str) -> None:
-        self.name: str = name
-        self.commands: t.Dict[str, Command] = {}
+        self.name = name
+        self.commands = {}
         for type in CommandType:
             self.commands[type.name] = None
-        self.folders: t.List[Path] = []
+        self.folders = []
+        self.files = []
 
     def add_command(self, command: Command) -> None:
         """Add provided command to this software component.
@@ -52,18 +55,19 @@ class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
         """
         self.commands[command.type.name] = command
 
-    def get_command(self, type: CommandType) -> t.Optional[Command]:
-        """Get command by provided type.
+    def get_file(self, file_pattern: str) -> t.Optional[Path]:
+        """Try to find a file that matches the provided pattern. The first match
+        or None, if there is no match, is returned.
 
         Args:
-            type (CommandType): The command type to look for.
+            file_pattern (str): A pattern to match a file against.
 
         Returns:
-            t.Optional[Command]: The found command or None if there is no such
-            command.
+            t.Optional[Path]: The first matched file or None.
         """
-        if self.commands[type.name] != None:
-            return self.commands[type.name]
+        for file in self.files:
+            if file.match(file_pattern):
+                return file
         return None
 
     def build_manage_command_group(self) -> click.Group:

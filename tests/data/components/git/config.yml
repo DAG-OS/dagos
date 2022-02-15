@@ -1,0 +1,3 @@
+git_settings:
+  user.name: "Max Mustermann"
+  user.email: "max.mustermann@gmx.de"

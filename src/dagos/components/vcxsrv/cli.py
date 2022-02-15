@@ -73,8 +73,7 @@ class ConfigureVcXsrvCommand(Command):
             logger.error("Unable to find autostart directory!")
             exit(1)
 
-        # TODO: Allow providing a configuration file via component configuration
-        xlaunch_config = Path(__file__).parent / "config.xlaunch"
+        xlaunch_config = self.parent.get_file("config.xlaunch")
         if not xlaunch_config.exists():
             logger.error("There is no configuration file present for VcXsrv!")
             exit(1)

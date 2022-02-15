@@ -1,6 +1,7 @@
 import importlib.util
 import inspect
 import typing as t
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from loguru import logger
@@ -9,12 +10,20 @@ from dagos.core.components import SoftwareComponent
 from dagos.platform.exceptions import UnsupportedPlatformException
 
 
+@dataclass
+class ComponentFiles:
+    folders: t.List[Path] = field(default_factory=list)
+    files: t.List[Path] = field(default_factory=list)
+
+
 class SoftwareComponentScanner(object):
+
+    scan_result: t.Dict[str, ComponentFiles] = {}
+
     def scan(self, search_paths: t.List[Path]) -> None:
         logger.trace(f"Looking for software components in {len(search_paths)} places")
         for search_path in search_paths:
             if self._is_valid_search_path(search_path):
-                # TODO: Aggregate files for components
                 self._scan_search_path(search_path)
 
     def _scan_search_path(self, search_path: Path) -> None:
@@ -22,23 +31,32 @@ class SoftwareComponentScanner(object):
         for folder in search_path.iterdir():
             if self._contains_software_component(folder):
                 logger.trace(f"Found folder for software component '{folder.name}'")
+                if not folder.name in self.scan_result:
+                    self.scan_result[folder.name] = ComponentFiles()
+                self.scan_result[folder.name].folders.append(folder)
                 self._scan_folder(folder)
 
     def _scan_folder(self, folder: Path) -> None:
         for file in folder.iterdir():
+            if not file.name.startswith("_"):
+                self.scan_result[folder.name].files.append(file)
             if file.is_file and file.suffix == ".py":
                 module_name = f"dagos.components.external.{folder.name}"
                 module = self._load_module(module_name, file)
                 classes = inspect.getmembers(module, inspect.isclass)
-                self._find_software_components(classes)
+                self._find_software_components(folder.name, classes)
 
-    def _find_software_components(self, classes: t.List[t.Tuple[str, object]]) -> None:
+    def _find_software_components(
+        self, component_name: str, classes: t.List[t.Tuple[str, object]]
+    ) -> None:
         for clazz in classes:
             if clazz[0] != "SoftwareComponent" and issubclass(
                 clazz[1], SoftwareComponent
             ):
                 try:
                     component = clazz[1]()
+                    component.folders = self.scan_result[component_name].folders
+                    component.files = self.scan_result[component_name].files
                 except Exception as e:
                     # TODO: Gracefully handle broken plugins
                     logger.warning(f"Failed to instantiate software component: {e}")

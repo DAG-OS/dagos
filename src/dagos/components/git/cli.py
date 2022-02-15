@@ -40,16 +40,16 @@ class ConfigureGitCommand(Command):
     def execute(self) -> None:
         logger.info("Configuring Git")
 
-        # TODO: Use configuration again
-        # if self.parent.config.exists():
-        #    with open(self.parent.config) as f:
-        #        config_values = yaml.safe_load(f)
-        #    if config_values["git_settings"]:
-        #        git_settings = config_values["git_settings"]
         extravars = {
             "state": "configure",
-            # "git_settings": git_settings,
         }
+
+        git_config_file = self.parent.get_file("config.yml")
+        if git_config_file:
+            with open(git_config_file) as f:
+                config_values = yaml.safe_load(f)
+            if config_values["git_settings"]:
+                extravars["git_settings"] = config_values["git_settings"]
 
         ansible_runner.run(
             role="dagos.git",
