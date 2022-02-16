@@ -60,6 +60,7 @@ class SoftwareComponentScanner(object):
                 except Exception as e:
                     # TODO: Gracefully handle broken plugins
                     logger.warning(f"Failed to instantiate software component: {e}")
+                    return
                 logger.trace(f"Found software component '{component.name}'")
 
     def _load_module(self, name: str, file: Path):
