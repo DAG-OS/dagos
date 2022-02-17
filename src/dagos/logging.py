@@ -47,7 +47,9 @@ def configure_logging(verbosity: int) -> None:
     )
 
     logger.remove()
-    logger.add(handler, format=log_format, level=log_level)
+    # Use function to format log to avoid duplicate exception logging
+    # See: https://github.com/Delgan/loguru/issues/592
+    logger.add(handler, format=lambda _: log_format, level=log_level)
 
 
 @contextmanager
