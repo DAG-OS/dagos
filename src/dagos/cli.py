@@ -1,6 +1,5 @@
 import sys
 import time
-from pathlib import Path
 
 import click
 import rich_click
@@ -41,7 +40,7 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
     ctx.call_on_close(print_elapsed_time)
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.option(
     "--verbose",
     "-v",
@@ -61,7 +60,8 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
 )
 @click.pass_context
 def dagos_cli(ctx: click.Context, verbose: int, timer: bool):
-    """"""
+    if ctx.invoked_subcommand is None:
+        print(ctx.get_help())
 
 
 # TODO: Make this list configurable
@@ -78,9 +78,10 @@ component_search_paths = [
 def dagos():
     try:
         use_config_log_level = False
-        if "-v" == sys.argv[1]:
+        arguments = sys.argv[1:]
+        if len(arguments) > 0 and "-v" == arguments[0]:
             configure_logging(1)
-        elif "-vv" == sys.argv[1]:
+        elif len(arguments) > 0 and "-vv" == arguments[0]:
             configure_logging(2)
         else:
             use_config_log_level = True
