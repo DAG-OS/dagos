@@ -9,7 +9,8 @@ Feature: Configure DAG-OS CLI
         Given I have following text:
             verbosity: 1
 
-        When I store this text at "~/.dagos/config.yml"
+        When I store this text at "~/.dagos/.dagos-config.yml"
         And run "dagos manage"
 
-        Then I see no "TRACE" messages
+        Then I see "^DEBUG" messages
+        And I see no "^TRACE" messages

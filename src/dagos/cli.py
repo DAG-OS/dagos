@@ -1,3 +1,4 @@
+import sys
 import time
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from loguru import logger
 from dagos.commands.wsl.cli import wsl
 from dagos.core.commands import CommandRegistry, CommandType
 from dagos.core.component_scanner import SoftwareComponentScanner
+from dagos.core.configuration import ConfigurationScanner
 from dagos.exceptions import DagosException
 from dagos.logging import configure_logging
 
@@ -59,7 +61,7 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
 )
 @click.pass_context
 def dagos_cli(ctx: click.Context, verbose: int, timer: bool):
-    configure_logging(verbose)
+    """"""
 
 
 # TODO: Make this list configurable
@@ -75,8 +77,18 @@ component_search_paths = [
 
 def dagos():
     try:
-        # TODO: Make initial verbosity level configurable
-        configure_logging(2)
+        use_config_log_level = False
+        if "-v" == sys.argv[1]:
+            configure_logging(1)
+        elif "-vv" == sys.argv[1]:
+            configure_logging(2)
+        else:
+            use_config_log_level = True
+            configure_logging(0)
+        configuration = ConfigurationScanner().scan()
+        if use_config_log_level:
+            configure_logging(configuration.verbosity)
+
         SoftwareComponentScanner().scan(component_search_paths)
         for command_group in CommandRegistry.commands.values():
             dagos_cli.add_command(command_group)

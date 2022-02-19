@@ -42,6 +42,13 @@ def i_see_command_with_description(command, description, command_output: str):
     assert re.search(pattern, command_output)
 
 
+@then(parsers.parse('I see "{pattern}" messages'))
+def i_see_messages(pattern, command_output: str):
+    result = re.search(pattern, command_output)
+    assert result
+
+
 @then(parsers.parse('I see no "{pattern}" messages'))
-def i_see_no(pattern, command_output: str):
-    assert not re.search(pattern, command_output)
+def i_see_no_messages(pattern, command_output: str):
+    result = re.search(pattern, command_output)
+    assert not result
