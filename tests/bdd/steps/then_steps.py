@@ -44,7 +44,7 @@ def i_see_command_with_description(command, description, command_output: str):
 
 @then(parsers.parse('''I don't see a command "{command}"'''))
 def i_dont_see_command(command, command_output: str):
-    pattern = f"{command} +\w"
+    pattern = f"{command} +\\w"
     assert not re.search(pattern, command_output)
 
 
