@@ -112,7 +112,15 @@ class GitHubInstallCommand(Command):
         install_path = Path(self.install_dir).resolve()
         file_utils.extract_archive(archive, install_path, self.strip_root_folder)
 
+        self.post_extraction(install_path)
+
         if hasattr(self, "binary"):
             # TODO: Generalize adding to path
             usr_local_bin = Path("/usr/local/bin")
             file_utils.add_executable_to_path(install_path / self.binary, usr_local_bin)
+
+    def post_extraction(self, install_path: Path) -> None:
+        """Called after the downloaded archive is extracted. May be used by
+        extending commands to do something with the extracted files before
+        remaining things are done.
+        """

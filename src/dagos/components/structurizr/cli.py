@@ -1,3 +1,8 @@
+import shutil
+from pathlib import Path
+
+from loguru import logger
+
 from dagos.commands.github import GitHubInstallCommand
 from dagos.core.components import SoftwareComponent
 
@@ -21,4 +26,17 @@ class InstallStructurizrCommand(GitHubInstallCommand):
         self.repository = "structurizr/cli"
         self.pattern = "*.zip"
         self.install_dir = "/home/dev/software/structurizr/cli"
-        # TODO: Make structurizr CLI executable and put it on the path
+        self.binary = "structurizr"
+
+    def post_extraction(self, install_path: Path) -> None:
+        """Apply workaround described here:
+        https://github.com/structurizr/cli/issues/43
+        """
+        original_starter = install_path / "structurizr.sh"
+        modified_starter = install_path / "structurizr"
+
+        logger.debug("Modifying starter script to work for symlinks")
+        content = original_starter.read_text()
+        content = content.replace(r"${BASH_SOURCE[0]}", '$(readlink -f "$0")')
+        modified_starter.write_text(content)
+        modified_starter.chmod(755)

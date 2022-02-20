@@ -9,7 +9,7 @@ Feature: Manage common software components
         Examples:
             | component   | command         |
             | github-cli  | gh              |
-            | structurizr | structurizr-cli |
+            | structurizr | structurizr |
 
     Scenario Outline: Install common software components via install
         Given I have root privileges
