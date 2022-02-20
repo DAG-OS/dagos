@@ -44,5 +44,7 @@ def i_store_text_at_destination(text: str, destination: str):
 @when(parsers.parse('run "{command}"'), target_fixture="command_output")
 def run_command(command: str) -> str:
     result = subprocess.run(command, shell=True, capture_output=True)
+    stdout = result.stdout.decode("utf-8")
+    print(stdout)
     assert result.returncode == 0
-    return result.stdout.decode("utf-8")
+    return stdout

@@ -15,6 +15,17 @@ Feature: Configure DAG-OS CLI
         Then I see "^DEBUG" messages
         And I see no "^TRACE" messages
 
+    Scenario: Configure search paths
+        Given I have following text:
+            search_paths:
+              - "{{data_dir}}/search_paths/simple/"
+
+        When I store this text at "~/.dagos/.dagos-config.yml"
+        And run "dagos manage"
+
+        Then I see a command "idea" with the description "Manage the IntelliJ IDE."
+        And I don't see a command "vale"
+
     Scenario: Configure additional software component search paths
         Given I have following text:
             component_search_paths:

@@ -42,6 +42,12 @@ def i_see_command_with_description(command, description, command_output: str):
     assert re.search(pattern, command_output)
 
 
+@then(parsers.parse('''I don't see a command "{command}"'''))
+def i_dont_see_command(command, command_output: str):
+    pattern = f"{command} +\w"
+    assert not re.search(pattern, command_output)
+
+
 @then(parsers.parse('I see "{pattern}" messages'))
 def i_see_messages(pattern, command_output: str):
     result = re.search(pattern, command_output)
