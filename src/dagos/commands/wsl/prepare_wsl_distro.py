@@ -39,7 +39,7 @@ def prepare_wsl_distro(image, container, output):
     else:
         container = start_container(container_engine, image)
 
-    image_name = re.sub("(:|/)", "_", image)
+    image_name = re.sub("[:/]", "_", image)
     archive = f"{output}/{image_name}.tar"
     logger.debug(f"Exporting '{container}' to '{archive}'")
     with spinner("Exporting...", "Successfully exported container"):
