@@ -44,6 +44,7 @@ jobs:
       - name: Generate coverage report.
         run: |
           poetry run coverage combine
+          poetry run coverage report --show-missing
           poetry run coverage xml
 
       - name: SonarCloud scan.
