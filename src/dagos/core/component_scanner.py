@@ -86,6 +86,16 @@ class SoftwareComponentScanner(object):
         if not search_path.exists():
             logger.trace(f"Component search path '{search_path}' does not exist")
             return False
+        if not search_path.is_dir():
+            logger.warning(f"The search path '{search_path}' is not a folder!")
+            return False
+        if not search_path.name == "components" and not any(
+            search_path.glob(".dagos-components")
+        ):
+            logger.warning(
+                f"The search path '{search_path}' must either be named 'components' or contain a marker file '.dagos-components'"
+            )
+            return False
         return True
 
     def _contains_software_component(self, path: Path) -> bool:
