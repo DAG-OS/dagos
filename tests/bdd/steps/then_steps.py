@@ -21,16 +21,6 @@ def delete_file(file):
     Path(file).unlink()
 
 
-@then(parsers.parse('I stop the "{container_name}" container'))
-def stop_container(container_name, container_engine):
-    subprocess.check_call(f"{container_engine} stop {container_name}", shell=True)
-
-
-@then(parsers.parse('remove the "{container_name}" container'))
-def stop_container(container_name, container_engine):
-    subprocess.check_call(f"{container_engine} rm {container_name}", shell=True)
-
-
 @then(parsers.parse('I see "{expected_output}"'))
 def i_see(expected_output, command_output: str):
     assert expected_output in command_output

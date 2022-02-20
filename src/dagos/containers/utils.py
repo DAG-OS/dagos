@@ -4,24 +4,33 @@ from loguru import logger
 
 import dagos.platform.utils as platform_utils
 from dagos.logging import spinner
-from dagos.platform.exceptions import UnsupportedPlatformException
+
+from .exceptions import ContainerException, NoSupportedContainerEngineException
+
+selected_container_engine = None
 
 
 def get_container_engine() -> str:
+    global selected_container_engine
+    if not selected_container_engine is None:
+        return selected_container_engine
+
     supported_container_engines = ["podman", "docker"]
     logger.debug(
         f"Looking for a supported container engine: {', '.join(supported_container_engines)}"
     )
-    for container_engine in supported_container_engines:
-        if platform_utils.is_command_available(container_engine):
-            logger.info(f"Using '{container_engine}' as container engine")
-            return container_engine
-    raise UnsupportedPlatformException(
-        f"No supported container engine found! Please install one of {', '.join(supported_container_engines)}"
-    )
+    for engine in supported_container_engines:
+        if platform_utils.is_command_available(engine):
+            logger.info(f"Using '{engine}' as container engine")
+            selected_container_engine = engine
+            return engine
+    raise NoSupportedContainerEngineException(supported_container_engines)
 
 
-def start_container(container_engine, image, name="dagos"):
+def start_container(image: str, name="dagos"):
+    platform_utils.assert_command_available("awk")
+    container_engine = get_container_engine()
+
     logger.debug("Starting container from provided image")
     with spinner("Starting container..."):
         run_result = subprocess.run(
@@ -29,11 +38,12 @@ def start_container(container_engine, image, name="dagos"):
             shell=True,
             stderr=subprocess.PIPE,
         )
+
     if run_result.returncode != 0:
-        logger.error(
-            f"Failed to start container for image '{image}':\n{run_result.stderr.decode('utf-8')}"
+        stderr = run_result.stderr.decode("utf-8")
+        raise ContainerException(
+            f"Failed to start container for image '{image}':\n{stderr}"
         )
-        exit(1)
 
     logger.debug("Grabbing container ID")
     container_id = (
@@ -50,18 +60,33 @@ def start_container(container_engine, image, name="dagos"):
     return container_id
 
 
-def get_image_name(container_engine, container):
-    container_exists = subprocess.run(
-        [container_engine, "container", "exists", container]
+def remove_container(container: str) -> None:
+    container_engine = get_container_engine()
+    logger.debug(f"Removing container '{container}'")
+    subprocess.run(
+        [container_engine, "rm", container],
+        check=True,
+        stdout=subprocess.DEVNULL,
     )
-    if container_exists.returncode != 0:
-        logger.error(f"No container exists with provided ID '{container}'!")
-        exit(1)
+    logger.info(f"Removed container '{container}'")
+
+
+def container_exists(container: str) -> bool:
+    container_engine = get_container_engine()
+
+    result = subprocess.run([container_engine, "container", "exists", container])
+    return result.returncode == 0
+
+
+def get_image_name(container: str) -> str:
+    container_engine = get_container_engine()
+    if not container_exists(container):
+        raise ContainerException(f"No container exists with provided ID '{container}'!")
 
     image = (
         subprocess.run(
             [
-                "podman",
+                container_engine,
                 "container",
                 "inspect",
                 container,

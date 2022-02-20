@@ -5,6 +5,8 @@ from pytest_bdd import given, parsers
 import dagos.containers.utils as container_utils
 import dagos.platform.utils as platform_utils
 
+from .utils import yield_step
+
 
 @given("I have root privileges")
 def i_have_root_privileges():
@@ -26,5 +28,9 @@ def i_have_text(test_data_dir: Path, text: str):
 
 
 @given(parsers.parse('I have a running container named "{container_name}"'))
-def i_have_container(container_name: str, container_engine):
-    container_utils.start_container(container_engine, "busybox", container_name)
+@yield_step
+def i_have_container(container_name: str):
+    container_id = container_utils.start_container("busybox", container_name)
+    yield
+    container_utils.remove_container(container_id)
+    yield

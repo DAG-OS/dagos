@@ -30,21 +30,18 @@ def prepare_wsl_distro(image, container, output):
 
     The resulting archive is ready for import as a WSL distro, e.g., via `dagos wsl import`.
     """
-    container_engine = container_utils.get_container_engine()
-
     delete_container = True
     if container:
         delete_container = False
-        image = container_utils.get_image_name(container_engine, container)
+        image = container_utils.get_image_name(container)
     else:
-        container = container_utils.start_container(
-            container_engine, image, "dagos-export"
-        )
+        container = container_utils.start_container(image, "dagos-export")
 
     image_name = re.sub("[:/]", "_", image)
     archive = f"{output}/{image_name}.tar"
     logger.debug(f"Exporting '{container}' to '{archive}'")
     with spinner("Exporting...", "Successfully exported container"):
+        container_engine = container_utils.get_container_engine()
         subprocess.run(
             [container_engine, "export", "--output", archive, container],
             check=True,
@@ -53,12 +50,6 @@ def prepare_wsl_distro(image, container, output):
     # TODO: Package additional files together with exported tar file
 
     if delete_container:
-        logger.debug(f"Removing container '{container}'")
-        subprocess.run(
-            [container_engine, "rm", container],
-            check=True,
-            stdout=subprocess.DEVNULL,
-        )
-        logger.info(f"Removed container '{container}'")
+        container_utils.remove_container(container)
 
     # TODO: Remove temporary files
