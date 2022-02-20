@@ -1,7 +1,11 @@
+from pathlib import Path
+
 from pytest_bdd import scenarios
 
-# scenarios("features/actions.feature")
-scenarios("features/configure_dagos.feature")
-scenarios("features/common_components.feature")
-scenarios("features/custom_components.feature")
-scenarios("features/wsl.feature")
+features_base_dir = str(Path(__file__).parent / "features")
+
+# scenarios("features/actions.feature", features_base_dir=features_base_dir)
+scenarios("configure_dagos.feature", features_base_dir=features_base_dir)
+scenarios("common_components.feature", features_base_dir=features_base_dir)
+scenarios("custom_components.feature", features_base_dir=features_base_dir)
+scenarios("wsl.feature", features_base_dir=features_base_dir)

@@ -31,6 +31,16 @@ jobs:
       - name: Run Tox.
         run: poetry run tox
 
+      - name: Log in to GitLab container registry.
+        uses: redhat-actions/podman-login@v1
+        with:
+          username: gitlab+deploy-token-824041
+          password: ${{ secrets.GITLAB_DAGOS_CONTAINER_REGISTRY_TOKEN   }}
+          registry: registry.gitlab.com
+
+      - name: Run integration tests.
+        run: podman run --rm --volume .:/root/dagos registry.gitlab.com/dag-os/dagos/dagos-test-image
+
       - name: Generate coverage report.
         run: |
           poetry run coverage combine
