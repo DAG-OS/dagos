@@ -5,7 +5,7 @@ import click
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 from loguru import logger
 
-import dagos.platform.utils as platform_utils
+import dagos.containers.utils as container_utils
 from dagos.logging import spinner
 
 
@@ -30,14 +30,16 @@ def prepare_wsl_distro(image, container, output):
 
     The resulting archive is ready for import as a WSL distro, e.g., via `dagos wsl import`.
     """
-    container_engine = get_container_engine()
+    container_engine = container_utils.get_container_engine()
 
     delete_container = True
     if container:
         delete_container = False
-        image = get_image_name(container_engine, container)
+        image = container_utils.get_image_name(container_engine, container)
     else:
-        container = start_container(container_engine, image)
+        container = container_utils.start_container(
+            container_engine, image, "dagos-export"
+        )
 
     image_name = re.sub("[:/]", "_", image)
     archive = f"{output}/{image_name}.tar"
@@ -60,76 +62,3 @@ def prepare_wsl_distro(image, container, output):
         logger.info(f"Removed container '{container}'")
 
     # TODO: Remove temporary files
-
-
-def get_container_engine():
-    supported_container_engines = ["podman", "docker"]
-    logger.debug(
-        f"Looking for a supported container engine: {', '.join(supported_container_engines)}"
-    )
-    for container_engine in supported_container_engines:
-        if platform_utils.is_command_available(container_engine):
-            logger.info(f"Using '{container_engine}' as container engine")
-            return container_engine
-    logger.error(
-        f"Please install a supported container engine ({', '.join(supported_container_engines)})"
-    )
-    exit(1)
-
-
-def start_container(container_engine, image, name="dagos-export"):
-    logger.debug("Starting container from provided image")
-    with spinner("Starting container..."):
-        run_result = subprocess.run(
-            f"{container_engine} run -t --name={name} {image} sh -c 'ls / > /dev/null'",
-            shell=True,
-            stderr=subprocess.PIPE,
-        )
-    if run_result.returncode != 0:
-        logger.error(
-            f"Failed to start container for image '{image}':\n{run_result.stderr.decode('utf-8')}"
-        )
-        exit(1)
-
-    logger.debug("Grabbing container ID")
-    container_id = (
-        subprocess.run(
-            f"{container_engine} ps --last 1 | awk -F '[[:space:]]+' '$2 ~ /{image}/ {{ print $1 }}'",
-            shell=True,
-            check=True,
-            capture_output=True,
-        )
-        .stdout.decode("utf-8")
-        .strip()
-    )
-    logger.info(f"Started container '{container_id}' from image '{image}'")
-    return container_id
-
-
-def get_image_name(container_engine, container):
-    container_exists = subprocess.run(
-        [container_engine, "container", "exists", container]
-    )
-    if container_exists.returncode != 0:
-        logger.error(f"No container exists with provided ID '{container}'!")
-        exit(1)
-
-    image = (
-        subprocess.run(
-            [
-                "podman",
-                "container",
-                "inspect",
-                container,
-                "--format",
-                r"{{.ImageName}}",
-            ],
-            check=True,
-            capture_output=True,
-        )
-        .stdout.decode("utf-8")
-        .strip()
-    )
-
-    logger.debug(f"Image for container '{container}' is '{image}'")
-    return image

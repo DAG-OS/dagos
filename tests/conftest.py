@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from dagos.commands.wsl.prepare_wsl_distro import get_container_engine
+import dagos.containers.utils as container_utils
 
 pytest_plugins = [
     "tests.bdd.steps.given_steps",
@@ -18,4 +18,4 @@ def test_data_dir() -> Path:
 
 @pytest.fixture
 def container_engine() -> str:
-    return get_container_engine()
+    return container_utils.get_container_engine()
