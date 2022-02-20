@@ -50,15 +50,16 @@ markers = [
     "integration"
 ]
 
-[tool.coverage.paths]
-source = [
-    "src/",
-    "/root/dagos/src",
-]
-
 [tool.coverage.run]
+relative_files = true
+source = [
+    "src/*",
+    "/root/dagos/src/*"
+]
 omit = [
-    "src/dagos/__main__.py"
+    "src/dagos/__main__.py",
+    "tests/*",
+    "*/.dagos/*"
 ]
 
 [tool.poetry.scripts]
