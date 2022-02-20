@@ -1,1 +1,3 @@
+component_search_paths:
+  - "{{data_dir}}/components"
 verbosity: 1

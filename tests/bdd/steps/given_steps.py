@@ -19,7 +19,9 @@ def i_have_a_file(test_data_dir: Path, file):
 
 
 @given(parsers.parse("I have following text:\n{text}"), target_fixture="text")
-def i_have_text(text):
+def i_have_text(test_data_dir: Path, text: str):
+    if "{{data_dir}}" in text:
+        text = text.replace("{{data_dir}}", str(test_data_dir))
     return text
 
 

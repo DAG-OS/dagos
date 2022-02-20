@@ -64,17 +64,6 @@ def dagos_cli(ctx: click.Context, verbose: int, timer: bool):
         print(ctx.get_help())
 
 
-# TODO: Make this list configurable
-component_search_paths = [
-    # user
-    Path.home() / ".dagos" / "components",
-    # system (linux)
-    Path("/opt/dagos/components"),
-    # dagos
-    Path(__file__).parent / "components",
-]
-
-
 def dagos():
     try:
         use_config_log_level = False
@@ -90,7 +79,7 @@ def dagos():
         if use_config_log_level:
             configure_logging(configuration.verbosity)
 
-        SoftwareComponentScanner().scan(component_search_paths)
+        SoftwareComponentScanner().scan(configuration.component_search_paths)
         for command_group in CommandRegistry.commands.values():
             dagos_cli.add_command(command_group)
         dagos_cli.add_command(wsl)
