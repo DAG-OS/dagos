@@ -24,9 +24,6 @@ class SoftwareComponentRegistry(type):
 
         if not cls in cls.components:
             cls.components.append(component)
-            CommandRegistry.add_command(
-                CommandType.MANAGE, component.build_manage_command_group()
-            )
 
         return component
 

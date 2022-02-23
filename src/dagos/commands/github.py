@@ -1,22 +1,20 @@
 import atexit
 import fnmatch
+import typing as t
 from pathlib import Path
 
 import requests
-import yaml
 from loguru import logger
 
 from dagos.core.commands import Command, CommandType
 from dagos.core.components import SoftwareComponent
-from dagos.exceptions import DagosException, SoftwareComponentScanException
+from dagos.exceptions import DagosException
 from dagos.utils import file_utils
 
 
 class GitHubInstallCommand(Command):
     """Install a software component via a GitHub release."""
 
-    # TODO: Allow providing these values via configuration
-    name: str
     repository: str
     pattern: str
     install_dir: str
@@ -27,27 +25,15 @@ class GitHubInstallCommand(Command):
         super().__init__(CommandType.INSTALL, parent)
 
     @staticmethod
-    def parse(path: Path):
-        if not path.exists():
-            raise SoftwareComponentScanException("Action file does not exist")
-        try:
-            with path.open() as f:
-                yaml_content = yaml.safe_load(f)
-        except yaml.YAMLError as e:
-            raise SoftwareComponentScanException("YAML is invalid", e)
-
-        command = GitHubInstallCommand()
+    def parse(yaml: t.Dict, component: SoftwareComponent):
+        command = GitHubInstallCommand(component)
         # TODO: Add error handling
-        command.name = yaml_content["name"]
-        command.repository = yaml_content["repository"]
-        command.pattern = yaml_content["pattern"]
-        command.install_dir = yaml_content["install_dir"]
-        if "binary" in yaml_content:
-            command.binary = yaml_content["binary"]
-        if "strip_root_folder" in yaml_content:
-            command.strip_root_folder = yaml_content["strip_root_folder"]
-        else:
-            command.strip_root_folder = False
+        command.repository = yaml["repository"]
+        command.pattern = yaml["pattern"]
+        command.install_dir = yaml["install_dir"]
+        if "binary" in yaml:
+            command.binary = yaml["binary"]
+        command.strip_root_folder = True if "strip_root_folder" in yaml else False
         return command
 
     def _parse_repository_url(self) -> str:
@@ -109,7 +95,7 @@ class GitHubInstallCommand(Command):
         atexit.register(lambda: archive.unlink())
 
         # TODO: Is there a need to check if its an archive?
-        install_path = Path(self.install_dir).resolve()
+        install_path = Path(self.install_dir).expanduser()
         file_utils.extract_archive(archive, install_path, self.strip_root_folder)
 
         self.post_extraction(install_path)

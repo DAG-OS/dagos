@@ -4,7 +4,6 @@ from pytest_bdd import scenarios
 
 features_base_dir = str(Path(__file__).parent / "features")
 
-# scenarios("features/actions.feature", features_base_dir=features_base_dir)
 scenarios("configure_dagos.feature", features_base_dir=features_base_dir)
 scenarios("common_components.feature", features_base_dir=features_base_dir)
 scenarios("custom_components.feature", features_base_dir=features_base_dir)

@@ -1,7 +1,0 @@
----
-name: "structurizr"
-action: "install"
-via: "github_cli"
-repository: "structurizr/cli"
-pattern: "*.zip"
-install_dir: "/home/dev/software/structurizr/cli"

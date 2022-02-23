@@ -1,9 +1,11 @@
 ---
-name: "shellcheck"
-action: "install"
-via: "github_cli"
-repository: "https://github.com/koalaman/shellcheck"
-pattern: "shellcheck-*.linux.x86_64.tar.xz"
-install_dir: "/opt/shellcheck"
-strip_root_folder: true
-binary: shellcheck
+command:
+  component: "shellcheck"
+  type: "install"
+  provider: "github"
+  configuration:
+    repository: "https://github.com/koalaman/shellcheck"
+    pattern: "shellcheck-*.linux.x86_64.tar.xz"
+    install_dir: "/opt/shellcheck"
+    strip_root_folder: true
+    binary: shellcheck

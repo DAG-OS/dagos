@@ -1,9 +1,10 @@
 ---
-name: "vale"
-action: "install"
-via: "github_cli"
-repository: "https://github.com/errata-ai/vale"
-pattern: "vale*Linux_64*.tar.gz"
-# TODO: Resolve home dir in install_dir values
-install_dir: "/home/dev/software/vale"
-binary: "vale"
+command:
+  component: "vale"
+  type: "install"
+  provider: "github"
+  configuration:
+    repository: "https://github.com/errata-ai/vale"
+    pattern: "vale*Linux_64*.tar.gz"
+    install_dir: "~/software/vale"
+    binary: "vale"
