@@ -1,9 +1,9 @@
 import atexit
 import logging
-import os
 import shutil
 import tarfile
 import tempfile
+import typing as t
 import zipfile
 from pathlib import Path
 
@@ -86,29 +86,44 @@ def _extract_zip_archive(
             zip.extractall(output_dir)
 
 
-def add_executable_to_path(
-    executable: Path, dir_on_path: Path, exists_ok: bool = True
+def create_symlink(
+    from_path: t.Union[str, Path],
+    to_path: t.Union[str, Path],
+    force: bool = False,
+    target_is_directory: bool = False,
 ) -> None:
-    """Add a symlink to provided executable to provided dir on path.
+    """Create symlink from a provided path to another.
 
     Args:
-        executable (Path): The executable to link into provided dir.
-        dir_on_path (Path): A directory that is already on the PATH.
-        exists_ok (bool, optional): If False, fails when the target file already exists. Defaults to True.
+        from_path (t.Union[str, Path]): The path where the symlink is created.
+        to_path (t.Union[str, Path]): The path to where the symlink points.
+        force (bool, optional): If True, existing files at from_path are overridden.
+            If False, an exception is raised when the from_path already exists.
+            Defaults to False.
+        target_is_directory (bool, optional): Set True, if the target is a directory.
+            Defaults to False.
+
+    Raises:
+        DagosException: If the from_path exists and force is not provided.
+        DagosException: If the to_path does not exist.
     """
-    symlink_target = dir_on_path / executable.name
-    if symlink_target.exists():
-        if exists_ok:
-            logger.trace(
-                f"Replacing existing '{executable.name}' symlink in '{symlink_target}'"
-            )
-            symlink_target.unlink()
+    if isinstance(from_path, str):
+        from_path = Path(from_path)
+    if isinstance(to_path, str):
+        to_path = Path(to_path)
+    if from_path.exists():
+        if force:
+            logger.trace(f"Removing existing file at '{from_path}'")
+            from_path.unlink()
         else:
-            logger.error(
-                f"A '{executable.name}' executable is already in '{symlink_target}'..."
+            raise DagosException(
+                f"Failed to create symbolic link '{from_path}': a file with that name already exists"
             )
-            exit(1)
-    os.symlink(executable, symlink_target)
+    if not to_path.exists():
+        raise DagosException(
+            f"Failed to create symbolic link '{from_path}': the target does not exist"
+        )
+    from_path.symlink_to(to_path, target_is_directory)
 
 
 def create_temp_dir(remove_at_exit: bool = True) -> Path:

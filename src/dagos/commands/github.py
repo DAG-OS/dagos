@@ -103,7 +103,9 @@ class GitHubInstallCommand(Command):
         if hasattr(self, "binary"):
             # TODO: Generalize adding to path
             usr_local_bin = Path("/usr/local/bin")
-            file_utils.add_executable_to_path(install_path / self.binary, usr_local_bin)
+            file_utils.create_symlink(
+                usr_local_bin / self.binary, install_path / self.binary, force=True
+            )
 
     def post_extraction(self, install_path: Path) -> None:
         """Called after the downloaded archive is extracted. May be used by
