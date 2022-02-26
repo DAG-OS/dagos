@@ -14,18 +14,17 @@ from dagos.logging import configure_logging
 
 from . import __version__
 
-click.Command.format_help = rich_click.rich_format_help
-click.Group.format_help = rich_click.rich_format_help
-
-rich_click.core.COMMAND_GROUPS = {
+click.Command.format_help = rich_click.rich_click.rich_format_help
+click.Group.format_help = rich_click.rich_click.rich_format_help
+rich_click.rich_click.COMMAND_GROUPS = {
     "dagos": [
         {
             "name": "Software Component Commands",
             "commands": [type.value for type in CommandType],
         },
+        {"name": "Software Environment Commands", "commands": ["env", "wsl"]},
     ]
 }
-rich_click.core.COMMANDS_PANEL_TITLE = "General Commands"
 
 
 def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None:
