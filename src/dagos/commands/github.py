@@ -104,7 +104,9 @@ class GitHubInstallCommand(Command):
             # TODO: Generalize adding to path
             usr_local_bin = Path("/usr/local/bin")
             file_utils.create_symlink(
-                usr_local_bin / self.binary, install_path / self.binary, force=True
+                usr_local_bin / Path(self.binary).name,
+                install_path / self.binary,
+                force=True,
             )
 
     def post_extraction(self, install_path: Path) -> None:
