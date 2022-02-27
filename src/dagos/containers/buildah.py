@@ -41,35 +41,6 @@ def _unwind_list(arg: str, items: t.List[str]) -> t.List[str]:
     return result
 
 
-def run(
-    container: str,
-    command: t.Union[str, t.List[str]],
-    user: t.Optional[str] = None,
-    capture_stdout: t.Optional[bool] = False,
-    capture_stderr: t.Optional[bool] = False,
-) -> subprocess.CompletedProcess:
-    """Run provided command using the container's root filesystem, using config
-    settings inherited from the container's image or as specified during previous
-    calls to the config command.
-
-    Args:
-        container (str): The container to run the command in.
-        command (t.Union[str, t.List[str]]): The command to run.
-        user (str, optional): The user[:group] to run the command as.
-        capture_stdout (bool, optional): If True, capture stdout for later retrieval. Defaults to False.
-        capture_stderr (bool, optional): If True, capture stderr for later retrieval. Defaults to False.
-
-    Returns:
-        subprocess.CompletedProcess: The result of running the command.
-    """
-    run_command = ["buildah", "run"]
-    if user:
-        run_command.extend(["--user", user])
-    run_command.extend([container, "--"])
-    run_command.extend(command.split() if isinstance(command, str) else command)
-    return _run(run_command, capture_stdout, capture_stderr)
-
-
 def create_container(
     container_image: str,
     name: str = None,
@@ -96,32 +67,6 @@ def create_container(
     container = result.stdout.strip()
     logger.success(f"Created '{container}' from image '{container_image}'")
     return container
-
-
-def copy(
-    container: str,
-    src: t.Union[str, Path],
-    dst: t.Optional[t.Union[str, Path]] = None,
-    chown: t.Optional[str] = None,
-) -> None:
-    """Copy the contents of a file, URL, or directory into a container's working
-    directory.
-
-    Args:
-        container (str): The container to copy the contents to.
-        src (str | Path): The content source.
-        dst (str | Path, optional): The destination in the container.
-        chown (str, optional): The user[:group] ownership of the destination content.
-    """
-    path_to_str = lambda x: x if isinstance(x, str) else x.as_posix()
-
-    command = ["buildah", "copy"]
-    if chown:
-        command.extend(["--chown", chown])
-    command.extend([container, path_to_str(src)])
-    if dst:
-        command.append(path_to_str(dst))
-    _run(command)
 
 
 def commit(container: str, image_name: t.Optional[str] = None) -> str:
@@ -207,6 +152,32 @@ def config(
         _run(command)
 
 
+def copy(
+    container: str,
+    src: t.Union[str, Path],
+    dst: t.Optional[t.Union[str, Path]] = None,
+    chown: t.Optional[str] = None,
+) -> None:
+    """Copy the contents of a file, URL, or directory into a container's working
+    directory.
+
+    Args:
+        container (str): The container to copy the contents to.
+        src (str | Path): The content source.
+        dst (str | Path, optional): The destination in the container.
+        chown (str, optional): The user[:group] ownership of the destination content.
+    """
+    path_to_str = lambda x: x if isinstance(x, str) else x.as_posix()
+
+    command = ["buildah", "copy"]
+    if chown:
+        command.extend(["--chown", chown])
+    command.extend([container, path_to_str(src)])
+    if dst:
+        command.append(path_to_str(dst))
+    _run(command)
+
+
 def rm(container: str) -> None:
     """Remove provided container.
 
@@ -214,3 +185,32 @@ def rm(container: str) -> None:
         container (str): The container to remove.
     """
     _run(["buildah", "rm", container])
+
+
+def run(
+    container: str,
+    command: t.Union[str, t.List[str]],
+    user: t.Optional[str] = None,
+    capture_stdout: t.Optional[bool] = False,
+    capture_stderr: t.Optional[bool] = False,
+) -> subprocess.CompletedProcess:
+    """Run provided command using the container's root filesystem, using config
+    settings inherited from the container's image or as specified during previous
+    calls to the config command.
+
+    Args:
+        container (str): The container to run the command in.
+        command (t.Union[str, t.List[str]]): The command to run.
+        user (str, optional): The user[:group] to run the command as.
+        capture_stdout (bool, optional): If True, capture stdout for later retrieval. Defaults to False.
+        capture_stderr (bool, optional): If True, capture stderr for later retrieval. Defaults to False.
+
+    Returns:
+        subprocess.CompletedProcess: The result of running the command.
+    """
+    run_command = ["buildah", "run"]
+    if user:
+        run_command.extend(["--user", user])
+    run_command.extend([container, "--"])
+    run_command.extend(command.split() if isinstance(command, str) else command)
+    return _run(run_command, capture_stdout, capture_stderr)

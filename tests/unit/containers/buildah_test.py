@@ -62,61 +62,6 @@ def test_create_container(mocker, image, name, volumes, expectation):
 
 
 @pytest.mark.parametrize(
-    "command,user,capture_stdout,capture_stderr,expectation",
-    [
-        ("ls -la", None, True, False, ["container", "--", "ls", "-la"]),
-        (["ls", "-la"], None, False, True, ["container", "--", "ls", "-la"]),
-        ("ls", "dev:dev", False, False, ["--user", "dev:dev", "container", "--", "ls"]),
-    ],
-)
-def test_run(mocker, command, user, capture_stdout, capture_stderr, expectation):
-    mocker.patch("dagos.containers.buildah._run")
-    expectation = ["buildah", "run"] + expectation
-
-    buildah.run(
-        "container",
-        command,
-        user=user,
-        capture_stdout=capture_stdout,
-        capture_stderr=capture_stderr,
-    )
-
-    buildah._run.assert_called_once_with(expectation, capture_stdout, capture_stderr)
-
-
-@pytest.mark.parametrize(
-    "src,dst,chown,expectation",
-    [
-        (
-            "README.md",
-            None,
-            None,
-            ["container", "README.md"],
-        ),
-        (
-            "README.md",
-            "/root/README.md",
-            None,
-            ["container", "README.md", "/root/README.md"],
-        ),
-        (
-            "README.md",
-            "/root/README.md",
-            "root:root",
-            ["--chown", "root:root", "container", "README.md", "/root/README.md"],
-        ),
-    ],
-)
-def test_copy(mocker, src, dst, chown, expectation):
-    mocker.patch("dagos.containers.buildah._run")
-    expectation = ["buildah", "copy"] + expectation
-
-    buildah.copy("container", src, dst, chown)
-
-    buildah._run.assert_called_once_with(expectation)
-
-
-@pytest.mark.parametrize(
     "image_name,expectation",
     [
         (None, []),
@@ -167,9 +112,64 @@ def test_config_no_args(mocker):
     buildah._run.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "src,dst,chown,expectation",
+    [
+        (
+            "README.md",
+            None,
+            None,
+            ["container", "README.md"],
+        ),
+        (
+            "README.md",
+            "/root/README.md",
+            None,
+            ["container", "README.md", "/root/README.md"],
+        ),
+        (
+            "README.md",
+            "/root/README.md",
+            "root:root",
+            ["--chown", "root:root", "container", "README.md", "/root/README.md"],
+        ),
+    ],
+)
+def test_copy(mocker, src, dst, chown, expectation):
+    mocker.patch("dagos.containers.buildah._run")
+    expectation = ["buildah", "copy"] + expectation
+
+    buildah.copy("container", src, dst, chown)
+
+    buildah._run.assert_called_once_with(expectation)
+
+
 def test_rm(mocker):
     mocker.patch("dagos.containers.buildah._run")
 
     buildah.rm("container")
 
     buildah._run.assert_called_once_with(["buildah", "rm", "container"])
+
+
+@pytest.mark.parametrize(
+    "command,user,capture_stdout,capture_stderr,expectation",
+    [
+        ("ls -la", None, True, False, ["container", "--", "ls", "-la"]),
+        (["ls", "-la"], None, False, True, ["container", "--", "ls", "-la"]),
+        ("ls", "dev:dev", False, False, ["--user", "dev:dev", "container", "--", "ls"]),
+    ],
+)
+def test_run(mocker, command, user, capture_stdout, capture_stderr, expectation):
+    mocker.patch("dagos.containers.buildah._run")
+    expectation = ["buildah", "run"] + expectation
+
+    buildah.run(
+        "container",
+        command,
+        user=user,
+        capture_stdout=capture_stdout,
+        capture_stderr=capture_stderr,
+    )
+
+    buildah._run.assert_called_once_with(expectation, capture_stdout, capture_stderr)
