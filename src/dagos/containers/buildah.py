@@ -214,8 +214,3 @@ def rm(container: str) -> None:
         container (str): The container to remove.
     """
     _run(["buildah", "rm", container])
-
-
-def version() -> str:
-    result = _run("buildah --version", capture_stdout=True)
-    return result.stdout.strip()
