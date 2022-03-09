@@ -786,6 +786,17 @@ python-versions = ">=3.5"
 dev = ["pytest (>=4.6.2)", "black (>=19.3b0)"]
 
 [[package]]
+name = "yamale"
+version = "4.0.3"
+description = "A schema and validator for YAML."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pyyaml = "*"
+
+[[package]]
 name = "zipp"
 version = "3.7.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -803,7 +814,7 @@ ansible = ["ansible", "ansible-runner"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "e714b9123027aa70e778d584051027ffb34fcfcca836a8c6661563d29b566657"
+content-hash = "5dc7f88047f1eeefb6d4ab3bd6d417592e99cf7134813ad491ba21d2ac0799a7"
 
 [metadata.files]
 ansible = [
@@ -1286,6 +1297,10 @@ virtualenv = [
 win32-setctime = [
     {file = "win32_setctime-1.1.0-py3-none-any.whl", hash = "sha256:231db239e959c2fe7eb1d7dc129f11172354f98361c4fa2d6d2d7e278baa8aad"},
     {file = "win32_setctime-1.1.0.tar.gz", hash = "sha256:15cf5750465118d6929ae4de4eb46e8edae9a5634350c01ba582df868e932cb2"},
+]
+yamale = [
+    {file = "yamale-4.0.3-py3-none-any.whl", hash = "sha256:0fe07b81db43003401108fe8eb1a2874337b0e08af8d4210a5c3a760f8dc748c"},
+    {file = "yamale-4.0.3.tar.gz", hash = "sha256:1efb07da8de7dbebecfd353daab9b42334d5e4904a7a2d4b454839d81ae01bfd"},
 ]
 zipp = [
     {file = "zipp-3.7.0-py3-none-any.whl", hash = "sha256:b47250dd24f92b7dd6a0a8fc5244da14608f3ca90a5efcd37a3b1642fac9a375"},
