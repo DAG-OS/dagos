@@ -62,17 +62,25 @@ def test_create_container(mocker, image, name, volumes, expectation):
 
 
 @pytest.mark.parametrize(
-    "image_name,expectation",
+    "image_name,rm,squash,expectation",
     [
-        (None, []),
-        ("localhost/dagos-buildah-test-image", ["localhost/dagos-buildah-test-image"]),
+        (None, False, False, ["container"]),
+        (
+            "localhost/dagos-buildah-test-image",
+            False,
+            False,
+            ["container", "localhost/dagos-buildah-test-image"],
+        ),
+        (None, True, False, ["--rm", "container"]),
+        (None, False, True, ["--squash", "container"]),
+        ("test-image", True, True, ["--rm", "--squash", "container", "test-image"]),
     ],
 )
-def test_commit(mocker, image_name, expectation):
+def test_commit(mocker, image_name, rm, squash, expectation):
     mocker.patch("dagos.containers.buildah._run")
-    expectation = ["buildah", "commit", "container"] + expectation
+    expectation = ["buildah", "commit"] + expectation
 
-    image = buildah.commit("container", image_name)
+    image = buildah.commit("container", image_name=image_name, rm=rm, squash=squash)
 
     buildah._run.assert_called_once_with(expectation, capture_stdout=True)
     assert image

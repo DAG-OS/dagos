@@ -69,23 +69,37 @@ def create_container(
     return container
 
 
-def commit(container: str, image_name: t.Optional[str] = None) -> str:
+def commit(
+    container: str,
+    image_name: t.Optional[str] = None,
+    rm: bool = False,
+    squash: bool = False,
+) -> str:
     """Write a new image using the container's read-write layer and, if it is
     based on an image, the layers of that image.
 
     Args:
         container (str): The container to commit.
         image_name (str, optional): The name of the resulting image.
+        rm (bool, optional): If True, remove the container after committing it to an image. Defaults to False.
+        squash (bool, optional): If True, squash all images layers into one. Defaults to False.
 
     Returns:
-        str: _description_
+        str: The committed image ID.
     """
-    command = ["buildah", "commit", container]
+    command = ["buildah", "commit"]
+
+    if rm:
+        command.append("--rm")
+    if squash:
+        command.append("--squash")
+    command.append(container)
     if image_name:
         command.append(image_name)
+
     result = _run(command, capture_stdout=True)
     image = result.stdout.strip()
-    logger.success(f"Committed image '{image}'")
+    logger.info(f"Committed image '{image_name if image_name else image}'")
     return image
 
 
