@@ -1,0 +1,19 @@
+# This schema describes the structure of an environment definition file in the
+# YAML format. It is based on the syntax defined by Yamale:
+# https://github.com/23andMe/Yamale
+
+environment:
+  name: str()
+  description: str(required=False)
+  platform: include('platform')
+  components: map(include('component'), key=str())
+---
+platform:
+  os: any(include('os'), list(include('os')))
+  image: any(include('image'), list(include('image')), required=False)
+os: enum('linux', 'windows')
+image: str(min=1, multiline=False)
+
+component:
+  purpose: str(required=False)
+  version: str()

@@ -1,0 +1,25 @@
+---
+environment:
+  name: "dagos"
+  description: "An environment used to develop the DAG-OS CLI."
+  platform:
+    os:
+      - linux
+    image:
+      - ubuntu
+  components:
+    miniconda:
+      purpose: Manage Python environments in multiple versions.
+      version: ^4.11
+    poetry:
+      purpose: Python dependency manager and build tool.
+      version: ^1.1
+    podman:
+      purpose: Build, run, and export containers.
+      version: latest
+    vale:
+      purpose: Prose linter used for linting documentation.
+      version: latest
+    structurizr:
+      purpose: C4 model diagramming tool used to document architecture.
+      version: latest
