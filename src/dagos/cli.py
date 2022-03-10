@@ -5,6 +5,7 @@ import click
 import rich_click
 from loguru import logger
 
+from dagos.commands.env.cli import env
 from dagos.commands.wsl.cli import wsl
 from dagos.core.commands import CommandRegistry, CommandType
 from dagos.core.component_scanner import SoftwareComponentScanner
@@ -82,6 +83,7 @@ def dagos():
         for command_group in CommandRegistry.commands.values():
             dagos_cli.add_command(command_group)
         dagos_cli.add_command(wsl)
+        dagos_cli.add_command(env)
         dagos_cli()
     except DagosException as e:
         logger.error(e)
