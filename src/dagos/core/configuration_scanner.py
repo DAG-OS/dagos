@@ -5,6 +5,7 @@ import yaml
 from loguru import logger
 
 from dagos.core.configuration import DagosConfiguration
+from dagos.core.validator import Validator
 from dagos.exceptions import DagosException
 
 
@@ -39,17 +40,11 @@ class ConfigurationScanner:
 
     def load_configuration(self, config_file: Path) -> DagosConfiguration:
         logger.debug(f"Loading configuration from '{config_file}'")
-        if not config_file.exists():
-            raise DagosException("Provided config file does not exist")
-        try:
-            with config_file.open() as f:
-                yaml_content = yaml.safe_load(f)
-        except yaml.YAMLError as e:
-            raise DagosException("YAML is invalid", e)
+        data = Validator().validate_configuration(config_file)
 
         for variable in DagosConfiguration.get_config_keys():
-            if variable in yaml_content:
-                config_value = yaml_content[variable]
+            if variable in data:
+                config_value = data[variable]
                 if variable == "component_search_paths":
                     config_value = self._parse_component_search_paths(config_value)
 

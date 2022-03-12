@@ -1,10 +1,10 @@
 from pathlib import Path
 
 import click
-import yamale
 from loguru import logger
 
 from dagos.core.components import SoftwareComponentRegistry
+from dagos.core.validator import Validator
 
 
 @click.command()
@@ -18,19 +18,8 @@ def deploy(file: Path):
     """Deploy a provided environment."""
     # TODO: Allow selecting deployment target
 
-    schema_file = Path(__file__).parent.parent.parent / "environments" / "schema.yml"
-    schema = yamale.make_schema(schema_file)
-    data = yamale.make_data(file)
-    try:
-        yamale.validate(schema, data)
-        logger.debug("Provided environment file '{}' is valid", file)
-    except yamale.YamaleError as e:
-        logger.error("Provided environment file '{}' is invalid!", file)
-        for result in e.results:
-            for error in result.errors:
-                logger.error(error)
-
-    environment = data[0][0]["environment"]
+    data = Validator().validate_environment(file)
+    environment = data["environment"]
     logger.info("Deploying environment '{}'", environment["name"])
 
     # TODO: Check if selected platform is supported

@@ -4,3 +4,7 @@ class DagosException(Exception):
 
 class SoftwareComponentScanException(DagosException):
     """A base exception for all component scanning errors."""
+
+
+class ValidationException(DagosException):
+    """A base excetpion for all validation errors."""

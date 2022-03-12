@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from dagos.core.configuration_scanner import ConfigurationScanner
-from dagos.exceptions import DagosException
+from dagos.exceptions import ValidationException
 
 
 @contextmanager
@@ -16,8 +16,8 @@ def does_not_raise():
     "file,expectation",
     [
         ("config/basic.yml", does_not_raise()),
-        ("does_not_exist", pytest.raises(DagosException)),
-        ("config/invalid.yml", pytest.raises(DagosException)),
+        ("does_not_exist", pytest.raises(ValidationException)),
+        ("config/invalid.yml", pytest.raises(ValidationException)),
     ],
 )
 def test_load_configuration(test_data_dir: Path, file, expectation):
