@@ -1,0 +1,15 @@
+# This schema describes the structure of a configuration file in the YAML format.
+# It is based on the syntax defined by Yamale: https://github.com/23andMe/Yamale
+
+# The paths where to search for configuration, components, and environments. By
+# providing paths here the default paths are overwritten entirely!
+search_paths: list(include('path'), required=False, none=False)
+# Additional paths where to look for software components. Each entry must be a
+# folder which is either named "components" or contains a ".dagos-components"
+# marker file.
+component_search_paths: list(include('path'), required=False)
+# The default level of verbosity used for logging. Lowest is 0 (INFO), highest
+# is 2 (TRACE).
+verbosity: int(min=0, max=2, required=False, none=False)
+---
+path: str()
