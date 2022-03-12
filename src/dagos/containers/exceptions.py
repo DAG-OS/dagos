@@ -13,11 +13,11 @@ class NoSupportedContainerEngineException(UnsupportedPlatformException):
         engines = ", ".join(supported_engines)
         message.writelines(
             [
-                "No supported container engine found!",
-                f"Please install one of {engines} and try again.",
+                "No supported container engine found! ",
+                f"Please install one of [{engines}] and try again.",
             ]
         )
-        super.__init__(message.getvalue())
+        super().__init__(message.getvalue())
 
 
 class ContainerException(DagosException):
