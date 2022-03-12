@@ -1,6 +1,7 @@
 {
     "asciidoc.use_kroki": true,
     "c4.diagram.plantuml.enabled": true,
+    "editor.rulers": [80, 100, 120],
     "files.exclude": {
         "**/__pycache__": true
     },
