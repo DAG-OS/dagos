@@ -25,7 +25,9 @@ def deploy(file: Path):
     # TODO: Check if selected platform is supported
 
     components = environment["components"]
-    for component, values in components.items():
-        logger.info("Deploying component '{}'", component)
-        if not component in [x.name for x in SoftwareComponentRegistry.components]:
-            logger.error("Component '{}' is unknown!", component)
+    for component in components:
+        logger.info("Deploying component '{}'", component["name"])
+        if not component["name"] in [
+            x.name for x in SoftwareComponentRegistry.components
+        ]:
+            logger.error("Component '{}' is unknown!", component["name"])

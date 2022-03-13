@@ -6,7 +6,7 @@ environment:
   name: str()
   description: str(required=False)
   platform: include('platform')
-  components: map(include('component'), key=str())
+  components: list(include('component'))
 ---
 platform:
   os: any(include('os'), list(include('os')))
@@ -15,5 +15,6 @@ os: enum('linux', 'windows')
 image: str(min=1, multiline=False)
 
 component:
+  name: str()
   purpose: str(required=False)
-  version: str()
+  version: str(required=False)

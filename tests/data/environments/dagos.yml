@@ -8,18 +8,18 @@ environment:
     image:
       - ubuntu
   components:
-    miniconda:
+    - name: miniconda
       purpose: Manage Python environments in multiple versions.
       version: ^4.11
-    poetry:
+    - name: poetry
       purpose: Python dependency manager and build tool.
       version: ^1.1
-    podman:
+    - name: podman
       purpose: Build, run, and export containers.
       version: latest
-    vale:
+    - name: vale
       purpose: Prose linter used for linting documentation.
       version: latest
-    structurizr:
+    - name: structurizr
       purpose: C4 model diagramming tool used to document architecture.
       version: latest
