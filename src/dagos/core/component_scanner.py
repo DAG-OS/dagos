@@ -44,7 +44,9 @@ class SoftwareComponentScanner(object):
         for name, component_result in self.scan_result.items():
             if len(component_result.commands) > 0:
                 if component_result.component is None:
-                    component_result.component = SoftwareComponent(name)
+                    component_result.component = SoftwareComponent(
+                        name, component_result.folders, component_result.files
+                    )
                 for command_result in component_result.commands:
                     self._construct_command(component_result.component, command_result)
 

@@ -43,13 +43,15 @@ class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
     files: t.List[Path]
     commands: t.Dict[str, Command]
 
-    def __init__(self, name: str) -> None:
+    def __init__(
+        self, name: str, folders: t.List[Path] = None, files: t.List[Path] = None
+    ) -> None:
         self.name = name
         self.commands = {}
         for type in CommandType:
             self.commands[type.name] = None
-        self.folders = []
-        self.files = []
+        self.folders = folders if folders else []
+        self.files = files if files else []
 
     def add_command(self, command: Command) -> None:
         """Add provided command to this software component.
