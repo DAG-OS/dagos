@@ -7,7 +7,7 @@ import click
 
 from dagos.exceptions import SoftwareComponentScanException
 
-from .commands import Command, CommandRegistry, CommandType
+from .commands import Command, CommandType
 
 
 class SoftwareComponentRegistry(type):
@@ -26,6 +26,13 @@ class SoftwareComponentRegistry(type):
             cls.components.append(component)
 
         return component
+
+    @classmethod
+    def find_component(cls, name: str) -> t.Optional[SoftwareComponent]:
+        for component in cls.components:
+            if component.name == name:
+                return component
+        return None
 
 
 class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):

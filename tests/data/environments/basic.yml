@@ -1,0 +1,11 @@
+environment:
+  name: basic
+  description: An environment for BDD tests of the DAG-OS CLI.
+  platform:
+    os:
+      - linux
+    image:
+      - ubuntu
+  components:
+    - name: vale
+      purpose: Lint some documents.

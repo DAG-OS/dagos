@@ -3,6 +3,7 @@ from pathlib import Path
 import click
 from loguru import logger
 
+from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponentRegistry
 from dagos.core.validator import Validator
 
@@ -24,10 +25,13 @@ def deploy(file: Path):
 
     # TODO: Check if selected platform is supported
 
+    # TODO: Validate that all components are known and installable
     components = environment["components"]
     for component in components:
-        logger.info("Deploying component '{}'", component["name"])
-        if not component["name"] in [
-            x.name for x in SoftwareComponentRegistry.components
-        ]:
+        found_component = SoftwareComponentRegistry.find_component(component["name"])
+        if found_component:
+            logger.info("Deploying component '{}'", component["name"])
+            install_command = found_component.commands[CommandType.INSTALL.name]
+            install_command.execute()
+        else:
             logger.error("Component '{}' is unknown!", component["name"])
