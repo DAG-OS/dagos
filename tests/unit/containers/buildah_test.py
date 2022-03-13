@@ -161,14 +161,17 @@ def test_rm(mocker):
 
 
 @pytest.mark.parametrize(
-    "command,user,capture_stdout,capture_stderr,expectation",
+    "command,user,capture_stdout,capture_stderr,ignore_failure,expectation",
     [
-        ("ls -la", None, True, False, ["container", "--", "ls", "-la"]),
-        (["ls", "-la"], None, False, True, ["container", "--", "ls", "-la"]),
-        ("ls", "dev:dev", False, False, ["--user", "dev:dev", "container", "--", "ls"]),
+        ("ls -la", None, True, False, False, ["container", "--", "ls", "-la"]),
+        (["ls", "-la"], None, False, True, False, ["container", "--", "ls", "-la"]),
+        ("ls", "d:d", False, False, False, ["--user", "d:d", "container", "--", "ls"]),
+        ("xxxxx", None, False, False, True, ["container", "--", "xxxxx"]),
     ],
 )
-def test_run(mocker, command, user, capture_stdout, capture_stderr, expectation):
+def test_run(
+    mocker, command, user, capture_stdout, capture_stderr, ignore_failure, expectation
+):
     mocker.patch("dagos.containers.buildah._run")
     expectation = ["buildah", "run"] + expectation
 
@@ -178,6 +181,9 @@ def test_run(mocker, command, user, capture_stdout, capture_stderr, expectation)
         user=user,
         capture_stdout=capture_stdout,
         capture_stderr=capture_stderr,
+        ignore_failure=ignore_failure,
     )
 
-    buildah._run.assert_called_once_with(expectation, capture_stdout, capture_stderr)
+    buildah._run.assert_called_once_with(
+        expectation, capture_stdout, capture_stderr, ignore_failure
+    )

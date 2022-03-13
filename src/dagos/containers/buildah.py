@@ -9,6 +9,7 @@ def _run(
     command: t.Union[str, t.List[str]],
     capture_stdout=False,
     capture_stderr=False,
+    ignore_failure=False,
 ) -> subprocess.CompletedProcess:
     logger.info(
         f"Running command: {command if isinstance(command, str) else ' '.join(command)}"
@@ -23,7 +24,8 @@ def _run(
     )
 
     # TODO: Exception handling
-    result.check_returncode()
+    if not ignore_failure:
+        result.check_returncode()
     return result
 
 
@@ -207,6 +209,7 @@ def run(
     user: t.Optional[str] = None,
     capture_stdout: t.Optional[bool] = False,
     capture_stderr: t.Optional[bool] = False,
+    ignore_failure: t.Optional[bool] = False,
 ) -> subprocess.CompletedProcess:
     """Run provided command using the container's root filesystem, using config
     settings inherited from the container's image or as specified during previous
@@ -218,6 +221,7 @@ def run(
         user (str, optional): The user[:group] to run the command as.
         capture_stdout (bool, optional): If True, capture stdout for later retrieval. Defaults to False.
         capture_stderr (bool, optional): If True, capture stderr for later retrieval. Defaults to False.
+        ignore_failure (bool, optional): If True, do not fail if the command fails. Defaults to False.
 
     Returns:
         subprocess.CompletedProcess: The result of running the command.
@@ -227,4 +231,4 @@ def run(
         run_command.extend(["--user", user])
     run_command.extend([container, "--"])
     run_command.extend(command.split() if isinstance(command, str) else command)
-    return _run(run_command, capture_stdout, capture_stderr)
+    return _run(run_command, capture_stdout, capture_stderr, ignore_failure)
