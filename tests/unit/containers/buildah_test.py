@@ -187,3 +187,26 @@ def test_run(
     buildah._run.assert_called_once_with(
         expectation, capture_stdout, capture_stderr, ignore_failure
     )
+
+
+@pytest.mark.parametrize(
+    "command,user",
+    [
+        ("ls", None),
+        ("ls", "dev:dev"),
+        ("dagos", "dev:dev"),
+    ],
+)
+def test_check_command(mocker, command, user):
+    mocker.patch("dagos.containers.buildah.run")
+
+    buildah.check_command("container", command, user)
+
+    buildah.run.assert_called_once_with(
+        "container",
+        f"command -v {command}",
+        user=user,
+        capture_stdout=True,
+        capture_stderr=True,
+        ignore_failure=True,
+    )

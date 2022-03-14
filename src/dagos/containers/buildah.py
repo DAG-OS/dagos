@@ -232,3 +232,25 @@ def run(
     run_command.extend([container, "--"])
     run_command.extend(command.split() if isinstance(command, str) else command)
     return _run(run_command, capture_stdout, capture_stderr, ignore_failure)
+
+
+def check_command(container: str, command: str, user: t.Optional[str] = None) -> bool:
+    """Check if provided command is available in provided container.
+
+    Args:
+        container (str): The container to check in.
+        command (str): The command to check availability for.
+        user (t.Optional[str], optional): The user[:group] to check for. Defaults to None.
+
+    Returns:
+        bool: True, if the command is available, false otherwise.
+    """
+    result = run(
+        container,
+        f"command -v {command}",
+        user=user,
+        capture_stdout=True,
+        capture_stderr=True,
+        ignore_failure=True,
+    )
+    return result.returncode == 0
