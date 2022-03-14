@@ -1,6 +1,5 @@
 import re
 import shutil
-import subprocess
 from pathlib import Path
 
 from pytest_bdd import parsers, then

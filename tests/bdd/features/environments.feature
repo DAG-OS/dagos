@@ -1,6 +1,6 @@
-@integration
 Feature: Manage software environments
 
+    @integration
     Scenario: Deploy a software environment
         Given I have a file "environments/basic.yml"
         And I have root privileges

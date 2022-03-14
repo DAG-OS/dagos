@@ -11,7 +11,9 @@ from .utils import yield_step
 @when(parsers.parse('I store this file at "{destination}"'))
 @when(parsers.parse('I store this folder at "{destination}"'))
 def i_store_file_at_destination(file: Path, destination: str):
-    Path(destination).expanduser().parent.mkdir(parents=True, exist_ok=True)
+    file = file.expanduser()
+    destination = Path(destination).expanduser()
+    destination.parent.mkdir(parents=True, exist_ok=True)
     if file.is_file():
         shutil.copy(file, destination)
     elif file.is_dir():

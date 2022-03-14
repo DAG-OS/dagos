@@ -48,7 +48,12 @@ required_plugins = [
     "pytest-bdd",
 ]
 markers = [
-    "integration"
+    # Integration tests that modify the system and therefore should run inside a
+    # container.
+    "integration",
+    # Tests that interact with a container engine and therefore may have issues
+    # running inside a container.
+    "container"
 ]
 
 [tool.coverage.run]

@@ -1,3 +1,4 @@
+@container
 Feature: Manage WSL distros and instances
 
     Scenario: Prepare WSL distro from image
