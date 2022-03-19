@@ -4,6 +4,8 @@ from pathlib import Path
 
 from loguru import logger
 
+from dagos.exceptions import DagosException
+
 
 def _run(
     command: t.Union[str, t.List[str]],
@@ -11,9 +13,8 @@ def _run(
     capture_stderr=False,
     ignore_failure=False,
 ) -> subprocess.CompletedProcess:
-    logger.info(
-        f"Running command: {command if isinstance(command, str) else ' '.join(command)}"
-    )
+    formatted_command = command if isinstance(command, str) else " ".join(command)
+    logger.info(f"Running command: {formatted_command}")
 
     result = subprocess.run(
         command,
@@ -23,9 +24,8 @@ def _run(
         text=True,
     )
 
-    # TODO: Exception handling
-    if not ignore_failure:
-        result.check_returncode()
+    if not ignore_failure and result.returncode != 0:
+        raise DagosException("Command failure in container, see above for errors!")
     return result
 
 

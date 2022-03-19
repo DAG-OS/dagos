@@ -26,7 +26,7 @@ def test_private_run(
 ):
     mocker.patch("subprocess.run")
 
-    buildah._run(command, capture_stdout, capture_stderr)
+    buildah._run(command, capture_stdout, capture_stderr, ignore_failure=True)
 
     subprocess.run.assert_called_once_with(
         command,
