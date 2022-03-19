@@ -157,7 +157,9 @@ def test_rm(mocker):
 
     buildah.rm("container")
 
-    buildah._run.assert_called_once_with(["buildah", "rm", "container"])
+    buildah._run.assert_called_once_with(
+        ["buildah", "rm", "container"], capture_stdout=True
+    )
 
 
 @pytest.mark.parametrize(

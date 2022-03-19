@@ -200,7 +200,7 @@ def rm(container: str) -> None:
     Args:
         container (str): The container to remove.
     """
-    _run(["buildah", "rm", container])
+    _run(["buildah", "rm", container], capture_stdout=True)
 
 
 def run(
