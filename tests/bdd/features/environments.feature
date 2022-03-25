@@ -19,6 +19,6 @@ Feature: Manage software environments
         When I store this file at "~/.dagos/environments/basic.yml"
         And run "dagos env deploy --container ~/.dagos/environments/basic.yml"
 
-        Then I see "Deploying environment 'basic' into 'ubuntu' container image"
+        Then I see "Deploying environment 'basic' into 'rockylinux' container image"
         And I see "Committed image 'basic'"
         # TODO: Check that vale is installed in the container

@@ -16,6 +16,10 @@ os: enum('linux', 'windows')
 image:
   # The fully qualifying ID of the image used for pulling it
   id: str(min=1, multiline=False)
+  # A hint for dagos for which package manager to use. If none is provided dagos
+  # checks if one of a list of supported ones is installed and uses those to
+  # install any packages provided below.
+  package_manager: str(required=False)
   # A list of packages to install with the system package manager
   packages: include('packages', required=False)
 

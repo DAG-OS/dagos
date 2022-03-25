@@ -7,6 +7,7 @@ from loguru import logger
 import dagos.containers.buildah as buildah
 from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponent, SoftwareComponentRegistry
+from dagos.core.package_managers import PackageManager, PackageManagerRegistry
 from dagos.core.validator import Validator
 from dagos.exceptions import DagosException
 
@@ -40,7 +41,7 @@ def deploy(container: bool, image: str, file: Path):
         logger.info(
             "Deploying environment '{}' into '{}' container image",
             environment["name"],
-            image,
+            image["id"],
         )
     else:
         logger.info("Deploying environment '{}'", environment["name"])
@@ -52,11 +53,11 @@ def deploy(container: bool, image: str, file: Path):
         _deploy_locally(components)
 
 
-def _get_image(image_option: str, environment: t.Dict) -> str:
+def _get_image(image_option: str, environment: t.Dict) -> t.Dict:
     if image_option:
         return image_option
-    if "image" in environment["platform"]:
-        return environment["platform"]["image"][0]
+    if "images" in environment["platform"]:
+        return environment["platform"]["images"][0]
     raise DagosException(
         f"For deploying an environment to a container a valid base image is required!"
     )
@@ -93,24 +94,16 @@ def _deploy_locally(components: t.List[SoftwareComponent]) -> None:
 
 
 def _deploy_to_container(
-    components: t.List[SoftwareComponent], image: str, result_name: str
+    components: t.List[SoftwareComponent], image: t.Dict, result_name: str
 ) -> None:
-    container = buildah.create_container(image)
+    container = buildah.create_container(image["id"])
 
     try:
+        _install_packages(container, image)
+
         # Ensure dagos is installed
         if not buildah.check_command(container, "dagos"):
-            # TODO: Check base image meets minimum requirements (dagos or pip,git)
-            # TODO: Handle different package managers
-            buildah.run(container, "apt update")
-            buildah.run(container, "apt install -y python3-pip git")
-            buildah.run(
-                container,
-                "pip3 install git+https://github.com/DAG-OS/dagos.git#egg=dagos",
-            )
-            # Committing the base image with dagos installed so that users may
-            # continue from this image to save time during debugging.
-            buildah.commit(container, f"{image}-with-dagos")
+            container = _bootstrap_container(container, image)
 
         # Copy software components to container
         component_dir = "/root/.dagos/components"
@@ -124,3 +117,45 @@ def _deploy_to_container(
         buildah.commit(container, result_name)
     finally:
         buildah.rm(container)
+
+
+def _install_packages(container: str, image: t.Dict) -> None:
+    if "packages" in image:
+        if "package_manager" in image:
+            package_manager = PackageManagerRegistry.find(image["package_manager"])
+        else:
+            # TODO: Analyze platform first and get information from there?
+            package_manager = _select_package_manager(container)
+        buildah.run(container, package_manager.install(image["packages"]))
+        clean_command = package_manager.clean()
+        if clean_command:
+            buildah.run(container, clean_command)
+
+
+def _bootstrap_container(container: str, image: t.Dict) -> str:
+    """Install dagos on the container."""
+    # TODO: How important is it to have the exact same version of dagos installed?
+    # TODO: Include dagos wheel within dagos to skip git installation and
+    #       have the same version calling dagos installed.
+
+    # TODO: Ensure the installed python version is supported
+    buildah.run(container, "python3 --version")
+    buildah.run(
+        container,
+        "python3 -m pip install git+https://github.com/DAG-OS/dagos.git#egg=dagos",
+    )
+
+    # Committing the base image with dagos installed so that users may
+    # continue from this image to save time during debugging.
+    intermediate_image = buildah.commit(container, f"{image['id']}-with-dagos", rm=True)
+    return buildah.create_container(intermediate_image)
+
+
+def _select_package_manager(container: str) -> PackageManager:
+    for package_manager in PackageManagerRegistry.managers:
+        if buildah.check_command(container, package_manager.name()):
+            return package_manager
+    supported_managers = [x.name() for x in PackageManagerRegistry.managers]
+    raise DagosException(
+        f"None of the supported package managers are available: {', '.join(supported_managers)}"
+    )

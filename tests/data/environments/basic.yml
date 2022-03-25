@@ -5,7 +5,17 @@ environment:
     os:
       - linux
     images:
+      - id: rockylinux
+        package_manager: dnf
+        packages:
+          - git
+          - python38
+          - python38-pip
       - id: ubuntu
+        packages:
+          - git
+          - python3
+          - python3-pip
   components:
     - name: vale
       purpose: Lint some documents.

@@ -17,8 +17,8 @@ def _run(
     logger.info(f"Running command: {formatted_command}")
 
     result = subprocess.run(
-        command,
-        shell=True if isinstance(command, str) else False,
+        formatted_command,
+        shell=True,
         stdout=subprocess.PIPE if capture_stdout else None,
         stderr=subprocess.PIPE if capture_stderr else None,
         text=True,
@@ -102,7 +102,7 @@ def commit(
     result = _run(command, capture_stdout=True)
     image = result.stdout.strip()
     logger.info(f"Committed image '{image_name if image_name else image}'")
-    return image
+    return image_name if image_name else image
 
 
 def config(
@@ -245,12 +245,15 @@ def check_command(container: str, command: str, user: t.Optional[str] = None) ->
     Returns:
         bool: True, if the command is available, false otherwise.
     """
-    result = run(
-        container,
-        f"command -v {command}",
-        user=user,
-        capture_stdout=True,
-        capture_stderr=True,
-        ignore_failure=True,
-    )
+    args = {
+        "user": user,
+        "capture_stdout": True,
+        "capture_stderr": True,
+        "ignore_failure": True,
+    }
+    # Check that the 'command' executable is on path
+    if run(container, "command", **args).returncode == 0:
+        result = run(container, f"command -v {command}", **args)
+    else:
+        result = run(container, f"which {command}", **args)
     return result.returncode == 0

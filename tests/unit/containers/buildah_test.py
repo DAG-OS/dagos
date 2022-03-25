@@ -1,4 +1,5 @@
 import subprocess
+from unittest.mock import call
 
 import pytest
 
@@ -200,15 +201,30 @@ def test_run(
     ],
 )
 def test_check_command(mocker, command, user):
-    mocker.patch("dagos.containers.buildah.run")
+    mocker.patch(
+        "dagos.containers.buildah.run",
+        return_value=subprocess.CompletedProcess("cmd", returncode=0),
+    )
 
     buildah.check_command("container", command, user)
 
-    buildah.run.assert_called_once_with(
-        "container",
-        f"command -v {command}",
-        user=user,
-        capture_stdout=True,
-        capture_stderr=True,
-        ignore_failure=True,
+    buildah.run.assert_has_calls(
+        [
+            call(
+                "container",
+                "command",
+                user=user,
+                capture_stdout=True,
+                capture_stderr=True,
+                ignore_failure=True,
+            ),
+            call(
+                "container",
+                f"command -v {command}",
+                user=user,
+                capture_stdout=True,
+                capture_stderr=True,
+                ignore_failure=True,
+            ),
+        ],
     )
