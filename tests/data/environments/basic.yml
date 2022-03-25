@@ -4,8 +4,8 @@ environment:
   platform:
     os:
       - linux
-    image:
-      - ubuntu
+    images:
+      - id: ubuntu
   components:
     - name: vale
       purpose: Lint some documents.

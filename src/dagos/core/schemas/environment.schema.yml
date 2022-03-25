@@ -10,9 +10,16 @@ environment:
 ---
 platform:
   os: any(include('os'), list(include('os')))
-  image: any(include('image'), list(include('image')), required=False)
+  images: list(include('image'), required=False)
 os: enum('linux', 'windows')
-image: str(min=1, multiline=False)
+
+image:
+  # The fully qualifying ID of the image used for pulling it
+  id: str(min=1, multiline=False)
+  # A list of packages to install with the system package manager
+  packages: include('packages', required=False)
+
+packages: list(str())
 
 component:
   name: str()

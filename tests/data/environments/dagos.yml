@@ -5,8 +5,8 @@ environment:
   platform:
     os:
       - linux
-    image:
-      - ubuntu
+    images:
+      - id: ubuntu
   components:
     - name: miniconda
       purpose: Manage Python environments in multiple versions.
