@@ -7,8 +7,8 @@ Feature: Manage common software components
         Then "<command>" is installed
 
         Examples:
-            | component   | command         |
-            | github-cli  | gh              |
+            | component   | command     |
+            | github-cli  | gh          |
             | structurizr | structurizr |
 
     Scenario Outline: Install common software components via install
@@ -17,5 +17,6 @@ Feature: Manage common software components
         Then "<command>" is installed
 
         Examples:
-            | component   | command         |
-            | vale        | vale            |
+            | component   | command |
+            | vale        | vale    |
+            | miniconda   | conda   |
