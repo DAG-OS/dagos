@@ -37,7 +37,7 @@ class InstallPoetryCommand(Command):
         )
 
         logger.info("Add poetry to path")
-        install_dir = Path.home / ".poetry"
+        install_dir = Path.home() / ".poetry"
         binary = install_dir / "bin" / "poetry"
 
         file_utils.create_symlink("/usr/local/bin/poetry", binary, force=True)
