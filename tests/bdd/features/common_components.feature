@@ -20,3 +20,4 @@ Feature: Manage common software components
             | component   | command |
             | vale        | vale    |
             | miniconda   | conda   |
+            | poetry      | poetry  |
