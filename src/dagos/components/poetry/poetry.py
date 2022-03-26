@@ -38,6 +38,10 @@ class InstallPoetryCommand(Command):
             shell=True,
         )
 
+        logger.info("Add poetry to path")
+        binary = Path.home() / ".local" / "bin" / "poetry"
+        file_utils.create_symlink("/usr/local/bin/poetry", binary, force=True)
+
 
 class UninstallPoetryCommand(Command):
     """Uninstall poetry."""
@@ -51,3 +55,6 @@ class UninstallPoetryCommand(Command):
             f"curl -sSL https://install.python-poetry.org | python3 - --uninstall",
             shell=True,
         )
+
+        logger.info("Remove poetry from path")
+        Path("/usr/local/bin/poetry").unlink()
