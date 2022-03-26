@@ -106,9 +106,13 @@ def _deploy_to_container(
             container = _bootstrap_container(container, image)
 
         # Copy software components to container
-        component_dir = "/root/.dagos/components"
+        component_dir = Path("/root/.dagos/components")
         for component in components:
-            buildah.copy(container, component.folders[0], component_dir)
+            buildah.copy(
+                container,
+                component.folders[0],
+                component_dir / component.folders[0].name,
+            )
 
         # Install components
         for component in components:
