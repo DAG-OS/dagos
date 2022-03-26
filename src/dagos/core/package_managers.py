@@ -60,8 +60,11 @@ class PackageManager(object, metaclass=PackageManagerRegistry):
 
 
 class Apt(PackageManager):
-    def install(self, packages: t.List[str]) -> str:
-        return f"{self.refresh()} && apt install -y --no-install-recommends {' '.join(packages)}"
+    def install(self, packages: t.List[str]) -> t.List[str]:
+        return [
+            self.refresh(),
+            f"apt install -y --no-install-recommends {' '.join(packages)}",
+        ]
 
     def clean(self) -> t.Optional[str]:
         return "apt clean"

@@ -1,0 +1,29 @@
+environment:
+  name: dagos-test-environment
+  description: An environment for testing the DAG-OS CLI.
+  platform:
+    os: linux
+    # TODO: Allow configuration common to all images
+    images:
+      - id: ubuntu
+        # TODO: Configure workdir
+        # TODO: Configure entrypoint
+        # TODO: Copy poetry config files and install dependencies
+        # TODO: Add sudo user for user tests
+        packages:
+          - curl
+          - git
+          - python3
+          - python3-pip
+          - python3-venv
+      - id: python:3-slim
+        packages:
+          - git
+  components:
+    - name: miniconda
+      purpose: Used to manage tested Python versions.
+      # TODO: Run `conda clean --all` after installation
+      # TODO: Replace system python with conda python?
+    - name: poetry
+      purpose: Python dependency manager and build tool.
+      # TODO: Remove redundant python installations

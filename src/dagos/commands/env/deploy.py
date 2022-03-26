@@ -116,6 +116,7 @@ def _deploy_to_container(
 
         # Install components
         for component in components:
+            # TODO: Use the same verbosity as the CLI was initially called with
             buildah.run(container, f"dagos install {component.name}")
 
         buildah.commit(container, result_name)
@@ -130,7 +131,12 @@ def _install_packages(container: str, image: t.Dict) -> None:
         else:
             # TODO: Analyze platform first and get information from there?
             package_manager = _select_package_manager(container)
-        buildah.run(container, package_manager.install(image["packages"]))
+        install_command = package_manager.install(image["packages"])
+        if isinstance(install_command, str):
+            buildah.run(container, install_command)
+        else:
+            for command in install_command:
+                buildah.run(container, command)
         clean_command = package_manager.clean()
         if clean_command:
             buildah.run(container, clean_command)
