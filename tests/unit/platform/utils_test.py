@@ -41,6 +41,19 @@ def test_assert_windows(mocker, system, expectation):
 
 
 @pytest.mark.parametrize(
+    "system,expectation",
+    [
+        ("Windows", pytest.raises(UnsupportedOperatingSystem)),
+        ("Linux", does_not_raise()),
+    ],
+)
+def test_assert_linux(mocker, system, expectation):
+    mocker.patch("platform.system", return_value=system)
+    with expectation:
+        utils.assert_linux()
+
+
+@pytest.mark.parametrize(
     "system,systems,expectation",
     [
         ("Windows", [OperatingSystem.WINDOWS], does_not_raise()),
