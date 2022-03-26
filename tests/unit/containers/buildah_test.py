@@ -10,10 +10,10 @@ import dagos.containers.buildah as buildah
     "command,shell,capture_stdout,capture_stderr,stdout,stderr",
     [
         ("command", True, None, None, None, None),
-        (["command"], False, None, None, None, None),
-        (["command"], False, True, None, subprocess.PIPE, None),
-        (["command"], False, False, True, None, subprocess.PIPE),
-        (["command"], False, True, True, subprocess.PIPE, subprocess.PIPE),
+        (["command"], True, None, None, None, None),
+        (["command"], True, True, None, subprocess.PIPE, None),
+        (["command"], True, False, True, None, subprocess.PIPE),
+        (["command"], True, True, True, subprocess.PIPE, subprocess.PIPE),
     ],
 )
 def test_private_run(
@@ -30,7 +30,7 @@ def test_private_run(
     buildah._run(command, capture_stdout, capture_stderr, ignore_failure=True)
 
     subprocess.run.assert_called_once_with(
-        command,
+        command if isinstance(command, str) else " ".join(command),
         shell=shell,
         stdout=stdout,
         stderr=stderr,
