@@ -22,6 +22,7 @@ class PoetrySoftwareComponent(SoftwareComponent):
     def __init__(self) -> None:
         super().__init__("poetry")
         self.add_command(InstallPoetryCommand(self))
+        self.add_command(UninstallPoetryCommand(self))
 
 
 class InstallPoetryCommand(Command):
@@ -33,11 +34,20 @@ class InstallPoetryCommand(Command):
     def execute(self) -> None:
         logger.info("Download and run installer")
         subprocess.run(
-            "curl -sSL https://install.python-poetry.org | python3 -", shell=True
+            f"curl -sSL https://install.python-poetry.org | python3 -",
+            shell=True,
         )
 
-        logger.info("Add poetry to path")
-        install_dir = Path.home() / ".poetry"
-        binary = install_dir / "bin" / "poetry"
 
-        file_utils.create_symlink("/usr/local/bin/poetry", binary, force=True)
+class UninstallPoetryCommand(Command):
+    """Uninstall poetry."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:
+        super().__init__(CommandType.UNINSTALL, parent)
+
+    def execute(self) -> None:
+        logger.info("Download and run uninstaller")
+        subprocess.runn(
+            f"curl -sSL https://install.python-poetry.org | python3 - --uninstall",
+            shell=True,
+        )
