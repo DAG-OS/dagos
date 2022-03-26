@@ -62,9 +62,13 @@ class SoftwareComponentScanner(object):
         logger.trace(f"Looking for software components in '{search_path}'")
         for folder in search_path.iterdir():
             if self._contains_software_component(folder):
-                logger.trace(f"Found folder for software component '{folder.name}'")
                 if not folder.name in self.scan_result:
+                    logger.trace(f"Found folder for software component '{folder.name}'")
                     self.scan_result[folder.name] = ComponentResult()
+                else:
+                    logger.trace(
+                        f"Found additional folder for software component '{folder.name}'"
+                    )
                 self.scan_result[folder.name].folders.append(folder)
                 self._scan_folder(folder)
 
@@ -73,6 +77,10 @@ class SoftwareComponentScanner(object):
             x for x in folder.iterdir() if x.is_file() and not x.name.startswith("_")
         ]:
             self.scan_result[folder.name].files.append(file)
+            if self.scan_result[folder.name].component:
+                # Avoid overwriting existing components
+                continue
+
             if file.suffix in [".yml", ".yaml"]:
                 self._parse_yaml_file(folder.name, file)
             elif file.suffix == ".py":
