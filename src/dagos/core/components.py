@@ -4,6 +4,7 @@ import typing as t
 from pathlib import Path
 
 import click
+from loguru import logger
 
 from dagos.exceptions import SoftwareComponentScanException
 
@@ -53,12 +54,23 @@ class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
         self.folders = folders if folders else []
         self.files = files if files else []
 
-    def add_command(self, command: Command) -> None:
+    def add_command(self, command: Command, force: t.Optional[bool] = False) -> None:
         """Add provided command to this software component.
 
         Args:
             command (Command): The command to add.
+            force (t.Optional[bool]) If True, overrides any existing commands of the same type. Defaults, to False.
         """
+        if not self.commands[command.type.name] is None and not force:
+            if force:
+                logger.debug(
+                    f"Overwriting the existing '{command.type.name}' command on '{self.name}' component"
+                )
+            else:
+                logger.trace(
+                    f"The '{self.name}' component already has a '{command.type.name}' command"
+                )
+                return
         self.commands[command.type.name] = command
 
     def get_file(self, file_pattern: str) -> t.Optional[Path]:

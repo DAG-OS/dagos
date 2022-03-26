@@ -77,13 +77,12 @@ class SoftwareComponentScanner(object):
             x for x in folder.iterdir() if x.is_file() and not x.name.startswith("_")
         ]:
             self.scan_result[folder.name].files.append(file)
-            if self.scan_result[folder.name].component:
-                # Avoid overwriting existing components
-                continue
 
             if file.suffix in [".yml", ".yaml"]:
                 self._parse_yaml_file(folder.name, file)
-            elif file.suffix == ".py":
+            elif (
+                file.suffix == ".py" and self.scan_result[folder.name].component is None
+            ):
                 # TODO: What if there are multiple SoftwareComponents in the py files?
                 module_name = f"dagos.components.external.{folder.name}"
                 module = self._load_module(module_name, file)
