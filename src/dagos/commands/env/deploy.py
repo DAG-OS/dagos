@@ -55,7 +55,7 @@ def deploy(container: bool, image: str, file: Path):
 
 def _get_image(image_option: str, environment: t.Dict) -> t.Dict:
     if image_option:
-        return image_option
+        return {"id": image_option}
     if "images" in environment["platform"]:
         return environment["platform"]["images"][0]
     raise DagosException(
