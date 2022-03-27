@@ -7,4 +7,8 @@ class SoftwareComponentScanException(DagosException):
 
 
 class ValidationException(DagosException):
-    """A base excetpion for all validation errors."""
+    """A base exception for all validation errors."""
+
+
+class SchemaValidationException(ValidationException):
+    """A base exception for all schema validation errors."""

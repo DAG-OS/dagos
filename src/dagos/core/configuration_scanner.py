@@ -1,12 +1,10 @@
 import typing as t
 from pathlib import Path
 
-import yaml
 from loguru import logger
 
 from dagos.core.configuration import DagosConfiguration
 from dagos.core.validator import Validator
-from dagos.exceptions import DagosException
 
 
 class ConfigurationScanner:

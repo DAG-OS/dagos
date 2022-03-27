@@ -2,6 +2,7 @@ import re
 import shutil
 from pathlib import Path
 
+from pytest import fail
 from pytest_bdd import parsers, then
 
 
@@ -47,3 +48,8 @@ def i_see_messages(pattern, command_output: str):
 def i_see_no_messages(pattern, command_output: str):
     result = re.search(pattern, command_output)
     assert not result
+
+
+@then(parsers.parse("the test fails"))
+def fail_test():
+    fail()

@@ -1,15 +1,17 @@
 import importlib.util
 import inspect
+import re
 import typing as t
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import yaml
 from loguru import logger
 
 from dagos.commands.github import GitHubInstallCommand
 from dagos.core.commands import CommandRegistry, CommandType
 from dagos.core.components import SoftwareComponent
+from dagos.core.validator import Validator
+from dagos.exceptions import SchemaValidationException, ValidationException
 from dagos.platform.exceptions import UnsupportedPlatformException
 
 
@@ -127,32 +129,33 @@ class SoftwareComponentScanner(object):
         return module
 
     def _parse_yaml_file(self, component_name: str, file: Path) -> None:
-        logger.trace(f"Parsing YAML file '{file}'")
-        try:
-            with file.open() as f:
-                yaml_content = yaml.safe_load(f)
-        except yaml.YAMLError as e:
-            logger.warning(f"Invalid YAML content in file '{file}' detected: {e}")
-            return
+        content = file.read_text()
 
-        if "command" in yaml_content:
-            command = yaml_content["command"]
-            command_type = command["type"] if "type" in command else None
-            command_provider = command["provider"] if "provider" in command else None
-            configuration = (
-                command["configuration"] if "configuration" in command else None
+        # Regexes constructed via melody, see `src/dagos/core/regexes`.
+        if re.match(r"(?:(?:^#.*(?:\n)*)*|(?:^\-\-\-\n){1})command:\n", content):
+            self._parse_command_file(component_name, file)
+        else:
+            logger.debug("Skipping file '{}' with unknown contents", file)
+
+    def _parse_command_file(self, component_name: str, file: Path) -> None:
+        try:
+            data = Validator().validate_command(file)
+            command = data["command"]
+            command_type = command["type"]
+            command_provider = command["provider"]
+            configuration = command["configuration"]
+            logger.debug(
+                f"Found {command_type} command for {component_name} based on {command_provider}"
             )
-            if (
-                not command_type is None
-                and not command_provider is None
-                and not configuration is None
-            ):
-                logger.debug(
-                    f"Found {command_type} command for {component_name} based on {command_provider}"
-                )
-                self.scan_result[component_name].commands.append(
-                    CommandResult(file, command_provider, command_type, configuration)
-                )
+            self.scan_result[component_name].commands.append(
+                CommandResult(file, command_provider, command_type, configuration)
+            )
+        except SchemaValidationException as e:
+            logger.warning(
+                "Invalid command configuration detected at '{}': {}", file, e
+            )
+        except ValidationException as e:
+            logger.warning(e)
 
     def _construct_command(
         self, component: SoftwareComponent, command_result: CommandResult

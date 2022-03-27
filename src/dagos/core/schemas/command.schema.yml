@@ -1,0 +1,11 @@
+# This schema describes the structure of a command file in the YAML format.
+# It is based on the syntax defined by Yamale: https://github.com/23andMe/Yamale
+
+command:
+  type: enum('install', 'uninstall', 'update', 'configure', 'verify')
+  # The software component this command belongs to
+  component: str()
+  # The command provider, e.g., github.
+  provider: str()
+  # Command provider specific configuration values.
+  configuration: map(any(), key=str())
