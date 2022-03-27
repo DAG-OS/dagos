@@ -118,6 +118,11 @@ def _deploy_to_container(
         for component in components:
             # TODO: Use the same verbosity as the CLI was initially called with
             buildah.run(container, f"dagos install {component.name}")
+            # TODO: The components are removed to ensure dagos CLI tests use the correct components
+            #   Users may want to keep the copied components on the containers?
+            buildah.run(
+                container, f"rm -rf {component_dir / component.folders[0].name}"
+            )
 
         buildah.commit(container, result_name)
     finally:
