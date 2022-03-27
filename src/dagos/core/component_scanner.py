@@ -36,7 +36,7 @@ class SoftwareComponentScanner(object):
     scan_result: t.Dict[str, ComponentResult] = {}
 
     def scan(self, search_paths: t.List[Path]) -> None:
-        logger.trace(f"Looking for software components in {len(search_paths)} places")
+        logger.trace("Looking for software components in {} places", len(search_paths))
         for search_path in search_paths:
             if self._is_valid_search_path(search_path):
                 self._scan_search_path(search_path)
@@ -61,15 +61,17 @@ class SoftwareComponentScanner(object):
             )
 
     def _scan_search_path(self, search_path: Path) -> None:
-        logger.trace(f"Looking for software components in '{search_path}'")
+        logger.trace("Looking for software components in '{}'", search_path)
         for folder in search_path.iterdir():
             if self._contains_software_component(folder):
                 if not folder.name in self.scan_result:
-                    logger.trace(f"Found folder for software component '{folder.name}'")
                     self.scan_result[folder.name] = ComponentResult()
+                    logger.trace(
+                        "[bold]{}[/bold]: Looking for a software component", folder.name
+                    )
                 else:
                     logger.trace(
-                        f"Found additional folder for software component '{folder.name}'"
+                        "[bold]{}[/bold]: Found additional folder", folder.name
                     )
                 self.scan_result[folder.name].folders.append(folder)
                 self._scan_folder(folder)
@@ -87,7 +89,7 @@ class SoftwareComponentScanner(object):
             ):
                 # TODO: What if there are multiple SoftwareComponents in the py files?
                 module_name = f"dagos.components.external.{folder.name}"
-                module = self._load_module(module_name, file)
+                module = self._load_module(folder.name, module_name, file)
                 classes = inspect.getmembers(module, inspect.isclass)
                 self._find_software_component(folder.name, classes)
 
@@ -103,13 +105,17 @@ class SoftwareComponentScanner(object):
                     component.folders = self.scan_result[component_name].folders
                     component.files = self.scan_result[component_name].files
                     self.scan_result[component_name].component = component
-                    logger.trace(f"Found software component '{component.name}'")
+                    logger.trace(
+                        "[bold]{}[/bold]: Found software component", component_name
+                    )
                 except Exception as e:
                     # TODO: Gracefully handle broken plugins
-                    logger.warning(f"Failed to instantiate software component: {e}")
+                    logger.warning(
+                        "[bold]{}[/bold]: Failed to instantiate\n{}", component_name, e
+                    )
                 return
 
-    def _load_module(self, name: str, file: Path):
+    def _load_module(self, component: str, name: str, file: Path):
         spec = importlib.util.spec_from_file_location(name, file)
         module = importlib.util.module_from_spec(spec)
         try:
@@ -124,7 +130,11 @@ class SoftwareComponentScanner(object):
                 raise UnsupportedPlatformException(e)
         except UnsupportedPlatformException as e:
             logger.debug(
-                f"Module '{name}' at '{file}' does not support current platform: {e}"
+                "[bold]{}[/bold]: Module '{}' at '{}' does not support current platform: {}",
+                component,
+                name,
+                file,
+                e,
             )
         return module
 
@@ -135,7 +145,11 @@ class SoftwareComponentScanner(object):
         if re.match(r"(?:(?:^#.*(?:\n)*)*|(?:^\-\-\-\n){1})command:\n", content):
             self._parse_command_file(component_name, file)
         else:
-            logger.debug("Skipping file '{}' with unknown contents", file)
+            logger.debug(
+                "[bold]{}[/bold]: Skipping file '{}' with unknown contents",
+                component_name,
+                file,
+            )
 
     def _parse_command_file(self, component_name: str, file: Path) -> None:
         try:
@@ -145,7 +159,10 @@ class SoftwareComponentScanner(object):
             command_provider = command["provider"]
             configuration = command["configuration"]
             logger.debug(
-                f"Found {command_type} command for {component_name} based on {command_provider}"
+                "[bold]{}[/bold]: Found {} command based on {}",
+                component_name,
+                command_type,
+                command_provider,
             )
             self.scan_result[component_name].commands.append(
                 CommandResult(file, command_provider, command_type, configuration)
@@ -161,7 +178,10 @@ class SoftwareComponentScanner(object):
         self, component: SoftwareComponent, command_result: CommandResult
     ) -> None:
         logger.trace(
-            f"Constructing {command_result.type} command with '{command_result.provider}' provider for '{component.name}' software component"
+            "[bold]{}[/bold]: Constructing {} command with '{}' provider",
+            component.name,
+            command_result.type,
+            command_result.provider,
         )
         if command_result.provider == "github":
             if command_result.type == "install":
@@ -169,7 +189,10 @@ class SoftwareComponentScanner(object):
                 component.add_command(command)
                 return
         logger.warning(
-            f"Unknown command provider '{command_result.provider}' in '{command_result.file}'!"
+            "[bold]{}[/bold]: Unknown command provider '{}' in '{}'!",
+            component.name,
+            command_result.provider,
+            command_result.file,
         )
 
     def _is_valid_search_path(self, search_path: Path) -> bool:

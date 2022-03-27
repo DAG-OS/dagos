@@ -48,5 +48,4 @@ class Validator:
                 f"The {schema_key} at '{path}' is invalid:\n\t{errors.getvalue()}"
             )
 
-        logger.trace("The {} at '{}' is valid", schema_key, path)
         return data[0][0]
