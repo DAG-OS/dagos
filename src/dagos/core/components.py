@@ -36,7 +36,7 @@ class SoftwareComponentRegistry(type):
         return None
 
 
-class SoftwareComponent(object, metaclass=SoftwareComponentRegistry):
+class SoftwareComponent(metaclass=SoftwareComponentRegistry):
     """Base class for software components."""
 
     name: str

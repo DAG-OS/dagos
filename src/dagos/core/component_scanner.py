@@ -31,7 +31,7 @@ class ComponentResult:
     files: t.List[Path] = field(default_factory=list)
 
 
-class SoftwareComponentScanner(object):
+class SoftwareComponentScanner:
 
     scan_result: t.Dict[str, ComponentResult] = {}
 

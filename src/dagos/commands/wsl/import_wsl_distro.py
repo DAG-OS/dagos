@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import click
@@ -16,7 +15,7 @@ from dagos.utils import wsl_utils
 @click.option(
     "--archive",
     required=True,
-    type=click.Path(exists=True),
+    type=click.Path(exists=True, path_type=Path),
     help="Archive path to import, both .tar and .tar.gz are supported.",
 )
 @click.option(
@@ -29,7 +28,7 @@ from dagos.utils import wsl_utils
         Warning: This will unregister the existing distro.
     """,
 )
-def import_wsl_distro(name, archive, force):
+def import_wsl_distro(name: str, archive: Path, force: bool):
     """
     Import a WSL distro from a .tar or .tar.gz file.
     """
@@ -39,8 +38,8 @@ def import_wsl_distro(name, archive, force):
 
     # Create a folder at install location with the name of the distro and install there
     # TODO: Ensure name can be a folder name
-    install_location = f"{os.getcwd()}\{name}"
-    Path(install_location).mkdir(exist_ok=True)
+    install_location = Path(__file__).parent / name
+    install_location.mkdir(exist_ok=True)
 
     wsl_utils.import_distro(name, install_location, archive, 2)
 

@@ -56,7 +56,7 @@ class CommandRegistry(type):
         cls.commands[type.name].add_command(command)
 
 
-class Command(object, metaclass=CommandRegistry):
+class Command(metaclass=CommandRegistry):
     """Base class for software component commands."""
 
     def __init__(self, type: CommandType, parent: SoftwareComponent) -> None:  # type: ignore reportUndefinedVariable

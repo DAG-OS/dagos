@@ -25,7 +25,7 @@ class PackageManagerRegistry(type):
         return None
 
 
-class PackageManager(object, metaclass=PackageManagerRegistry):
+class PackageManager(metaclass=PackageManagerRegistry):
     """A base class for all supported package managers.
 
     Since the package manager may reside on a remote platform, e.g., within a

@@ -12,6 +12,11 @@ repos:
       - id: destroyed-symlinks
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.31.1
+    hooks:
+      - id: pyupgrade
+        args: ["--py37-plus"]
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
     hooks:

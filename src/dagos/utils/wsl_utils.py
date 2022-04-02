@@ -1,5 +1,6 @@
 import subprocess
 from dataclasses import dataclass
+from pathlib import Path
 
 from loguru import logger
 
@@ -51,7 +52,7 @@ def unregister_distro(name):
         exit(1)
 
 
-def import_distro(name, install_location, archive, version):
+def import_distro(name: str, install_location: Path, archive: Path, version: int):
     logger.info("Starting the WSL import")
     with spinner("Importing..."):
         run_result = subprocess.run(
@@ -59,8 +60,8 @@ def import_distro(name, install_location, archive, version):
                 "wsl",
                 "--import",
                 name,
-                install_location,
-                archive,
+                str(install_location),
+                str(archive),
                 "--version",
                 str(version),
             ]
