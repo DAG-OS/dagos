@@ -73,28 +73,30 @@ class SoftwareComponentScanner(object):
                     logger.trace(
                         "[bold]{}[/bold]: Found additional folder", folder.name
                     )
-                self.scan_result[folder.name].folders.append(folder)
-                self._scan_folder(folder)
+                scan = self.scan_result[folder.name]
+                scan.folders.append(folder)
+                self._scan_folder(folder, scan)
 
-    def _scan_folder(self, folder: Path) -> None:
+    def _scan_folder(self, folder: Path, scan: ComponentResult) -> None:
         for file in [
             x for x in folder.iterdir() if x.is_file() and not x.name.startswith("_")
         ]:
-            self.scan_result[folder.name].files.append(file)
+            scan.files.append(file)
 
             if file.suffix in [".yml", ".yaml"]:
-                self._parse_yaml_file(folder.name, file)
-            elif (
-                file.suffix == ".py" and self.scan_result[folder.name].component is None
-            ):
+                self._parse_yaml_file(folder.name, file, scan)
+            elif file.suffix == ".py" and scan.component is None:
                 # TODO: What if there are multiple SoftwareComponents in the py files?
                 module_name = f"dagos.components.external.{folder.name}"
                 module = self._load_module(folder.name, module_name, file)
                 classes = inspect.getmembers(module, inspect.isclass)
-                self._find_software_component(folder.name, classes)
+                self._find_software_component(folder.name, classes, scan)
 
     def _find_software_component(
-        self, component_name: str, classes: t.List[t.Tuple[str, object]]
+        self,
+        component_name: str,
+        classes: t.List[t.Tuple[str, object]],
+        scan: ComponentResult,
     ) -> None:
         for clazz in classes:
             if clazz[0] != "SoftwareComponent" and issubclass(
@@ -102,9 +104,9 @@ class SoftwareComponentScanner(object):
             ):
                 try:
                     component = clazz[1]()
-                    component.folders = self.scan_result[component_name].folders
-                    component.files = self.scan_result[component_name].files
-                    self.scan_result[component_name].component = component
+                    component.folders = scan.folders
+                    component.files = scan.files
+                    scan.component = component
                     logger.trace(
                         "[bold]{}[/bold]: Found software component", component_name
                     )
@@ -138,12 +140,14 @@ class SoftwareComponentScanner(object):
             )
         return module
 
-    def _parse_yaml_file(self, component_name: str, file: Path) -> None:
+    def _parse_yaml_file(
+        self, component_name: str, file: Path, scan: ComponentResult
+    ) -> None:
         content = file.read_text()
 
         # Regexes constructed via melody, see `src/dagos/core/regexes`.
         if re.match(r"(?:(?:^#.*(?:\n)*)*|(?:^\-\-\-\n){1})command:\n", content):
-            self._parse_command_file(component_name, file)
+            self._parse_command_file(component_name, file, scan)
         else:
             logger.debug(
                 "[bold]{}[/bold]: Skipping file '{}' with unknown contents",
@@ -151,7 +155,9 @@ class SoftwareComponentScanner(object):
                 file,
             )
 
-    def _parse_command_file(self, component_name: str, file: Path) -> None:
+    def _parse_command_file(
+        self, component_name: str, file: Path, scan: ComponentResult
+    ) -> None:
         try:
             data = Validator().validate_command(file)
             command = data["command"]
@@ -164,7 +170,7 @@ class SoftwareComponentScanner(object):
                 command_type,
                 command_provider,
             )
-            self.scan_result[component_name].commands.append(
+            scan.commands.append(
                 CommandResult(file, command_provider, command_type, configuration)
             )
         except SchemaValidationException as e:
