@@ -1,6 +1,6 @@
 // This file describes the regex used to determine if a file defines a command.
 // It is based on the syntax defined by Melody: https://github.com/yoav-lavi/melody
-// Modify in playground: https://tinyurl.com/4m8mkfr2
+// Modify in playground: https://tinyurl.com/589mfsfv
 
 either {
     any of match {
@@ -9,7 +9,7 @@ either {
         any of <char>;
         any of <newline>;
     }
-    1 of match {
+    match {
         <start>;
         "---";
         <newline>;
@@ -19,4 +19,4 @@ either {
 "command:";
 <newline>;
 
-// Results in: (?:(?:^#.*(?:\n)*)*|(?:^\-\-\-\n){1})command:\n
+// Results in: (?:(?:^#.*(?:\n)*)*|(?:^\-\-\-\n))command:\n

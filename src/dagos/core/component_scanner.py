@@ -149,7 +149,7 @@ class SoftwareComponentScanner:
         content = file.read_text()
 
         # Regexes constructed via melody, see `src/dagos/core/regexes`.
-        if re.match(r"(?:(?:^#.*(?:\n)*)*|(?:^\-\-\-\n){1})command:\n", content):
+        if re.match(r"(?:(?:^#.*(?:\n)*)*|(?:^\-\-\-\n))command:\n", content):
             self._parse_command_file(component_name, file, scan)
         else:
             logger.debug(
