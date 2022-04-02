@@ -12,7 +12,7 @@ selected_container_engine = None
 
 def get_container_engine() -> str:
     global selected_container_engine
-    if not selected_container_engine is None:
+    if selected_container_engine != None:
         return selected_container_engine
 
     supported_container_engines = ["podman", "docker"]

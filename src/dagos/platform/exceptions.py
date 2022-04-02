@@ -25,7 +25,7 @@ class UnsupportedOperatingSystem(UnsupportedPlatformException):
         message = StringIO()
         message.write(self.current_system)
         message.write(" is not supported")
-        if not supported_systems == None:
+        if supported_systems != None:
             if len(supported_systems) == 1:
                 message.write(f", only {supported_systems[0].value} is")
             else:

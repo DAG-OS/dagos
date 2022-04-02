@@ -48,7 +48,7 @@ class CommandRegistry(type):
             type (CommandType): The command type.
             command (click.Command | click.Group): The command to register.
         """
-        if not type.name in cls.commands:
+        if type.name not in cls.commands:
             cls.commands[type.name] = click.Group(
                 name=type.value,
                 help=f"{type.value.capitalize()} software components.",

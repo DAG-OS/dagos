@@ -23,7 +23,7 @@ class SoftwareComponentRegistry(type):
         """
         component = super().__call__(*args, **kwds)
 
-        if not cls in cls.components:
+        if cls not in cls.components:
             cls.components.append(component)
 
         return component
@@ -61,7 +61,7 @@ class SoftwareComponent(metaclass=SoftwareComponentRegistry):
             command (Command): The command to add.
             force (t.Optional[bool]) If True, overrides any existing commands of the same type. Defaults, to False.
         """
-        if not self.commands[command.type.name] is None and not force:
+        if self.commands[command.type.name] != None and not force:
             if force:
                 logger.debug(
                     f"Overwriting the existing '{command.type.name}' command on '{self.name}' component"
@@ -102,7 +102,7 @@ class SoftwareComponent(metaclass=SoftwareComponentRegistry):
         )
         group = click.Group(name=self.name, help=help_text)
         for command in self.commands.values():
-            if not command == None:
+            if command != None:
                 group.add_command(command.build(command.type.value))
         return group
 

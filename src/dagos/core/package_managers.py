@@ -11,7 +11,7 @@ class PackageManagerRegistry(type):
     def __call__(cls, *args: t.Any, **kwds: t.Any) -> t.Any:
         manager = super().__call__(*args, **kwds)
 
-        if not cls in cls.managers:
+        if cls not in cls.managers:
             cls.managers.append(manager)
 
         return manager

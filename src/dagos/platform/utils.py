@@ -25,7 +25,7 @@ def assert_linux() -> None:
 
 
 def assert_operating_system(supported_systems: t.List[OperatingSystem]) -> None:
-    if not platform.system() in [x.value for x in supported_systems]:
+    if platform.system() not in [x.value for x in supported_systems]:
         raise UnsupportedOperatingSystem(supported_systems)
 
 

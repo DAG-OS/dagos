@@ -57,7 +57,7 @@ class SoftwareComponentScanner:
 
         # Aggregate component commands into a manage command group
         for component in [
-            x.component for x in self.scan_result.values() if not x.component is None
+            x.component for x in self.scan_result.values() if x.component != None
         ]:
             CommandRegistry.add_command(
                 CommandType.MANAGE, component.build_manage_command_group()
@@ -67,7 +67,7 @@ class SoftwareComponentScanner:
         logger.trace("Looking for software components in '{}'", search_path)
         for folder in search_path.iterdir():
             if self._contains_software_component(folder):
-                if not folder.name in self.scan_result:
+                if folder.name not in self.scan_result:
                     self.scan_result[folder.name] = ComponentResult()
                     logger.trace(
                         "[bold]{}[/bold]: Looking for a software component", folder.name
@@ -211,7 +211,7 @@ class SoftwareComponentScanner:
         if not search_path.is_dir():
             logger.warning(f"The search path '{search_path}' is not a folder!")
             return False
-        if not search_path.name == "components" and not any(
+        if search_path.name != "components" and not any(
             search_path.glob(".dagos-components")
         ):
             logger.warning(
