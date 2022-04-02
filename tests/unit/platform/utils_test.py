@@ -4,10 +4,8 @@ import pytest
 
 import dagos.platform.utils as utils
 from dagos.platform.domain import OperatingSystem
-from dagos.platform.exceptions import (
-    UnsupportedOperatingSystem,
-    UnsupportedPlatformException,
-)
+from dagos.platform.exceptions import UnsupportedOperatingSystem
+from dagos.platform.exceptions import UnsupportedPlatformException
 
 
 @contextmanager

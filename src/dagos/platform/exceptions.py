@@ -2,9 +2,8 @@ import platform
 import typing as t
 from io import StringIO
 
-from dagos.exceptions import DagosException
-
 from .domain import OperatingSystem
+from dagos.exceptions import DagosException
 
 
 class UnsupportedPlatformException(DagosException):

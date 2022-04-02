@@ -6,8 +6,10 @@ from loguru import logger
 
 import dagos.containers.buildah as buildah
 from dagos.core.commands import CommandType
-from dagos.core.components import SoftwareComponent, SoftwareComponentRegistry
-from dagos.core.package_managers import PackageManager, PackageManagerRegistry
+from dagos.core.components import SoftwareComponent
+from dagos.core.components import SoftwareComponentRegistry
+from dagos.core.package_managers import PackageManager
+from dagos.core.package_managers import PackageManagerRegistry
 from dagos.core.validator import Validator
 from dagos.exceptions import DagosException
 

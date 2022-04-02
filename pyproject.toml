@@ -30,6 +30,7 @@ pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
 tox-conda = "^0.9.1"
 tox-poetry = "^0.4.1"
+reorder-python-imports = "^3.0.1"
 
 [tool.poetry.extras]
 ansible = ["ansible", "ansible-runner"]
@@ -38,9 +39,6 @@ ansible = ["ansible", "ansible-runner"]
 # "You should include all Python versions that you want your code to run under."
 # Source: https://github.com/psf/black/issues/751
 target-version = ['py37', 'py38', 'py39', 'py310']
-
-[tool.isort]
-profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--cov=dagos --cov-report=term-missing:skip-covered"

@@ -4,7 +4,8 @@ import ansible_runner
 import yaml
 from loguru import logger
 
-from dagos.core.commands import Command, CommandType
+from dagos.core.commands import Command
+from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponent
 
 inventory = "localhost ansible_connection=local"

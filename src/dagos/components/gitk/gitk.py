@@ -6,7 +6,8 @@ import click
 from loguru import logger
 
 import dagos.platform.utils as platform_utils
-from dagos.core.commands import Command, CommandType
+from dagos.core.commands import Command
+from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
 

@@ -6,7 +6,8 @@ from pathlib import Path
 import requests
 from loguru import logger
 
-from dagos.core.commands import Command, CommandType
+from dagos.core.commands import Command
+from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
 from dagos.utils import file_utils

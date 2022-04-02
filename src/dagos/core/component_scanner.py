@@ -2,16 +2,19 @@ import importlib.util
 import inspect
 import re
 import typing as t
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from pathlib import Path
 
 from loguru import logger
 
 from dagos.commands.github import GitHubInstallCommand
-from dagos.core.commands import CommandRegistry, CommandType
+from dagos.core.commands import CommandRegistry
+from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponent
 from dagos.core.validator import Validator
-from dagos.exceptions import SchemaValidationException, ValidationException
+from dagos.exceptions import SchemaValidationException
+from dagos.exceptions import ValidationException
 from dagos.platform.exceptions import UnsupportedPlatformException
 
 

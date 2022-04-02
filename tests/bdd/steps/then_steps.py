@@ -3,7 +3,8 @@ import shutil
 from pathlib import Path
 
 from pytest import fail
-from pytest_bdd import parsers, then
+from pytest_bdd import parsers
+from pytest_bdd import then
 
 
 @then(parsers.parse('"{command}" is installed'))

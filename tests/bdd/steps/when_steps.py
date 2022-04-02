@@ -3,7 +3,8 @@ import subprocess
 from pathlib import Path
 
 from pytest import fail
-from pytest_bdd import parsers, when
+from pytest_bdd import parsers
+from pytest_bdd import when
 
 from .utils import yield_step
 

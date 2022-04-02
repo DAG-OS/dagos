@@ -5,15 +5,15 @@ import click
 import rich_click
 from loguru import logger
 
+from . import __version__
 from dagos.commands.env.cli import env
 from dagos.commands.wsl.cli import wsl
-from dagos.core.commands import CommandRegistry, CommandType
+from dagos.core.commands import CommandRegistry
+from dagos.core.commands import CommandType
 from dagos.core.component_scanner import SoftwareComponentScanner
 from dagos.core.configuration_scanner import ConfigurationScanner
 from dagos.exceptions import DagosException
 from dagos.logging import configure_logging
-
-from . import __version__
 
 click.Command.format_help = rich_click.rich_click.rich_format_help
 click.Group.format_help = rich_click.rich_click.rich_format_help

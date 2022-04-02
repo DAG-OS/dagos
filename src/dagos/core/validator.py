@@ -4,7 +4,8 @@ from pathlib import Path
 
 import yamale
 
-from dagos.exceptions import SchemaValidationException, ValidationException
+from dagos.exceptions import SchemaValidationException
+from dagos.exceptions import ValidationException
 
 
 class Validator:

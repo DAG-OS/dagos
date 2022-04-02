@@ -2,7 +2,8 @@ import re
 import subprocess
 
 import click
-from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
+from click_option_group import optgroup
+from click_option_group import RequiredMutuallyExclusiveOptionGroup
 from loguru import logger
 
 import dagos.containers.utils as container_utils

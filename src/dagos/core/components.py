@@ -6,9 +6,9 @@ from pathlib import Path
 import click
 from loguru import logger
 
+from .commands import Command
+from .commands import CommandType
 from dagos.exceptions import SoftwareComponentScanException
-
-from .commands import Command, CommandType
 
 
 class SoftwareComponentRegistry(type):

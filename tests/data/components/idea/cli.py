@@ -1,4 +1,5 @@
-from dagos.core.commands import Command, CommandType
+from dagos.core.commands import Command
+from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponent
 
 
