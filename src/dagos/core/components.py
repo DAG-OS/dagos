@@ -18,8 +18,7 @@ class SoftwareComponentRegistry(type):
 
     def __call__(cls, *args: t.Any, **kwds: t.Any) -> t.Any:
         """The registry hooks into the object construction lifecycle to register
-        constructed software components. It also registers the manage command
-        group to the command registry.
+        constructed software components.
         """
         component = super().__call__(*args, **kwds)
 

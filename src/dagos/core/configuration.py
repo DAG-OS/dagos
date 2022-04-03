@@ -31,6 +31,10 @@ class DagosConfiguration:
         paths.extend([Path(x) / "components" for x in self.search_paths])
         return paths
 
+    def get_environment_search_paths(self) -> t.List[Path]:
+        # TODO: Allow configuring additional search paths
+        return [Path(x) / "environments" for x in self.search_paths]
+
     def __repr__(self) -> str:
         result = StringIO()
         result.write("DagosConfiguration{")

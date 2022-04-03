@@ -1,4 +1,3 @@
-import typing as t
 from pathlib import Path
 
 import click
@@ -6,11 +5,10 @@ from loguru import logger
 
 import dagos.containers.buildah as buildah
 from dagos.core.commands import CommandType
-from dagos.core.components import SoftwareComponent
-from dagos.core.components import SoftwareComponentRegistry
+from dagos.core.environments import Image
+from dagos.core.environments import SoftwareEnvironment
 from dagos.core.package_managers import PackageManager
 from dagos.core.package_managers import PackageManagerRegistry
-from dagos.core.validator import Validator
 from dagos.exceptions import DagosException
 
 
@@ -35,70 +33,44 @@ from dagos.exceptions import DagosException
 )
 def deploy(container: bool, image: str, file: Path):
     """Deploy a provided environment."""
-    data = Validator().validate_environment(file.expanduser())
-    environment = data["environment"]
+    environment = SoftwareEnvironment(file)
 
     if container:
-        image = _get_image(image, environment)
+        chosen_image = _get_image(image, environment)
         logger.info(
             "Deploying environment '{}' into '{}' container image",
-            environment["name"],
-            image["id"],
+            environment.name,
+            chosen_image.id,
         )
     else:
-        logger.info("Deploying environment '{}'", environment["name"])
+        logger.info("Deploying environment '{}'", environment.name)
 
-    components = _collect_components(environment["components"])
     if container:
-        _deploy_to_container(components, image, environment["name"])
+        _deploy_to_container(environment, chosen_image)
     else:
-        _deploy_locally(components)
+        _deploy_locally(environment)
 
 
-def _get_image(image_option: str, environment: t.Dict) -> t.Dict:
+def _get_image(image_option: str, environment: SoftwareEnvironment) -> Image:
     if image_option:
-        return {"id": image_option}
-    if "images" in environment["platform"]:
-        return environment["platform"]["images"][0]
+        return Image(id=image_option)
+    if len(environment.platform.images) > 0:
+        return environment.platform.images[0]
     raise DagosException(
         f"For deploying an environment to a container a valid base image is required!"
     )
 
 
-def _collect_components(components: t.List[t.Dict]) -> t.List[SoftwareComponent]:
-    collected_components: t.List[SoftwareComponent] = []
-    unknown_components: t.List[str] = []
-    for component in components:
-        found_component = SoftwareComponentRegistry.find_component(component["name"])
-        if found_component:
-            logger.trace("Requested component '{}' is known!", component["name"])
-            # TODO: Check if selected platform supports component?
-            collected_components.append(found_component)
-        else:
-            unknown_components.append(component["name"])
-
-    if len(unknown_components) > 0:
-        logger.error(
-            "{} of the {} requested components are unknown, specifically: {}",
-            len(unknown_components),
-            len(components),
-            ", ".join(unknown_components),
-        )
-
-    return collected_components
-
-
-def _deploy_locally(components: t.List[SoftwareComponent]) -> None:
-    for component in components:
+def _deploy_locally(environment: SoftwareEnvironment) -> None:
+    for component in environment.collect_components():
         logger.info("Deploying component '{}'", component.name)
         install_command = component.commands[CommandType.INSTALL.name]
         install_command.execute()
 
 
-def _deploy_to_container(
-    components: t.List[SoftwareComponent], image: t.Dict, result_name: str
-) -> None:
-    container = buildah.create_container(image["id"])
+def _deploy_to_container(environment: SoftwareEnvironment, image: Image) -> None:
+    components = environment.collect_components()
+    container = buildah.create_container(image.id)
 
     try:
         _install_packages(container, image)
@@ -126,19 +98,19 @@ def _deploy_to_container(
                 container, f"rm -rf {component_dir / component.folders[0].name}"
             )
 
-        buildah.commit(container, result_name)
+        buildah.commit(container, environment.name)
     finally:
         buildah.rm(container)
 
 
-def _install_packages(container: str, image: t.Dict) -> None:
-    if "packages" in image:
-        if "package_manager" in image:
-            package_manager = PackageManagerRegistry.find(image["package_manager"])
+def _install_packages(container: str, image: Image) -> None:
+    if len(image.packages) > 0:
+        if image.package_manager is not None:
+            package_manager = PackageManagerRegistry.find(image.package_manager)
         else:
             # TODO: Analyze platform first and get information from there?
             package_manager = _select_package_manager(container)
-        install_command = package_manager.install(image["packages"])
+        install_command = package_manager.install(image.packages)
         if isinstance(install_command, str):
             buildah.run(container, install_command)
         else:
@@ -149,7 +121,7 @@ def _install_packages(container: str, image: t.Dict) -> None:
             buildah.run(container, clean_command)
 
 
-def _bootstrap_container(container: str, image: t.Dict) -> str:
+def _bootstrap_container(container: str, image: Image) -> str:
     """Install dagos on the container."""
     # TODO: How important is it to have the exact same version of dagos installed?
     # TODO: Include dagos wheel within dagos to skip git installation and
@@ -164,7 +136,7 @@ def _bootstrap_container(container: str, image: t.Dict) -> str:
 
     # Committing the base image with dagos installed so that users may
     # continue from this image to save time during debugging.
-    intermediate_image = buildah.commit(container, f"{image['id']}-with-dagos", rm=True)
+    intermediate_image = buildah.commit(container, f"{image.id}-with-dagos", rm=True)
     return buildah.create_container(intermediate_image)
 
 

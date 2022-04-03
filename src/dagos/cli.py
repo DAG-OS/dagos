@@ -12,6 +12,7 @@ from dagos.core.commands import CommandRegistry
 from dagos.core.commands import CommandType
 from dagos.core.component_scanner import SoftwareComponentScanner
 from dagos.core.configuration_scanner import ConfigurationScanner
+from dagos.core.environment_scanner import SoftwareEnvironmentScanner
 from dagos.exceptions import DagosException
 from dagos.logging import configure_logging
 
@@ -80,6 +81,7 @@ def dagos():
             configure_logging(configuration.verbosity)
 
         SoftwareComponentScanner().scan(configuration.get_component_search_paths())
+        SoftwareEnvironmentScanner().scan(configuration.get_environment_search_paths())
         for command_group in CommandRegistry.commands.values():
             dagos_cli.add_command(command_group)
         dagos_cli.add_command(wsl)
