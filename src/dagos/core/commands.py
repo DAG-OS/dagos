@@ -83,10 +83,10 @@ class Command(metaclass=CommandRegistry):
             if self.__doc__
             else f"{self.type.value.capitalize()} the {self.parent.name} software component."
         )
-        name = self.parent.name if name == None else name
+        name = self.parent.name if name is None else name
         return click.Command(name=name, help=help_text, callback=self.execute)
 
     @abstractmethod
-    def execute(self) -> None:
+    def execute(self, *args) -> None:
         """Execute the command."""
         raise NotImplementedError()

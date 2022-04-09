@@ -28,7 +28,7 @@ class InstallChocolateyCommand(Command):
     """Install Chocolatey via PowerShell."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(type, CommandType.INSTALL, parent)
+        super().__init__(CommandType.INSTALL, parent)
 
     def build(self, name: t.Optional[str] = None) -> click.Command:
         command = super().build(name)

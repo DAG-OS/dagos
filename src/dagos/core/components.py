@@ -60,7 +60,7 @@ class SoftwareComponent(metaclass=SoftwareComponentRegistry):
             command (Command): The command to add.
             force (t.Optional[bool]) If True, overrides any existing commands of the same type. Defaults, to False.
         """
-        if self.commands[command.type.name] != None and not force:
+        if self.commands[command.type.name] is not None:
             if force:
                 logger.debug(
                     f"Overwriting the existing '{command.type.name}' command on '{self.name}' component"
