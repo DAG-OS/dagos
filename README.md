@@ -15,10 +15,10 @@
 
 ## Features
 
-* Manage software components
-* Define custom software environments
-* Deploy environments anywhere (bare metal, VM, container, WSL)
-* Cross-platform
+* 📦 Manage custom and common software components
+* 🍱 Define software environments based on software components
+* 🌍 Deploy components or entire environments anywhere
+* 🔀 Cross-platform
 
 ## License
 
