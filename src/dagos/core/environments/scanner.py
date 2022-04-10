@@ -3,7 +3,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from dagos.core.environments import SoftwareEnvironment
+from .builder import SoftwareEnvironmentBuilder
 from dagos.exceptions import ValidationException
 
 
@@ -21,7 +21,7 @@ class SoftwareEnvironmentScanner:
         for path in search_path.iterdir():
             if path.is_file() and path.suffix in [".yml", ".yaml"]:
                 try:
-                    environment = SoftwareEnvironment(path)
+                    environment = SoftwareEnvironmentBuilder.from_file(path)
                     logger.trace(
                         "Found the '{}' software environment", environment.name
                     )

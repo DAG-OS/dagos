@@ -7,6 +7,7 @@ import dagos.containers.buildah as buildah
 from dagos.core.commands import CommandType
 from dagos.core.environments import Image
 from dagos.core.environments import SoftwareEnvironment
+from dagos.core.environments import SoftwareEnvironmentBuilder
 from dagos.core.package_managers import PackageManager
 from dagos.core.package_managers import PackageManagerRegistry
 from dagos.exceptions import DagosException
@@ -33,7 +34,7 @@ from dagos.exceptions import DagosException
 )
 def deploy(container: bool, image: str, file: Path):
     """Deploy a provided environment."""
-    environment = SoftwareEnvironment(file)
+    environment = SoftwareEnvironmentBuilder.from_file(file)
 
     if container:
         chosen_image = _get_image(image, environment)

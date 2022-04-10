@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass
-from pathlib import Path
 
 from loguru import logger
 
 from dagos.core.components import SoftwareComponent
 from dagos.core.components import SoftwareComponentRegistry
-from dagos.core.validator import Validator
 
 
 class SoftwareEnvironmentRegistry(type):
@@ -55,10 +53,6 @@ class Component:
     version: t.Optional[str]
 
 
-def _get_optional(dict: t.Dict, key: str, default=None):
-    return dict[key] if key in dict.keys() else default
-
-
 class SoftwareEnvironment(metaclass=SoftwareEnvironmentRegistry):
     """Base class for software environments."""
 
@@ -67,35 +61,17 @@ class SoftwareEnvironment(metaclass=SoftwareEnvironmentRegistry):
     platform: Platform
     components: t.List[Component]
 
-    def __init__(self, file: Path) -> None:
-        # TODO: Upon schema errors display env as greyed out with errors
-        data = Validator().validate_environment(file.expanduser())
-        environment = data["environment"]
-
-        self.name = environment["name"]
-        self.description = _get_optional(environment, "description")
-        # TODO: How does this behave if there is a list or string?
-        os = environment["platform"]["os"]
-        images = []
-        if "images" in environment["platform"]:
-            for image in environment["platform"]["images"]:
-                images.append(
-                    Image(
-                        image["id"],
-                        _get_optional(image, "package_manager"),
-                        _get_optional(image, "packages", []),
-                    )
-                )
-        self.platform = Platform(os, images)
-        components = []
-        for component in environment["components"]:
-            components.append(
-                Component(
-                    component["name"],
-                    _get_optional(component, "purpose"),
-                    _get_optional(component, "version"),
-                )
-            )
+    def __init__(
+        self,
+        name: str,
+        description: t.Optional[str],
+        platform: Platform,
+        components: t.List[Component],
+    ) -> None:
+        """"""
+        self.name = name
+        self.description = description
+        self.platform = platform
         self.components = components
 
     def collect_components(self) -> t.List[SoftwareComponent]:

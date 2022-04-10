@@ -12,7 +12,7 @@ from dagos.core.commands import CommandRegistry
 from dagos.core.commands import CommandType
 from dagos.core.component_scanner import SoftwareComponentScanner
 from dagos.core.configuration_scanner import ConfigurationScanner
-from dagos.core.environment_scanner import SoftwareEnvironmentScanner
+from dagos.core.environments import SoftwareEnvironmentScanner
 from dagos.exceptions import DagosException
 from dagos.logging import configure_logging
 

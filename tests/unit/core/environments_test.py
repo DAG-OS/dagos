@@ -1,13 +1,13 @@
 from pathlib import Path
 
-from dagos.core.environments import SoftwareEnvironment
+from dagos.core.environments import SoftwareEnvironmentBuilder
 from dagos.core.environments import SoftwareEnvironmentRegistry
 
 
 def test_constructor_with_basic_env(test_data_dir: Path):
     file = test_data_dir.joinpath("environments/basic.yml")
 
-    result = SoftwareEnvironment(file)
+    result = SoftwareEnvironmentBuilder.from_file(file)
 
     assert result.name == "basic"
     assert result.description != None
