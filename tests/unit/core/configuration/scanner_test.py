@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from dagos.core.configuration_scanner import ConfigurationScanner
+from dagos.core.configuration import ConfigurationScanner
 from dagos.exceptions import ValidationException
 
 

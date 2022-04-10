@@ -2,6 +2,8 @@ import typing as t
 from io import StringIO
 from pathlib import Path
 
+import dagos
+
 
 class DagosConfiguration:
 
@@ -15,7 +17,7 @@ class DagosConfiguration:
         # System (linux)
         Path("/opt/dagos"),
         # dagos internal
-        Path(__file__).parent.parent,
+        Path(dagos.__file__).parent,
     ]
     # Additional component search paths. Each entry must be a folder which is
     # either named "components" or contains a ".dagos-components" marker file.
