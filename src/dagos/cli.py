@@ -80,8 +80,8 @@ def dagos():
         if use_config_log_level:
             configure_logging(configuration.verbosity)
 
-        SoftwareComponentScanner().scan(configuration.get_component_search_paths())
-        SoftwareEnvironmentScanner().scan(configuration.get_environment_search_paths())
+        SoftwareComponentScanner().scan(configuration.component_search_paths)
+        SoftwareEnvironmentScanner().scan(configuration.environment_search_paths)
         for command_group in CommandRegistry.commands.values():
             dagos_cli.add_command(command_group)
         dagos_cli.add_command(wsl)

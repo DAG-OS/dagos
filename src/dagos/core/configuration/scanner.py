@@ -32,30 +32,43 @@ class ConfigurationScanner:
             file = search_path / self.file_name
             if file.exists() and file.is_file():
                 logger.debug(f"Found configuration file '{file}'")
-                return self.load_configuration(file)
+                self.load_configuration(file)
         logger.debug("No configuration file found in search paths, using defaults")
         return self.configuration
 
     def load_configuration(self, config_file: Path) -> DagosConfiguration:
         logger.debug(f"Loading configuration from '{config_file}'")
         data = Validator().validate_configuration(config_file)
-
-        for variable in DagosConfiguration.get_config_keys():
-            if variable in data:
-                config_value = data[variable]
-                if variable == "component_search_paths":
-                    config_value = self._parse_component_search_paths(config_value)
-
-                self.configuration.__dict__[variable] = config_value
+        known_options = DagosConfiguration.get_config_keys()
+        for key, value in data.items():
+            if key in known_options:
+                # TODO: Dynamically set simple values somehow
+                if key == "verbosity":
+                    self.configuration.verbosity = value
+                elif key == "search_paths":
+                    self.configuration.search_paths = value
+                elif key == "component_search_paths":
+                    self.configuration.component_search_paths = (
+                        self._parse_component_search_paths(
+                            value, self.configuration.component_search_paths
+                        )
+                    )
+                elif key == "environment_search_paths":
+                    self.configuration.environment_search_paths = (
+                        self._parse_component_search_paths(
+                            value, self.configuration.environment_search_paths
+                        )
+                    )
+            else:
+                logger.warning("Unknown configuration option '{}' detected", key)
 
         logger.debug(self.configuration)
-        return self.configuration
 
     def _parse_component_search_paths(
-        self, additional_search_paths: t.List[str]
+        self, additional_search_paths: t.List[str], initial_search_paths: t.List[str]
     ) -> t.List[Path]:
         intermediary = [Path(x).expanduser() for x in additional_search_paths]
-        intermediary.extend(self.configuration.component_search_paths)
+        intermediary.extend(initial_search_paths)
         config_value = []
         [config_value.append(x) for x in intermediary if x not in config_value]
         return config_value

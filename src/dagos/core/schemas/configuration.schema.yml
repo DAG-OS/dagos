@@ -8,6 +8,8 @@ search_paths: list(include('path'), required=False, none=False)
 # folder which is either named "components" or contains a ".dagos-components"
 # marker file.
 component_search_paths: list(include('path'), required=False)
+# Additional paths where to look for software environments.
+environment_search_paths: list(include('path'), required=False)
 # The default level of verbosity used for logging. Lowest is 0 (INFO), highest
 # is 2 (TRACE).
 verbosity: int(min=0, max=2, required=False, none=False)

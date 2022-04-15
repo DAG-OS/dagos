@@ -1,0 +1,5 @@
+search_paths:
+  - /tmp
+environment_search_paths:
+  - /tmp/environments
+verbosity: 2
