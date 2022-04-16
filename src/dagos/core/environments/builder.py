@@ -52,8 +52,9 @@ class SoftwareEnvironmentBuilder:
             .description(environment.get("description"))
         )
 
-        # TODO: How does this behave if there is a list or string?
         os = environment["platform"]["os"]
+        if isinstance(os, str):
+            os = [os]
         images = []
         if "images" in environment["platform"]:
             for image in environment["platform"]["images"]:
