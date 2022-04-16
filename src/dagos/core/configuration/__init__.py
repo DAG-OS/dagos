@@ -1,2 +1,2 @@
-from .domain import *
-from .scanner import *
+from .domain import DagosConfiguration
+from .scanner import ConfigurationScanner
