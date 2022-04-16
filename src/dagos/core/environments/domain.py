@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass
+from pathlib import Path
 
 from loguru import logger
 
@@ -56,6 +57,7 @@ class Component:
 class SoftwareEnvironment(metaclass=SoftwareEnvironmentRegistry):
     """Base class for software environments."""
 
+    path: Path
     name: str
     description: t.Optional[str]
     platform: Platform
@@ -63,12 +65,14 @@ class SoftwareEnvironment(metaclass=SoftwareEnvironmentRegistry):
 
     def __init__(
         self,
+        path: Path,
         name: str,
         description: t.Optional[str],
         platform: Platform,
         components: t.List[Component],
     ) -> None:
         """"""
+        self.path = path
         self.name = name
         self.description = description
         self.platform = platform

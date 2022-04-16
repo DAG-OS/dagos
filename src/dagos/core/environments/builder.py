@@ -15,6 +15,10 @@ class SoftwareEnvironmentBuilder:
         self._description = None
         self._components = []
 
+    def path(self, path: Path) -> SoftwareEnvironmentBuilder:
+        self._path = path
+        return self
+
     def name(self, name: str) -> SoftwareEnvironmentBuilder:
         self._name = name
         return self
@@ -37,7 +41,7 @@ class SoftwareEnvironmentBuilder:
 
     def build(self) -> SoftwareEnvironment:
         return SoftwareEnvironment(
-            self._name, self._description, self._platform, self._components
+            self._path, self._name, self._description, self._platform, self._components
         )
 
     @classmethod
@@ -48,6 +52,7 @@ class SoftwareEnvironmentBuilder:
 
         builder = (
             SoftwareEnvironmentBuilder()
+            .path(file)
             .name(environment["name"])
             .description(environment.get("description"))
         )
