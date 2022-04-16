@@ -46,29 +46,19 @@ class ConfigurationScanner:
                 if key == "verbosity":
                     self.configuration.verbosity = value
                 elif key == "search_paths":
-                    self.configuration.search_paths = value
+                    self.configuration.search_paths = self._parse_search_paths(value)
                 elif key == "component_search_paths":
                     self.configuration.component_search_paths = (
-                        self._parse_component_search_paths(
-                            value, self.configuration.component_search_paths
-                        )
+                        self._parse_search_paths(value)
                     )
                 elif key == "environment_search_paths":
                     self.configuration.environment_search_paths = (
-                        self._parse_component_search_paths(
-                            value, self.configuration.environment_search_paths
-                        )
+                        self._parse_search_paths(value)
                     )
             else:
                 logger.warning("Unknown configuration option '{}' detected", key)
 
         logger.debug(self.configuration)
 
-    def _parse_component_search_paths(
-        self, additional_search_paths: t.List[str], initial_search_paths: t.List[str]
-    ) -> t.List[Path]:
-        intermediary = [Path(x).expanduser() for x in additional_search_paths]
-        intermediary.extend(initial_search_paths)
-        config_value = []
-        [config_value.append(x) for x in intermediary if x not in config_value]
-        return config_value
+    def _parse_search_paths(self, search_paths: t.List[str]) -> t.List[Path]:
+        return [Path(x).expanduser() for x in search_paths]

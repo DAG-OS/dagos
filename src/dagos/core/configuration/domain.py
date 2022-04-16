@@ -110,12 +110,16 @@ class DagosConfiguration:
         result = StringIO()
         result.write("DagosConfiguration{")
         result.write(f"verbosity={self.verbosity}, ")
-        result.write(f"search_paths={','.join([str(x) for x in self.search_paths])}, ")
-        result.write(
-            f"component_search_paths={','.join([str(x) for x in self.component_search_paths])}"
+
+        search_paths = ",".join([str(x) for x in self.search_paths])
+        result.write(f"search_paths={search_paths}, ")
+
+        component_search_paths = ",".join([str(x) for x in self.component_search_paths])
+        result.write(f"component_search_paths={component_search_paths}, ")
+
+        environment_search_paths = ",".join(
+            [str(x) for x in self.environment_search_paths]
         )
-        result.write(
-            f"environment_search_paths={','.join([str(x) for x in self.environment_search_paths])}"
-        )
+        result.write(f"environment_search_paths={environment_search_paths}")
         result.write("}")
         return result.getvalue()
