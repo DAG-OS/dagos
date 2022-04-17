@@ -7,7 +7,6 @@ from pathlib import Path
 from loguru import logger
 
 from dagos.core.components import SoftwareComponent
-from dagos.core.components import SoftwareComponentRegistry
 
 
 class SoftwareEnvironmentRegistry(type):
@@ -52,6 +51,7 @@ class Component:
     name: str
     purpose: t.Optional[str]
     version: t.Optional[str]
+    software_component: t.Optional[SoftwareComponent]
 
 
 class SoftwareEnvironment(metaclass=SoftwareEnvironmentRegistry):
@@ -82,11 +82,10 @@ class SoftwareEnvironment(metaclass=SoftwareEnvironmentRegistry):
         collected_components: t.List[SoftwareComponent] = []
         unknown_components: t.List[str] = []
         for component in self.components:
-            found_component = SoftwareComponentRegistry.find_component(component.name)
-            if found_component:
+            if component.software_component:
                 logger.trace("Requested component '{}' is known!", component.name)
                 # TODO: Check if selected platform supports component?
-                collected_components.append(found_component)
+                collected_components.append(component.software_component)
             else:
                 unknown_components.append(component.name)
 

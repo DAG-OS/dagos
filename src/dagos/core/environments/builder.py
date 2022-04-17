@@ -7,6 +7,7 @@ from .domain import Component
 from .domain import Image
 from .domain import Platform
 from .domain import SoftwareEnvironment
+from dagos.core.components import SoftwareComponentRegistry
 from dagos.core.validator import Validator
 
 
@@ -33,10 +34,6 @@ class SoftwareEnvironmentBuilder:
 
     def add_component(self, component: Component) -> SoftwareEnvironmentBuilder:
         self._components.append(component)
-        return self
-
-    def components(self, components: t.List[Component]) -> SoftwareEnvironmentBuilder:
-        self._components = components
         return self
 
     def build(self) -> SoftwareEnvironment:
@@ -77,6 +74,7 @@ class SoftwareEnvironmentBuilder:
                     component["name"],
                     component.get("purpose"),
                     component.get("version"),
+                    SoftwareComponentRegistry.find_component(component["name"]),
                 )
             )
         return builder.build()
