@@ -2,7 +2,7 @@ import sys
 import time
 
 import click
-import rich_click
+import rich_click.rich_click as rich_click
 from loguru import logger
 
 from . import __version__
@@ -16,9 +16,10 @@ from dagos.core.environments import SoftwareEnvironmentScanner
 from dagos.exceptions import DagosException
 from dagos.logging import configure_logging
 
-click.Command.format_help = rich_click.rich_click.rich_format_help
-click.Group.format_help = rich_click.rich_click.rich_format_help
-rich_click.rich_click.COMMAND_GROUPS = {
+click.Command.format_help = rich_click.rich_format_help
+click.Group.format_help = rich_click.rich_format_help
+rich_click.STYLE_HELPTEXT = ""
+rich_click.COMMAND_GROUPS = {
     "dagos": [
         {
             "name": "Software Component Commands",
