@@ -5,6 +5,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from loguru import logger
+from rich.console import Console
+from rich.console import ConsoleOptions
+from rich.console import Group
+from rich.console import group
+from rich.console import RenderResult
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.table import Table
+from rich.tree import Tree
 
 from dagos.core.components import SoftwareComponent
 
@@ -37,6 +46,36 @@ class SoftwareEnvironmentRegistry(type):
 class Platform:
     os: t.List[str]
     images: t.List[Image]
+
+    def __rich_console__(
+        self, console: Console, options: ConsoleOptions
+    ) -> t.Generator[RenderResult]:
+        parent_table = Table(box=None)
+        parent_table.add_column()
+        parent_table.add_column()
+
+        os_table = Table(
+            title=f"Targeted Operating Systems ({len(self.os)})", min_width=35
+        )
+        os_table.add_column("Name")
+        # os_table.add_column("Packages")
+        for os in self.os:
+            os_table.add_row(os)
+
+        image_table = Table(title=f"Targeted Container Images ({len(self.images)})")
+        image_table.add_column("ID")
+        image_table.add_column("Packages")
+
+        for image in self.images:
+            package_tree = Tree(
+                image.package_manager if image.package_manager else "system"
+            )
+            for package in image.packages:
+                package_tree.add(package)
+            image_table.add_row(image.id, package_tree)
+
+        parent_table.add_row(os_table, image_table)
+        yield parent_table
 
 
 @dataclass
@@ -98,3 +137,42 @@ class SoftwareEnvironment(metaclass=SoftwareEnvironmentRegistry):
             )
 
         return collected_components
+
+    def __rich__(self) -> Panel:
+        @group()
+        def get_renderables():
+            yield Markdown(f"{self.description}\n")
+            yield self.platform
+
+            table = Table(
+                title=f"Software Components ({len(self.components)})",
+                title_justify="left",
+                show_lines=True,
+                expand=True,
+            )
+            table.add_column("Name")
+            table.add_column("Purpose", ratio=1)
+            table.add_column("Version", justify="right")
+            table.add_column("Found?", justify="center")
+            table.add_column("Valid?", justify="center")
+            for component in self.components:
+                table.add_row(
+                    component.name,
+                    component.purpose,
+                    component.version,
+                    ":white_check_mark:"
+                    if component.software_component
+                    else ":cross_mark:",
+                    ":white_check_mark:"
+                    if component.software_component.is_valid()
+                    else ":cross_mark:",
+                )
+            yield table
+
+        return Panel(
+            Group(get_renderables()),
+            title=f"Environment: {self.name}",
+            title_align="left",
+            subtitle=f"Path: {self.path}",
+            subtitle_align="right",
+        )

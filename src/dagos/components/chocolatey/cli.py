@@ -14,10 +14,12 @@ platform_utils.assert_windows()
 
 
 class ChocolateySoftwareComponent(SoftwareComponent):
-    """Manage Chocolatey.
+    """
+    Manage Chocolatey.
 
     Chocolatey is a package manager for Windows.
-    Project home: https://chocolatey.org/
+
+    Project home: <https://chocolatey.org/>
     """
 
     def __init__(self) -> None:

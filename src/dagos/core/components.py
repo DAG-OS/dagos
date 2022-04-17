@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import textwrap
 import typing as t
 from pathlib import Path
 
 import click
 from loguru import logger
+from rich.console import Group
+from rich.console import group
+from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.table import Table
+from rich.tree import Tree
 
 from .commands import Command
 from .commands import CommandType
@@ -110,3 +117,29 @@ class SoftwareComponent(metaclass=SoftwareComponentRegistry):
         if len(self.commands) > 0:
             is_valid = True
         return is_valid
+
+    def __rich__(self) -> Panel:
+        @group()
+        def get_renderables():
+            yield Markdown(f"{textwrap.dedent(self.__doc__)}")
+            yield ""
+
+            command_table = Table(title="Commands", show_header=False, box=None)
+            command_table.add_column("Type")
+            command_table.add_column("Description")
+
+            for command in [x for x in self.commands.values() if x]:
+                command_table.add_row(command.type.value, command.__doc__)
+            yield command_table
+            yield ""
+
+            file_tree = Tree("files")
+            for file in self.files:
+                file_tree.add(str(file))
+            yield file_tree
+
+        return Panel(
+            Group(get_renderables()),
+            title=f"Component: {self.name}",
+            title_align="left",
+        )

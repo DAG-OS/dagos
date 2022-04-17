@@ -3,9 +3,10 @@ from dagos.core.components import SoftwareComponent
 
 
 class DiveSoftwareComponent(SoftwareComponent):
-    """Manage dive, a tool for analyzing container images.
+    """
+    Manage dive, a tool for analyzing container images.
 
-    Project home: https://github.com/wagoodman/dive
+    Project home: <https://github.com/wagoodman/dive>
     """
 
     def __init__(self) -> None:

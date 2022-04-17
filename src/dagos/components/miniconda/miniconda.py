@@ -14,9 +14,11 @@ platform_utils.assert_command_available("sh")
 
 
 class MinicondaSoftwareComponent(SoftwareComponent):
-    """Manage miniconda, a minimal installer for conda.
+    """
+    Manage miniconda, a minimal installer for conda.
 
-    Project home: https://docs.conda.io/en/latest/miniconda.html"""
+    Project home: <https://docs.conda.io/en/latest/miniconda.html>
+    """
 
     def __init__(self) -> None:
         super().__init__("miniconda")

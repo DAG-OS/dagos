@@ -16,9 +16,11 @@ platform_utils.assert_command_available("python3")
 
 
 class PoetrySoftwareComponent(SoftwareComponent):
-    """Manage poetry, a Python dependency manager and build tool.
+    """
+    Manage poetry, a Python dependency manager and build tool.
 
-    Project home: https://github.com/python-poetry/poetry"""
+    Project home: <https://github.com/python-poetry/poetry>
+    """
 
     def __init__(self) -> None:
         super().__init__("poetry")

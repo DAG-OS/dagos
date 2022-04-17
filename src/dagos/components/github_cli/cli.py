@@ -6,10 +6,12 @@ platform_utils.assert_operating_system([OperatingSystem.LINUX])
 
 
 class GitHubCliSoftwareComponent(SoftwareComponent):
-    """Manage the GitHub CLI.
+    """
+    Manage the GitHub CLI.
 
     The GitHub CLI is useful for interacting with GitHub from the command line.
-    Project home: https://github.com/cli/cli
+
+    Project home: <https://github.com/cli/cli>
     """
 
     def __init__(self) -> None:

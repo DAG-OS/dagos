@@ -73,7 +73,7 @@ class SoftwareEnvironmentBuilder:
                 Component(
                     component["name"],
                     component.get("purpose"),
-                    component.get("version"),
+                    component.get("version") if "version" in component else "latest",
                     SoftwareComponentRegistry.find_component(component["name"]),
                 )
             )

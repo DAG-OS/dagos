@@ -7,6 +7,7 @@ from loguru import logger
 
 from . import __version__
 from dagos.commands.env.cli import env
+from dagos.commands.list_command import list
 from dagos.commands.wsl.cli import wsl
 from dagos.core.commands import CommandRegistry
 from dagos.core.commands import CommandType
@@ -21,6 +22,10 @@ click.Group.format_help = rich_click.rich_format_help
 rich_click.STYLE_HELPTEXT = ""
 rich_click.COMMAND_GROUPS = {
     "dagos": [
+        {
+            "name": "General Commands",
+            "commands": ["list"],
+        },
         {
             "name": "Software Component Commands",
             "commands": [type.value for type in CommandType],
@@ -87,6 +92,7 @@ def dagos():
             dagos_cli.add_command(command_group)
         dagos_cli.add_command(wsl)
         dagos_cli.add_command(env)
+        dagos_cli.add_command(list)
         dagos_cli()
     except DagosException as e:
         logger.error(e)

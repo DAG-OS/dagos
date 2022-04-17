@@ -7,9 +7,10 @@ from dagos.core.components import SoftwareComponent
 
 
 class StructurizrSoftwareComponent(SoftwareComponent):
-    """Manage the Structurizr CLI.
+    """
+    Manage the Structurizr CLI.
 
-    Project home: https://github.com/structurizr/cli
+    Project home: <https://github.com/structurizr/cli>
     """
 
     def __init__(self) -> None:
