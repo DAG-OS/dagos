@@ -8,7 +8,6 @@ from loguru import logger
 
 from .commands import Command
 from .commands import CommandType
-from dagos.exceptions import SoftwareComponentScanException
 
 
 class SoftwareComponentRegistry(type):
@@ -105,12 +104,9 @@ class SoftwareComponent(metaclass=SoftwareComponentRegistry):
                 group.add_command(command.build(command.type.value))
         return group
 
-    def validate(self) -> None:
-        if hasattr(self, "cli"):
-            cli_is_valid = self.cli.exists()
-        else:
-            cli_is_valid = False
-        if not cli_is_valid:
-            raise SoftwareComponentScanException(
-                f"{self.name}: There is neither a valid CLI nor actions!"
-            )
+    def is_valid(self) -> bool:
+        is_valid = False
+        # TODO: Improve component validation
+        if len(self.commands) > 0:
+            is_valid = True
+        return is_valid
