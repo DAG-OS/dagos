@@ -24,7 +24,13 @@ def delete_file(file):
 
 @then(parsers.parse('I see "{expected_output}"'))
 def i_see(expected_output, command_output: str):
-    assert expected_output in command_output
+    assert re.search(expected_output, command_output)
+
+
+@then(parsers.parse("""I don't see "{expected_output}"""))
+@then(parsers.parse("""I do not see "{expected_output}"""))
+def i_do_not_see(expected_output, command_output: str):
+    assert not re.search(expected_output, command_output)
 
 
 @then(parsers.parse('I see a command "{command}" with the description "{description}"'))
