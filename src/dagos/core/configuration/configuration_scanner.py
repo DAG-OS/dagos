@@ -33,7 +33,7 @@ class ConfigurationScanner:
             if file.exists() and file.is_file():
                 logger.debug(f"Found configuration file '{file}'")
                 self.load_configuration(file)
-        logger.debug("No configuration file found in search paths, using defaults")
+        logger.debug("Final configuration: {}", self.configuration)
         return self.configuration
 
     def load_configuration(self, config_file: Path) -> DagosConfiguration:
@@ -58,7 +58,7 @@ class ConfigurationScanner:
             else:
                 logger.warning("Unknown configuration option '{}' detected", key)
 
-        logger.debug(self.configuration)
+        logger.trace(self.configuration)
 
     def _parse_search_paths(self, search_paths: t.List[str]) -> t.List[Path]:
         return [Path(x).expanduser() for x in search_paths]
