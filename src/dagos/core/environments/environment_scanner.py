@@ -3,7 +3,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from .builder import SoftwareEnvironmentBuilder
+from dagos.core.environments import SoftwareEnvironmentBuilder
 from dagos.exceptions import ValidationException
 
 

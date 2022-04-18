@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from dagos.core.configuration import ConfigurationScanner
-from dagos.core.configuration.domain import DefaultPlaceholder
+from dagos.core.configuration.configuration_domain import DefaultPlaceholder
 from dagos.exceptions import ValidationException
 
 

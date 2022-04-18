@@ -3,10 +3,10 @@ from __future__ import annotations
 import typing as t
 from pathlib import Path
 
-from .domain import Component
-from .domain import Image
-from .domain import Platform
-from .domain import SoftwareEnvironment
+from .environment_domain import Component
+from .environment_domain import Image
+from .environment_domain import Platform
+from .environment_domain import SoftwareEnvironment
 from dagos.core.components import SoftwareComponentRegistry
 from dagos.core.validator import Validator
 
