@@ -47,7 +47,7 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
     ctx.call_on_close(print_elapsed_time)
 
 
-@click.group(invoke_without_command=True)
+@click.group()
 @click.option(
     "--verbose",
     "-v",
@@ -67,8 +67,7 @@ def timer_callback(ctx: click.Context, param: click.Option, value: bool) -> None
 )
 @click.pass_context
 def dagos_cli(ctx: click.Context, verbose: int, timer: bool):
-    if ctx.invoked_subcommand is None:
-        print(ctx.get_help())
+    pass
 
 
 def dagos():
