@@ -10,6 +10,7 @@ Feature: Manage common software components
             | component   | command     |
             | github-cli  | gh          |
             | structurizr | structurizr |
+            | sdkman      | sdk         |
 
     Scenario Outline: Install common software components via install
         Given I have root privileges

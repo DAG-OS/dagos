@@ -16,9 +16,13 @@ environment:
           - python3
           - python3-pip
           - python3-venv
+          - unzip
+          - zip
       - id: python:3-slim
         packages:
           - git
+          - unzip
+          - zip
   components:
     - name: miniconda
       purpose: Used to manage tested Python versions.
