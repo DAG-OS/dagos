@@ -5,8 +5,8 @@ from loguru import logger
 
 import dagos.platform.utils as platform_utils
 import dagos.utils.file_utils as file_utils
-from dagos.core.commands import Command
-from dagos.core.commands import CommandType
+from dagos.core.commands import InstallCommand
+from dagos.core.commands import UninstallCommand
 from dagos.core.components import SoftwareComponent
 
 # TODO: Remove limit to linux as this is only necessary because of hard coded adding to path
@@ -28,11 +28,11 @@ class PoetrySoftwareComponent(SoftwareComponent):
         self.add_command(UninstallPoetryCommand(self))
 
 
-class InstallPoetryCommand(Command):
+class InstallPoetryCommand(InstallCommand):
     """Install poetry."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.INSTALL, parent)
+        super().__init__(parent)
 
     def execute(self) -> None:
         logger.info("Download and run installer")
@@ -46,11 +46,11 @@ class InstallPoetryCommand(Command):
         file_utils.create_symlink("/usr/local/bin/poetry", binary, force=True)
 
 
-class UninstallPoetryCommand(Command):
+class UninstallPoetryCommand(UninstallCommand):
     """Uninstall poetry."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.UNINSTALL, parent)
+        super().__init__(parent)
 
     def execute(self) -> None:
         logger.info("Download and run uninstaller")

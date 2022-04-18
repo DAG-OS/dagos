@@ -5,8 +5,7 @@ from loguru import logger
 
 import dagos.platform.utils as platform_utils
 import dagos.utils.file_utils as file_utils
-from dagos.core.commands import Command
-from dagos.core.commands import CommandType
+from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 
 platform_utils.assert_linux()
@@ -25,11 +24,11 @@ class MinicondaSoftwareComponent(SoftwareComponent):
         self.add_command(InstallMinicondaCommand(self))
 
 
-class InstallMinicondaCommand(Command):
+class InstallMinicondaCommand(InstallCommand):
     """Install miniconda."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.INSTALL, parent)
+        super().__init__(parent)
 
     def execute(self) -> None:
         logger.info("Download miniconda installer")

@@ -7,8 +7,8 @@ import click
 from loguru import logger
 
 import dagos.platform.utils as platform_utils
-from dagos.core.commands import Command
-from dagos.core.commands import CommandType
+from dagos.core.commands import ConfigureCommand
+from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.logging import spinner
 from dagos.utils import powershell_utils
@@ -30,11 +30,11 @@ class VcXsrvSoftwareComponent(SoftwareComponent):
         self.add_command(ConfigureVcXsrvCommand(self))
 
 
-class InstallVcXsrvCommand(Command):
+class InstallVcXsrvCommand(InstallCommand):
     """Install VcXsrv."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.INSTALL, parent)
+        super().__init__(parent)
 
     def build(self, name: t.Optional[str] = None) -> click.Command:
         command = super().build(name)
@@ -59,11 +59,11 @@ class InstallVcXsrvCommand(Command):
                 exit(1)
 
 
-class ConfigureVcXsrvCommand(Command):
+class ConfigureVcXsrvCommand(ConfigureCommand):
     """Configure VcXsrv to autostart with Windows."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.CONFIGURE, parent)
+        super().__init__(parent)
 
     def execute(self) -> None:
         current_user = os.getlogin()

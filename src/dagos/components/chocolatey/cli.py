@@ -5,8 +5,7 @@ import click
 from loguru import logger
 
 import dagos.platform.utils as platform_utils
-from dagos.core.commands import Command
-from dagos.core.commands import CommandType
+from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.utils import powershell_utils
 
@@ -26,11 +25,11 @@ class ChocolateySoftwareComponent(SoftwareComponent):
         super().__init__("chocolatey")
 
 
-class InstallChocolateyCommand(Command):
+class InstallChocolateyCommand(InstallCommand):
     """Install Chocolatey via PowerShell."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.INSTALL, parent)
+        super().__init__(parent)
 
     def build(self, name: t.Optional[str] = None) -> click.Command:
         command = super().build(name)

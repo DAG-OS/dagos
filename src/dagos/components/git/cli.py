@@ -4,8 +4,8 @@ import ansible_runner
 import yaml
 from loguru import logger
 
-from dagos.core.commands import Command
-from dagos.core.commands import CommandType
+from dagos.core.commands import ConfigureCommand
+from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 
 inventory = "localhost ansible_connection=local"
@@ -20,9 +20,9 @@ class GitSoftwareComponent(SoftwareComponent):
         self.add_command(InstallGitCommand(self))
 
 
-class InstallGitCommand(Command):
+class InstallGitCommand(InstallCommand):
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.INSTALL, parent)
+        super().__init__(parent)
 
     def execute(self) -> None:
         logger.info("Installing Git")
@@ -34,9 +34,9 @@ class InstallGitCommand(Command):
         )
 
 
-class ConfigureGitCommand(Command):
+class ConfigureGitCommand(ConfigureCommand):
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.CONFIGURE, parent)
+        super().__init__(parent)
 
     def execute(self) -> None:
         logger.info("Configuring Git")

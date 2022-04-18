@@ -6,8 +6,7 @@ import click
 from loguru import logger
 
 import dagos.platform.utils as platform_utils
-from dagos.core.commands import Command
-from dagos.core.commands import CommandType
+from dagos.core.commands import ConfigureCommand
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
 
@@ -22,11 +21,11 @@ class GitkSoftwareComponent(SoftwareComponent):
         self.add_command(ConfigureGitkCommand(self))
 
 
-class ConfigureGitkCommand(Command):
+class ConfigureGitkCommand(ConfigureCommand):
     """Configure gitk to use Dracula dark theme."""
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.CONFIGURE, parent)
+        super().__init__(parent)
 
     def build(self, name: t.Optional[str] = None) -> click.Command:
         command = super().build(name)

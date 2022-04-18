@@ -6,14 +6,13 @@ from pathlib import Path
 import requests
 from loguru import logger
 
-from dagos.core.commands import Command
-from dagos.core.commands import CommandType
+from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
 from dagos.utils import file_utils
 
 
-class GitHubInstallCommand(Command):
+class GitHubInstallCommand(InstallCommand):
     """Install a software component via a GitHub release."""
 
     repository: str
@@ -23,7 +22,7 @@ class GitHubInstallCommand(Command):
     strip_root_folder: bool = False
 
     def __init__(self, parent: SoftwareComponent) -> None:
-        super().__init__(CommandType.INSTALL, parent)
+        super().__init__(parent)
 
     @staticmethod
     def parse(yaml: t.Dict, component: SoftwareComponent):

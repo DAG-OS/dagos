@@ -90,3 +90,38 @@ class Command(metaclass=CommandRegistry):
     def execute(self, *args) -> None:
         """Execute the command."""
         raise NotImplementedError()
+
+
+class InstallCommand(Command):
+    """Base class for install commands."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:  # type: ignore reportUndefinedVariable
+        super().__init__(CommandType.INSTALL, parent)
+
+
+class UninstallCommand(Command):
+    """Base class for uninstall commands."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:  # type: ignore reportUndefinedVariable
+        super().__init__(CommandType.UNINSTALL, parent)
+
+
+class UpdateCommand(Command):
+    """Base class for update commands."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:  # type: ignore reportUndefinedVariable
+        super().__init__(CommandType.UPDATE, parent)
+
+
+class ConfigureCommand(Command):
+    """Base class for configure commands."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:  # type: ignore reportUndefinedVariable
+        super().__init__(CommandType.CONFIGURE, parent)
+
+
+class VerifyCommand(Command):
+    """Base class for verify commands."""
+
+    def __init__(self, parent: SoftwareComponent) -> None:  # type: ignore reportUndefinedVariable
+        super().__init__(CommandType.VERIFY, parent)
