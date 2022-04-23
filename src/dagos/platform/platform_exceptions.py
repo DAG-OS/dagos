@@ -2,7 +2,7 @@ import platform
 import typing as t
 from io import StringIO
 
-from .domain import OperatingSystem
+from .platform_domain import OperatingSystem
 from dagos.exceptions import DagosException
 
 

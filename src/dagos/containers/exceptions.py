@@ -2,7 +2,7 @@ import typing as t
 from io import StringIO
 
 from dagos.exceptions import DagosException
-from dagos.platform.exceptions import UnsupportedPlatformException
+from dagos.platform import UnsupportedPlatformException
 
 
 class NoSupportedContainerEngineException(UnsupportedPlatformException):

@@ -6,11 +6,11 @@ from pathlib import Path
 import click
 from loguru import logger
 
-import dagos.platform.utils as platform_utils
 from dagos.core.commands import ConfigureCommand
 from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.logging import spinner
+from dagos.platform import platform_utils
 from dagos.utils import powershell_utils
 
 platform_utils.assert_windows()

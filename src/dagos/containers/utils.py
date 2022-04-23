@@ -2,10 +2,10 @@ import subprocess
 
 from loguru import logger
 
-import dagos.platform.utils as platform_utils
 from .exceptions import ContainerException
 from .exceptions import NoSupportedContainerEngineException
 from dagos.logging import spinner
+from dagos.platform import platform_utils
 
 selected_container_engine = None
 

@@ -15,7 +15,7 @@ from dagos.core.components import SoftwareComponent
 from dagos.core.validator import Validator
 from dagos.exceptions import SchemaValidationException
 from dagos.exceptions import ValidationException
-from dagos.platform.exceptions import UnsupportedPlatformException
+from dagos.platform import UnsupportedPlatformException
 
 
 @dataclass

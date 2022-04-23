@@ -5,10 +5,10 @@ from pathlib import Path
 import click
 from loguru import logger
 
-import dagos.platform.utils as platform_utils
 from dagos.core.commands import ConfigureCommand
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
+from dagos.platform import platform_utils
 
 platform_utils.assert_command_available("git")
 

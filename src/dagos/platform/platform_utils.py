@@ -5,9 +5,9 @@ import typing as t
 
 from loguru import logger
 
-from .domain import OperatingSystem
-from .exceptions import UnsupportedOperatingSystem
-from .exceptions import UnsupportedPlatformException
+from .platform_domain import OperatingSystem
+from .platform_exceptions import UnsupportedOperatingSystem
+from .platform_exceptions import UnsupportedPlatformException
 
 
 def is_operating_system(system: OperatingSystem) -> bool:

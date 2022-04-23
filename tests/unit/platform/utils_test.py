@@ -2,10 +2,10 @@ from contextlib import contextmanager
 
 import pytest
 
-import dagos.platform.utils as utils
-from dagos.platform.domain import OperatingSystem
-from dagos.platform.exceptions import UnsupportedOperatingSystem
-from dagos.platform.exceptions import UnsupportedPlatformException
+from dagos.platform import OperatingSystem
+from dagos.platform import platform_utils
+from dagos.platform import UnsupportedOperatingSystem
+from dagos.platform import UnsupportedPlatformException
 
 
 @contextmanager
@@ -22,7 +22,7 @@ def does_not_raise():
 )
 def test_is_operating_system(mocker, system, actual_system, expectation):
     mocker.patch("platform.system", return_value=actual_system)
-    assert utils.is_operating_system(system) == expectation
+    assert platform_utils.is_operating_system(system) == expectation
 
 
 @pytest.mark.parametrize(
@@ -35,7 +35,7 @@ def test_is_operating_system(mocker, system, actual_system, expectation):
 def test_assert_windows(mocker, system, expectation):
     mocker.patch("platform.system", return_value=system)
     with expectation:
-        utils.assert_windows()
+        platform_utils.assert_windows()
 
 
 @pytest.mark.parametrize(
@@ -48,7 +48,7 @@ def test_assert_windows(mocker, system, expectation):
 def test_assert_linux(mocker, system, expectation):
     mocker.patch("platform.system", return_value=system)
     with expectation:
-        utils.assert_linux()
+        platform_utils.assert_linux()
 
 
 @pytest.mark.parametrize(
@@ -63,7 +63,7 @@ def test_assert_linux(mocker, system, expectation):
 def test_assert_operating_system(mocker, system, systems, expectation):
     mocker.patch("platform.system", return_value=system)
     with expectation:
-        utils.assert_operating_system(systems)
+        platform_utils.assert_operating_system(systems)
 
 
 @pytest.mark.parametrize(
@@ -74,7 +74,7 @@ def test_assert_operating_system(mocker, system, systems, expectation):
     ],
 )
 def test_is_command_available(input, expected):
-    assert utils.is_command_available(input) == expected
+    assert platform_utils.is_command_available(input) == expected
 
 
 @pytest.mark.parametrize(
@@ -87,7 +87,7 @@ def test_is_command_available(input, expected):
 )
 def test_assert_command_available(input, expectation):
     with expectation:
-        utils.assert_command_available(input)
+        platform_utils.assert_command_available(input)
 
 
 @pytest.mark.parametrize(
@@ -101,7 +101,7 @@ def test_assert_command_available(input, expectation):
 def test_is_root(mocker, system, effective_uid, expectation):
     mocker.patch("platform.system", return_value=system)
     mocker.patch("os.geteuid", return_value=effective_uid)
-    assert utils.is_root() == expectation
+    assert platform_utils.is_root() == expectation
 
 
 @pytest.mark.parametrize(
@@ -116,4 +116,4 @@ def test_assert_root_privileges(mocker, system, effective_uid, expectation):
     mocker.patch("platform.system", return_value=system)
     mocker.patch("os.geteuid", return_value=effective_uid)
     with expectation:
-        utils.assert_root_privileges()
+        platform_utils.assert_root_privileges()

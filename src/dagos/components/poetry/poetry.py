@@ -3,11 +3,11 @@ from pathlib import Path
 
 from loguru import logger
 
-import dagos.platform.utils as platform_utils
 import dagos.utils.file_utils as file_utils
 from dagos.core.commands import InstallCommand
 from dagos.core.commands import UninstallCommand
 from dagos.core.components import SoftwareComponent
+from dagos.platform import platform_utils
 
 # TODO: Remove limit to linux as this is only necessary because of hard coded adding to path
 platform_utils.assert_linux()

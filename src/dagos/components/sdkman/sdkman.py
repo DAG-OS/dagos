@@ -2,9 +2,9 @@ import subprocess
 
 from loguru import logger
 
-import dagos.platform.utils as platform_utils
 from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
+from dagos.platform import platform_utils
 
 platform_utils.assert_command_available("bash")
 platform_utils.assert_command_available("curl")

@@ -4,8 +4,8 @@ from pytest_bdd import given
 from pytest_bdd import parsers
 
 import dagos.containers.utils as container_utils
-import dagos.platform.utils as platform_utils
 from .utils import yield_step
+from dagos.platform import platform_utils
 
 
 @given("I have root privileges")

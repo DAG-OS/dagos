@@ -1,6 +1,6 @@
-import dagos.platform.utils as platform_utils
 from dagos.core.components import SoftwareComponent
-from dagos.platform.domain import OperatingSystem
+from dagos.platform import OperatingSystem
+from dagos.platform import platform_utils
 
 platform_utils.assert_operating_system([OperatingSystem.LINUX])
 

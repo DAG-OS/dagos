@@ -4,8 +4,8 @@ from pathlib import Path
 
 from loguru import logger
 
-import dagos.platform.utils as platform_utils
 from dagos.logging import spinner
+from dagos.platform import platform_utils
 
 
 @dataclass
