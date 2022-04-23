@@ -15,6 +15,7 @@ from rich.tree import Tree
 
 from .commands import Command
 from .commands import CommandType
+from dagos.platform import PlatformIssue
 
 
 class SoftwareComponentRegistry(type):
@@ -110,6 +111,22 @@ class SoftwareComponent(metaclass=SoftwareComponentRegistry):
             if command != None:
                 group.add_command(command.build(command.type.value))
         return group
+
+    def supports_platform(self) -> t.List[PlatformIssue]:
+        """Implementing commands may override this function to check if the current
+        platform is supported. If there are any issues with running on this platform
+        a list of issues should be returned.
+
+        Typical checks:
+        * Is the operating system supported?
+        * Is all required software installed and available?
+        * Are any environment variables missing?
+        * Does the calling user have root privileges?
+
+        Returns:
+            t.List[PlatformValidationFinding]: Any issues found during the validation. If none are returned the platform is considered as supported.
+        """
+        return []
 
     def is_valid(self) -> bool:
         is_valid = False

@@ -5,6 +5,7 @@ from abc import abstractmethod
 from enum import Enum
 
 import click
+from loguru import logger
 
 
 class CommandType(Enum):
@@ -30,11 +31,23 @@ class CommandRegistry(type):
         constructed commands. Only after their construction it is possible to
         access their type.
         """
-        self = super().__call__(*args, **kwds)
+        command = super().__call__(*args, **kwds)
 
-        cls.add_command(self.type, self.build())
+        platform_issues = command.parent.supports_platform()
+        if len(platform_issues) == 0:
+            cls.add_command(command.type, command.build())
+        else:
+            logger.debug(
+                "[b]{}[/]: There are {} platform issues",
+                command.parent.name,
+                len(platform_issues),
+            )
+            # TODO: If issue is mitigatable, return a dedicated command
+            #   * Differently styled
+            #   * Highlights that there is an issue that must be resolved
+            #   * If called, prints details about the issue?
 
-        return self
+        return command
 
     @classmethod
     def add_command(

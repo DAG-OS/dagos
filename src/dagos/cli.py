@@ -87,8 +87,8 @@ def dagos():
 
         SoftwareComponentScanner().scan(configuration.component_search_paths)
         SoftwareEnvironmentScanner().scan(configuration.environment_search_paths)
-        for command_group in CommandRegistry.commands.values():
-            dagos_cli.add_command(command_group)
+        for command in CommandRegistry.commands.values():
+            dagos_cli.add_command(command)
         dagos_cli.add_command(wsl)
         dagos_cli.add_command(env)
         dagos_cli.add_command(list)
