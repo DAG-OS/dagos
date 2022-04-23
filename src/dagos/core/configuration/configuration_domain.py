@@ -34,6 +34,18 @@ def _is_default_value(value: t.Any) -> bool:
 
 
 class DagosConfiguration:
+    """A singleton that contains the values of DAG-OS related configuration options.
+
+    For each option it carries the default value which may be overwritten once.
+    """
+
+    __instance = None
+
+    def __new__(cls):
+        if DagosConfiguration.__instance is None:
+            DagosConfiguration.__instance = object.__new__(cls)
+        return DagosConfiguration.__instance
+
     # TODO: Handle environment variables?
     def __init__(
         self,
