@@ -40,3 +40,25 @@ class PlatformSupportChecker:
                 CommandNotAvailableIssue(command, fixable, installation_instructions)
             )
         return self
+
+    def check_module_is_available(
+        self,
+        module: str,
+        description: t.Optional[str] = None,
+        fixable: bool = True,
+        fix_instructions: t.Optional[str] = None,
+    ) -> PlatformSupportChecker:
+        module_name = module
+        try:
+            import module
+        except ImportError:
+            self.issues.append(
+                PlatformIssue(
+                    description
+                    if description
+                    else f"Required Python module '{module_name}' is unavailable!",
+                    fixable,
+                    fix_instructions,
+                )
+            )
+        return self
