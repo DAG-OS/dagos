@@ -1,12 +1,6 @@
 import typing as t
 from pathlib import Path
 
-
-try:
-    import ansible_runner
-except ImportError:
-    pass
-
 import yaml
 from loguru import logger
 
@@ -15,6 +9,11 @@ from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.platform import PlatformIssue
 from dagos.platform import PlatformSupportChecker
+
+try:
+    import ansible_runner
+except ImportError:
+    pass
 
 inventory = "localhost ansible_connection=local"
 roles_path = Path.home() / ".ansible" / "roles"
