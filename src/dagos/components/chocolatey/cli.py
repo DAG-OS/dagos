@@ -6,10 +6,10 @@ from loguru import logger
 
 from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
-from dagos.platform import platform_utils
+from dagos.platform import OperatingSystem
+from dagos.platform import PlatformIssue
+from dagos.platform import PlatformSupportChecker
 from dagos.utils import powershell_utils
-
-platform_utils.assert_windows()
 
 
 class ChocolateySoftwareComponent(SoftwareComponent):
@@ -23,6 +23,14 @@ class ChocolateySoftwareComponent(SoftwareComponent):
 
     def __init__(self) -> None:
         super().__init__("chocolatey")
+        self.add_command(InstallChocolateyCommand(self))
+
+    def supports_platform(self) -> t.List[PlatformIssue]:
+        return (
+            PlatformSupportChecker()
+            .check_operating_system([OperatingSystem.WINDOWS])
+            .issues
+        )
 
 
 class InstallChocolateyCommand(InstallCommand):

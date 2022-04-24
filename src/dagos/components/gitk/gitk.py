@@ -8,9 +8,8 @@ from loguru import logger
 from dagos.core.commands import ConfigureCommand
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
-from dagos.platform import platform_utils
-
-platform_utils.assert_command_available("git")
+from dagos.platform import PlatformIssue
+from dagos.platform import PlatformSupportChecker
 
 
 class GitkSoftwareComponent(SoftwareComponent):
@@ -19,6 +18,9 @@ class GitkSoftwareComponent(SoftwareComponent):
     def __init__(self) -> None:
         super().__init__("gitk")
         self.add_command(ConfigureGitkCommand(self))
+
+    def supports_platform(self) -> t.List[PlatformIssue]:
+        return PlatformSupportChecker().check_command_is_available("git").issues
 
 
 class ConfigureGitkCommand(ConfigureCommand):

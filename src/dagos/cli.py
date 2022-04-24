@@ -20,6 +20,7 @@ from dagos.logging import configure_logging
 click.Command.format_help = rich_click.rich_format_help
 click.Group.format_help = rich_click.rich_format_help
 rich_click.STYLE_HELPTEXT = ""
+rich_click.USE_RICH_MARKUP = True
 rich_click.COMMAND_GROUPS = {
     "dagos": [
         {

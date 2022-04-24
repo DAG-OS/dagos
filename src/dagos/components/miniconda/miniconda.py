@@ -1,4 +1,5 @@
 import subprocess
+import typing as t
 from pathlib import Path
 
 from loguru import logger
@@ -6,10 +7,9 @@ from loguru import logger
 import dagos.utils.file_utils as file_utils
 from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
-from dagos.platform import platform_utils
-
-platform_utils.assert_linux()
-platform_utils.assert_command_available("sh")
+from dagos.platform import OperatingSystem
+from dagos.platform import PlatformIssue
+from dagos.platform import PlatformSupportChecker
 
 
 class MinicondaSoftwareComponent(SoftwareComponent):
@@ -22,6 +22,14 @@ class MinicondaSoftwareComponent(SoftwareComponent):
     def __init__(self) -> None:
         super().__init__("miniconda")
         self.add_command(InstallMinicondaCommand(self))
+
+    def supports_platform(self) -> t.List[PlatformIssue]:
+        return (
+            PlatformSupportChecker()
+            .check_operating_system([OperatingSystem.LINUX])
+            .check_command_is_available("sh")
+            .issues
+        )
 
 
 class InstallMinicondaCommand(InstallCommand):

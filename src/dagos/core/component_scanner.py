@@ -59,9 +59,13 @@ class SoftwareComponentScanner:
         for component in [
             x.component for x in self.scan_result.values() if x.component != None
         ]:
-            CommandRegistry.add_command(
-                CommandType.MANAGE, component.build_manage_command_group()
-            )
+            unfixable_platform_issues = [
+                x for x in component.supports_platform() if not x.fixable
+            ]
+            if len(unfixable_platform_issues) == 0:
+                CommandRegistry.add_command(
+                    CommandType.MANAGE, component.build_manage_command_group()
+                )
 
     def _scan_search_path(self, search_path: Path) -> None:
         logger.trace("Looking for software components in '{}'", search_path)

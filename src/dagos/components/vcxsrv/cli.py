@@ -10,17 +10,16 @@ from dagos.core.commands import ConfigureCommand
 from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.logging import spinner
+from dagos.platform import OperatingSystem
 from dagos.platform import platform_utils
+from dagos.platform import PlatformIssue
+from dagos.platform import PlatformSupportChecker
 from dagos.utils import powershell_utils
-
-platform_utils.assert_windows()
-platform_utils.assert_command_available("choco")
 
 
 class VcXsrvSoftwareComponent(SoftwareComponent):
-    """Install or configure VcXsrv.
+    """Install or configure VcXsrv, an open-source X-server for Windows.
 
-    VcXsrv is an open-source X-server for Windows.
     Project home: https://sourceforge.net/projects/vcxsrv
     """
 
@@ -28,6 +27,18 @@ class VcXsrvSoftwareComponent(SoftwareComponent):
         super().__init__("vcxsrv")
         self.add_command(InstallVcXsrvCommand(self))
         self.add_command(ConfigureVcXsrvCommand(self))
+
+    def supports_platform(self) -> t.List[PlatformIssue]:
+        return (
+            PlatformSupportChecker()
+            .check_operating_system([OperatingSystem.WINDOWS])
+            .check_command_is_available(
+                "choco",
+                platform_utils.is_operating_system(OperatingSystem.WINDOWS),
+                "dagos install chocolatey",
+            )
+            .issues
+        )
 
 
 class InstallVcXsrvCommand(InstallCommand):

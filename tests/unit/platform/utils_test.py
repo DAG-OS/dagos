@@ -4,7 +4,7 @@ import pytest
 
 from dagos.platform import OperatingSystem
 from dagos.platform import platform_utils
-from dagos.platform import UnsupportedOperatingSystem
+from dagos.platform import UnsupportedOperatingSystemException
 from dagos.platform import UnsupportedPlatformException
 
 
@@ -29,7 +29,7 @@ def test_is_operating_system(mocker, system, actual_system, expectation):
     "system,expectation",
     [
         ("Windows", does_not_raise()),
-        ("Linux", pytest.raises(UnsupportedOperatingSystem)),
+        ("Linux", pytest.raises(UnsupportedOperatingSystemException)),
     ],
 )
 def test_assert_windows(mocker, system, expectation):
@@ -41,7 +41,7 @@ def test_assert_windows(mocker, system, expectation):
 @pytest.mark.parametrize(
     "system,expectation",
     [
-        ("Windows", pytest.raises(UnsupportedOperatingSystem)),
+        ("Windows", pytest.raises(UnsupportedOperatingSystemException)),
         ("Linux", does_not_raise()),
     ],
 )
@@ -57,7 +57,7 @@ def test_assert_linux(mocker, system, expectation):
         ("Windows", [OperatingSystem.WINDOWS], does_not_raise()),
         ("Linux", [OperatingSystem.LINUX], does_not_raise()),
         ("Linux", [OperatingSystem.WINDOWS, OperatingSystem.LINUX], does_not_raise()),
-        ("Linux", [], pytest.raises(UnsupportedOperatingSystem)),
+        ("Linux", [], pytest.raises(UnsupportedOperatingSystemException)),
     ],
 )
 def test_assert_operating_system(mocker, system, systems, expectation):

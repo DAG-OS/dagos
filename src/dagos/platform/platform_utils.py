@@ -6,7 +6,7 @@ import typing as t
 from loguru import logger
 
 from .platform_domain import OperatingSystem
-from .platform_exceptions import UnsupportedOperatingSystem
+from .platform_exceptions import UnsupportedOperatingSystemException
 from .platform_exceptions import UnsupportedPlatformException
 
 
@@ -16,17 +16,17 @@ def is_operating_system(system: OperatingSystem) -> bool:
 
 def assert_windows() -> None:
     if not is_operating_system(OperatingSystem.WINDOWS):
-        raise UnsupportedOperatingSystem([OperatingSystem.WINDOWS])
+        raise UnsupportedOperatingSystemException([OperatingSystem.WINDOWS])
 
 
 def assert_linux() -> None:
     if not is_operating_system(OperatingSystem.LINUX):
-        raise UnsupportedOperatingSystem([OperatingSystem.LINUX])
+        raise UnsupportedOperatingSystemException([OperatingSystem.LINUX])
 
 
 def assert_operating_system(supported_systems: t.List[OperatingSystem]) -> None:
     if platform.system() not in [x.value for x in supported_systems]:
-        raise UnsupportedOperatingSystem(supported_systems)
+        raise UnsupportedOperatingSystemException(supported_systems)
 
 
 def is_command_available(command: str) -> bool:

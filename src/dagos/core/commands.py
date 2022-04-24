@@ -5,7 +5,9 @@ from abc import abstractmethod
 from enum import Enum
 
 import click
-from loguru import logger
+
+from dagos.platform import PlatformIssue
+from dagos.platform import UnsupportedPlatformException
 
 
 class CommandType(Enum):
@@ -33,19 +35,7 @@ class CommandRegistry(type):
         """
         command = super().__call__(*args, **kwds)
 
-        platform_issues = command.parent.supports_platform()
-        if len(platform_issues) == 0:
-            cls.add_command(command.type, command.build())
-        else:
-            logger.debug(
-                "[b]{}[/]: There are {} platform issues",
-                command.parent.name,
-                len(platform_issues),
-            )
-            # TODO: If issue is mitigatable, return a dedicated command
-            #   * Differently styled
-            #   * Highlights that there is an issue that must be resolved
-            #   * If called, prints details about the issue?
+        cls.add_command(command.type, command.build())
 
         return command
 
@@ -69,6 +59,40 @@ class CommandRegistry(type):
         cls.commands[type.name].add_command(command)
 
 
+def _build_unsupported_platform_command(
+    name: str, platform_issues: t.List[PlatformIssue]
+) -> click.Command:
+    help_text = "[dim]:latin_cross: "
+    if len(platform_issues) == 1:
+        help_text += platform_issues[0].description
+    else:
+        help_text += f"There are {len(platform_issues)} platform issues[/]"
+
+    def callback(*args, **kwargs):
+        fixable_issues = [x for x in platform_issues if x.fixable]
+        unfixable_issues = [x for x in platform_issues if not x.fixable]
+        message = f"The '{name}' command does not support the current platform!\nThere is a total of {len(platform_issues)} issues."
+        if len(unfixable_issues) > 0:
+            message += f" Since there are {len(unfixable_issues)} unfixable issues this is irrecoverable!"
+            message += "\n\nUnfixable issues:"
+            index = 1
+            for issue in unfixable_issues:
+                message += f"\n\t{index}. {issue.description}"
+                index += 1
+        if len(fixable_issues) > 0:
+            message += "\n\nFixable issues:"
+            index = 1
+            for issue in fixable_issues:
+                message += f"\n\t{index}. {issue.description}"
+                if issue.fix_instructions:
+                    message += f"\n\t   Try: {issue.fix_instructions}"
+                index += 1
+
+        raise UnsupportedPlatformException(message)
+
+    return click.Command(name=name, help=help_text, callback=callback)
+
+
 class Command(metaclass=CommandRegistry):
     """Base class for software component commands."""
 
@@ -90,13 +114,20 @@ class Command(metaclass=CommandRegistry):
         Returns:
             click.Command: A Click command to be used in a CLI.
         """
+        name = self.parent.name if name is None else name
         # TODO: Allow overriding
         help_text = (
             self.__doc__
             if self.__doc__
             else f"{self.type.value.capitalize()} the {self.parent.name} software component."
         )
-        name = self.parent.name if name is None else name
+
+        # TODO: Allow command specific platform issues? e.g. root privileges?
+        platform_issues = self.parent.supports_platform()
+        if len(platform_issues) > 0:
+            # TODO: Check if all issues are fixable
+            return _build_unsupported_platform_command(name, platform_issues)
+
         return click.Command(name=name, help=help_text, callback=self.execute)
 
     @abstractmethod

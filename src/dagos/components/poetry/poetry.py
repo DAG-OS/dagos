@@ -1,4 +1,5 @@
 import subprocess
+import typing as t
 from pathlib import Path
 
 from loguru import logger
@@ -7,12 +8,10 @@ import dagos.utils.file_utils as file_utils
 from dagos.core.commands import InstallCommand
 from dagos.core.commands import UninstallCommand
 from dagos.core.components import SoftwareComponent
+from dagos.platform import OperatingSystem
 from dagos.platform import platform_utils
-
-# TODO: Remove limit to linux as this is only necessary because of hard coded adding to path
-platform_utils.assert_linux()
-platform_utils.assert_command_available("curl")
-platform_utils.assert_command_available("python3")
+from dagos.platform import PlatformIssue
+from dagos.platform import PlatformSupportChecker
 
 
 class PoetrySoftwareComponent(SoftwareComponent):
@@ -26,6 +25,16 @@ class PoetrySoftwareComponent(SoftwareComponent):
         super().__init__("poetry")
         self.add_command(InstallPoetryCommand(self))
         self.add_command(UninstallPoetryCommand(self))
+
+    def supports_platform(self) -> t.List[PlatformIssue]:
+        # TODO: Remove limit to linux? Path doesn't need to be hard coded and curl doesn't have to be used
+        return (
+            PlatformSupportChecker()
+            .check_operating_system([OperatingSystem.LINUX])
+            .check_command_is_available("curl")
+            .check_command_is_available("python3")
+            .issues
+        )
 
 
 class InstallPoetryCommand(InstallCommand):
