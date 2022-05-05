@@ -125,6 +125,8 @@ def create_symlink(
         raise DagosException(
             f"Failed to create symbolic link '{from_path}': the target does not exist"
         )
+    if not from_path.parent.exists():
+        from_path.parent.mkdir(parents=True)
     from_path.symlink_to(to_path, target_is_directory)
 
 
