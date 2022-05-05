@@ -111,6 +111,8 @@ def create_symlink(
         from_path = Path(from_path)
     if isinstance(to_path, str):
         to_path = Path(to_path)
+    from_path = from_path.expanduser()
+    to_path = to_path.expanduser()
     if from_path.exists():
         if force:
             logger.trace(f"Removing existing file at '{from_path}'")
