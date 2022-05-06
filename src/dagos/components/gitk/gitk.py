@@ -5,6 +5,7 @@ from pathlib import Path
 import click
 from loguru import logger
 
+import dagos.utils.file_utils as file_utils
 from dagos.core.commands import ConfigureCommand
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
@@ -44,9 +45,10 @@ class ConfigureGitkCommand(ConfigureCommand):
         logger.debug("Checking if install dir exists")
         install_dir = Path(install_dir).expanduser()
         if not install_dir.exists():
-            raise DagosException("Provided install dir does not exist!")
+            logger.debug("Creating installation directory")
+            install_dir.mkdir(parents=True)
 
-        logger.debug("Clone the dracula/gitk repository")
+        logger.debug("Cloning the dracula/gitk repository")
         git_repo = "https://github.com/dracula/gitk.git"
         repo_dir = install_dir / "gitk"
         if not repo_dir.exists():
@@ -54,11 +56,10 @@ class ConfigureGitkCommand(ConfigureCommand):
             if clone_result.returncode != 0:
                 raise DagosException("Failed to clone repository!")
 
-        logger.debug("Ensure configuration dir exists")
+        logger.debug("Ensuring configuration directory exists")
         config_dir = Path("~/.config/git").expanduser()
         config_dir.mkdir(parents=True, exist_ok=True)
 
-        logger.debug("Configure gitk to use cloned theme")
+        logger.debug("Configuring gitk to use cloned theme")
         symbolic_link = config_dir / "gitk"
-        symbolic_link.unlink()
-        symbolic_link.symlink_to(install_dir / "gitk/gitk")
+        file_utils.create_symlink(symbolic_link, install_dir / "gitk/gitk", force=True)
