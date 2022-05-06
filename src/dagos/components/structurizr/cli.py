@@ -25,7 +25,7 @@ class InstallStructurizrCommand(GitHubInstallCommand):
         super().__init__(parent)
         self.repository = "structurizr/cli"
         self.pattern = "*.zip"
-        self.install_dir = "/home/dev/software/structurizr/cli"
+        self.install_dir = "~/software/structurizr/cli"
         self.binary = "structurizr"
 
     def post_extraction(self, install_path: Path) -> None:

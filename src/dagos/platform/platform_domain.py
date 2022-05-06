@@ -10,6 +10,11 @@ class OperatingSystem(Enum):
     LINUX = "Linux"
 
 
+class PlatformScope(Enum):
+    USER = "user"
+    SYSTEM = "system"
+
+
 class PlatformIssue:
     description: str
     """

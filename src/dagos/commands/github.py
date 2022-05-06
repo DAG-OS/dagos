@@ -9,6 +9,7 @@ from loguru import logger
 from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.exceptions import DagosException
+from dagos.platform import platform_utils
 from dagos.utils import file_utils
 
 
@@ -101,13 +102,8 @@ class GitHubInstallCommand(InstallCommand):
         self.post_extraction(install_path)
 
         if hasattr(self, "binary"):
-            # TODO: Generalize adding to path
-            usr_local_bin = Path("/usr/local/bin")
-            file_utils.create_symlink(
-                usr_local_bin / Path(self.binary).name,
-                install_path / self.binary,
-                force=True,
-            )
+            # TODO: Allow system installation
+            platform_utils.add_binary_to_path(install_path / self.binary, force=True)
 
     def post_extraction(self, install_path: Path) -> None:
         """Called after the downloaded archive is extracted. May be used by

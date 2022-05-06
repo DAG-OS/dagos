@@ -8,6 +8,7 @@ import dagos.utils.file_utils as file_utils
 from dagos.core.commands import InstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.platform import OperatingSystem
+from dagos.platform import platform_utils
 from dagos.platform import PlatformIssue
 from dagos.platform import PlatformSupportChecker
 
@@ -45,6 +46,7 @@ class InstallMinicondaCommand(InstallCommand):
         )
 
         logger.info("Execute installer")
+        # TODO: Remove/update existing installation, otherwise not idempotempt
         # TODO: Allow configuring the install dir
         install_dir = Path.home() / "miniconda"
         subprocess.run(["sh", str(installer_file), "-b", "-p", str(install_dir)])
@@ -53,5 +55,4 @@ class InstallMinicondaCommand(InstallCommand):
         installer_file.unlink()
 
         logger.info("Add conda to path")
-        binary = install_dir / "bin" / "conda"
-        file_utils.create_symlink("/usr/local/bin/conda", binary, force=True)
+        platform_utils.add_binary_to_path(install_dir / "bin" / "conda", force=True)

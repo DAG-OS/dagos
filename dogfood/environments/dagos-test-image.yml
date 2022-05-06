@@ -10,6 +10,7 @@ environment:
         # TODO: Configure entrypoint
         # TODO: Copy poetry config files and install dependencies
         # TODO: Add sudo user for user tests
+        # TODO: Configure ENV, e.g., add ~/.local/bin to PATH
         packages:
           - curl
           - git

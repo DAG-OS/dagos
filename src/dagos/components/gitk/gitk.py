@@ -61,5 +61,6 @@ class ConfigureGitkCommand(ConfigureCommand):
         config_dir.mkdir(parents=True, exist_ok=True)
 
         logger.debug("Configuring gitk to use cloned theme")
-        symbolic_link = config_dir / "gitk"
-        file_utils.create_symlink(symbolic_link, install_dir / "gitk/gitk", force=True)
+        file_utils.create_symlink(
+            config_dir / "gitk", install_dir / "gitk/gitk", force=True
+        )

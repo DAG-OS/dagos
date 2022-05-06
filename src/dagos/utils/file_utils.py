@@ -91,7 +91,7 @@ def create_symlink(
     to_path: t.Union[str, Path],
     force: bool = False,
     target_is_directory: bool = False,
-) -> None:
+) -> Path:
     """Create symlink from a provided path to another.
 
     Args:
@@ -106,6 +106,9 @@ def create_symlink(
     Raises:
         DagosException: If the from_path exists and force is not provided.
         DagosException: If the to_path does not exist.
+
+    Returns:
+        Path: The path of created symlink
     """
     if isinstance(from_path, str):
         from_path = Path(from_path)
@@ -128,6 +131,7 @@ def create_symlink(
     if not from_path.parent.exists():
         from_path.parent.mkdir(parents=True)
     from_path.symlink_to(to_path, target_is_directory)
+    return from_path
 
 
 def create_temp_dir(remove_at_exit: bool = True) -> Path:

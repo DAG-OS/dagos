@@ -1,15 +1,12 @@
 import subprocess
 import typing as t
-from pathlib import Path
 
 from loguru import logger
 
-import dagos.utils.file_utils as file_utils
 from dagos.core.commands import InstallCommand
 from dagos.core.commands import UninstallCommand
 from dagos.core.components import SoftwareComponent
 from dagos.platform import OperatingSystem
-from dagos.platform import platform_utils
 from dagos.platform import PlatformIssue
 from dagos.platform import PlatformSupportChecker
 
@@ -50,10 +47,6 @@ class InstallPoetryCommand(InstallCommand):
             shell=True,
         )
 
-        logger.info("Add poetry to path")
-        binary = Path.home() / ".local" / "bin" / "poetry"
-        file_utils.create_symlink("/usr/local/bin/poetry", binary, force=True)
-
 
 class UninstallPoetryCommand(UninstallCommand):
     """Uninstall poetry."""
@@ -67,6 +60,3 @@ class UninstallPoetryCommand(UninstallCommand):
             f"curl -sSL https://install.python-poetry.org | python3 - --uninstall",
             shell=True,
         )
-
-        logger.info("Remove poetry from path")
-        Path("/usr/local/bin/poetry").unlink()

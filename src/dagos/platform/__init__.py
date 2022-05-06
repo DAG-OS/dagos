@@ -2,6 +2,7 @@ import dagos.platform.platform_utils as platform_utils
 from .platform_domain import CommandNotAvailableIssue
 from .platform_domain import OperatingSystem
 from .platform_domain import PlatformIssue
+from .platform_domain import PlatformScope
 from .platform_domain import UnsupportedOperatingSystemIssue
 from .platform_exceptions import UnsupportedOperatingSystemException
 from .platform_exceptions import UnsupportedPlatformException
