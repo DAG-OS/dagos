@@ -5,6 +5,7 @@ from pathlib import Path
 from loguru import logger
 
 from dagos.exceptions import DagosException
+from dagos.logging import LogLevel
 
 
 def _run(
@@ -12,20 +13,24 @@ def _run(
     capture_stdout=False,
     capture_stderr=False,
     ignore_failure=False,
+    log_level: LogLevel = LogLevel.INFO,
 ) -> subprocess.CompletedProcess:
-    formatted_command = command if isinstance(command, str) else " ".join(command)
-    logger.info(f"Running command: {formatted_command}")
+    logger.log(
+        log_level.value,
+        "Running command: {}",
+        command if isinstance(command, str) else " ".join(command),
+    )
 
     result = subprocess.run(
-        formatted_command,
-        shell=True,
+        command,
+        shell=True if isinstance(command, str) else False,
         stdout=subprocess.PIPE if capture_stdout else None,
         stderr=subprocess.PIPE if capture_stderr else None,
         text=True,
     )
 
     if not ignore_failure and result.returncode != 0:
-        raise DagosException("Command failure in container, see above for errors!")
+        raise DagosException(f"Command failed with code {result.returncode}!")
     return result
 
 
@@ -210,6 +215,7 @@ def run(
     capture_stdout: t.Optional[bool] = False,
     capture_stderr: t.Optional[bool] = False,
     ignore_failure: t.Optional[bool] = False,
+    log_level: t.Optional[LogLevel] = LogLevel.INFO,
 ) -> subprocess.CompletedProcess:
     """Run provided command using the container's root filesystem, using config
     settings inherited from the container's image or as specified during previous
@@ -222,6 +228,7 @@ def run(
         capture_stdout (bool, optional): If True, capture stdout for later retrieval. Defaults to False.
         capture_stderr (bool, optional): If True, capture stderr for later retrieval. Defaults to False.
         ignore_failure (bool, optional): If True, do not fail if the command fails. Defaults to False.
+        log_level (LogLevel, optional): The log level to use for logging the run command. Defaults to LogLevel.INFO.
 
     Returns:
         subprocess.CompletedProcess: The result of running the command.
@@ -231,7 +238,7 @@ def run(
         run_command.extend(["--user", user])
     run_command.extend([container, "--"])
     run_command.extend(command.split() if isinstance(command, str) else command)
-    return _run(run_command, capture_stdout, capture_stderr, ignore_failure)
+    return _run(run_command, capture_stdout, capture_stderr, ignore_failure, log_level)
 
 
 def check_command(container: str, command: str, user: t.Optional[str] = None) -> bool:

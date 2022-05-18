@@ -4,16 +4,17 @@ from unittest.mock import call
 import pytest
 
 import dagos.containers.buildah as buildah
+from dagos.logging import LogLevel
 
 
 @pytest.mark.parametrize(
     "command,shell,capture_stdout,capture_stderr,stdout,stderr",
     [
         ("command", True, None, None, None, None),
-        (["command"], True, None, None, None, None),
-        (["command"], True, True, None, subprocess.PIPE, None),
-        (["command"], True, False, True, None, subprocess.PIPE),
-        (["command"], True, True, True, subprocess.PIPE, subprocess.PIPE),
+        (["command"], False, None, None, None, None),
+        (["command"], False, True, None, subprocess.PIPE, None),
+        (["command"], False, False, True, None, subprocess.PIPE),
+        (["command"], False, True, True, subprocess.PIPE, subprocess.PIPE),
     ],
 )
 def test_private_run(
@@ -30,7 +31,7 @@ def test_private_run(
     buildah._run(command, capture_stdout, capture_stderr, ignore_failure=True)
 
     subprocess.run.assert_called_once_with(
-        command if isinstance(command, str) else " ".join(command),
+        command,
         shell=shell,
         stdout=stdout,
         stderr=stderr,
@@ -164,16 +165,47 @@ def test_rm(mocker):
 
 
 @pytest.mark.parametrize(
-    "command,user,capture_stdout,capture_stderr,ignore_failure,expectation",
+    "command,user,capture_stdout,capture_stderr,ignore_failure,log_level,expectation",
     [
-        ("ls -la", None, True, False, False, ["container", "--", "ls", "-la"]),
-        (["ls", "-la"], None, False, True, False, ["container", "--", "ls", "-la"]),
-        ("ls", "d:d", False, False, False, ["--user", "d:d", "container", "--", "ls"]),
-        ("xxxxx", None, False, False, True, ["container", "--", "xxxxx"]),
+        ("ls -la", None, True, False, False, None, ["container", "--", "ls", "-la"]),
+        (
+            ["ls", "-la"],
+            None,
+            False,
+            True,
+            False,
+            LogLevel.DEBUG,
+            ["container", "--", "ls", "-la"],
+        ),
+        (
+            "ls",
+            "d:d",
+            False,
+            False,
+            False,
+            LogLevel.ERROR,
+            ["--user", "d:d", "container", "--", "ls"],
+        ),
+        (
+            "xxxxx",
+            None,
+            False,
+            False,
+            True,
+            LogLevel.WARNING,
+            ["container", "--", "xxxxx"],
+        ),
     ],
 )
 def test_run(
-    mocker, command, user, capture_stdout, capture_stderr, ignore_failure, expectation
+    mocker,
+    command,
+    user,
+    capture_stdout,
+    capture_stderr,
+    ignore_failure,
+    log_level,
+    expectation,
 ):
     mocker.patch("dagos.containers.buildah._run")
     expectation = ["buildah", "run"] + expectation
@@ -185,10 +217,11 @@ def test_run(
         capture_stdout=capture_stdout,
         capture_stderr=capture_stderr,
         ignore_failure=ignore_failure,
+        log_level=log_level,
     )
 
     buildah._run.assert_called_once_with(
-        expectation, capture_stdout, capture_stderr, ignore_failure
+        expectation, capture_stdout, capture_stderr, ignore_failure, log_level
     )
 
 
