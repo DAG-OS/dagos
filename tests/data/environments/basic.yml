@@ -2,18 +2,17 @@ environment:
   name: basic
   description: An environment for BDD tests of the DAG-OS CLI.
   platform:
-    os:
-      - linux
+    packages:
+      - git
     images:
       - id: rockylinux
-        package_manager: dnf
         packages:
-          - git
-          - python38
-          - python38-pip
+          - manager: dnf
+            packages:
+              - python38
+              - python38-pip
       - id: ubuntu
         packages:
-          - git
           - python3
           - python3-pip
   components:

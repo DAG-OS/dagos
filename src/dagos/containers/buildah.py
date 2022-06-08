@@ -237,7 +237,11 @@ def run(
     if user:
         run_command.extend(["--user", user])
     run_command.extend([container, "--"])
-    run_command.extend(command.split() if isinstance(command, str) else command)
+    if isinstance(command, str):
+        run_command.append(command)
+        run_command = " ".join(run_command)
+    else:
+        run_command.extend(command)
     return _run(run_command, capture_stdout, capture_stderr, ignore_failure, log_level)
 
 

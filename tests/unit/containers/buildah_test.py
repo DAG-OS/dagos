@@ -167,7 +167,7 @@ def test_rm(mocker):
 @pytest.mark.parametrize(
     "command,user,capture_stdout,capture_stderr,ignore_failure,log_level,expectation",
     [
-        ("ls -la", None, True, False, False, None, ["container", "--", "ls", "-la"]),
+        ("ls -la", None, True, False, False, None, "container -- ls -la"),
         (
             ["ls", "-la"],
             None,
@@ -184,10 +184,10 @@ def test_rm(mocker):
             False,
             False,
             LogLevel.ERROR,
-            ["--user", "d:d", "container", "--", "ls"],
+            "--user d:d container -- ls",
         ),
         (
-            "xxxxx",
+            ["xxxxx"],
             None,
             False,
             False,
@@ -208,7 +208,10 @@ def test_run(
     expectation,
 ):
     mocker.patch("dagos.containers.buildah._run")
-    expectation = ["buildah", "run"] + expectation
+    if isinstance(expectation, str):
+        expectation = "buildah run " + expectation
+    else:
+        expectation = ["buildah", "run"] + expectation
 
     buildah.run(
         "container",

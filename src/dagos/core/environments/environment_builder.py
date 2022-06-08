@@ -4,7 +4,9 @@ import typing as t
 from pathlib import Path
 
 from .environment_domain import Component
+from .environment_domain import EnvironmentVariable
 from .environment_domain import Image
+from .environment_domain import Packages
 from .environment_domain import Platform
 from .environment_domain import SoftwareEnvironment
 from dagos.core.components import SoftwareComponentRegistry
@@ -54,27 +56,53 @@ class SoftwareEnvironmentBuilder:
             .description(environment.get("description"))
         )
 
-        os = environment["platform"]["os"]
-        if isinstance(os, str):
-            os = [os]
-        images = []
-        if "images" in environment["platform"]:
-            for image in environment["platform"]["images"]:
-                images.append(
-                    Image(
-                        image["id"],
-                        image.get("package_manager"),
-                        image.get("packages", []),
-                    )
-                )
-        builder.platform(Platform(os, images))
+        env = cls._parse_env(environment["platform"])
+        packages = cls._parse_packages(environment["platform"].get("packages"))
+        images = cls._parse_images(environment["platform"])
+        builder.platform(Platform(env, packages, images))
+
         for component in environment["components"]:
             builder.add_component(
                 Component(
                     component["name"],
                     component.get("purpose"),
-                    component.get("version") if "version" in component else "latest",
+                    component.get("version", "latest"),
                     SoftwareComponentRegistry.find_component(component["name"]),
                 )
             )
         return builder.build()
+
+    @classmethod
+    def _parse_env(cls, platform: t.Dict) -> t.List[EnvironmentVariable]:
+        envs = []
+        if "env" in platform:
+            for env in platform["env"]:
+                envs.append(EnvironmentVariable(env.get("name"), env.get("value")))
+        return envs
+
+    @classmethod
+    def _parse_packages(cls, packages: t.Optional[t.Dict]) -> t.List[Packages]:
+        result = []
+        if packages is not None and len(packages) > 0:
+            if isinstance(packages[0], str):
+                result.append(Packages(packages))
+            else:
+                for entry in packages:
+                    result.append(
+                        Packages(
+                            entry.get("packages"),
+                            entry.get("manager", "system"),
+                            entry.get("dependency"),
+                        )
+                    )
+        return result
+
+    @classmethod
+    def _parse_images(cls, platform: t.Dict) -> t.List[Image]:
+        images = []
+        if "images" in platform:
+            for image in platform["images"]:
+                images.append(
+                    Image(image["id"], cls._parse_packages(image.get("packages")))
+                )
+        return images

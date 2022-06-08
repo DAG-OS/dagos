@@ -26,7 +26,7 @@ class SoftwareEnvironmentScanner:
                         "Found the '{}' software environment", environment.name
                     )
                 except ValidationException as e:
-                    logger.warning("Found invalid software environment", e)
+                    logger.debug(e)
                     continue
 
     def _is_valid_search_path(self, search_path: Path) -> bool:

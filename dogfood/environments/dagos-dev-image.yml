@@ -1,0 +1,27 @@
+environment:
+  name: dagos-dev-environment
+  description: An environment for developing DAG-OS.
+  platform:
+    packages:
+      - packages:
+          - curl
+          - git
+          - unzip
+          - zip
+      - manager: pip
+        packages:
+          - tldr
+    env:
+      - name: PATH
+        value: "/root/.local/bin:${PATH}"
+    images:
+      - id: ubuntu
+        packages:
+          - python3
+          - python3-pip
+          - python3-venv
+  components:
+    - name: miniconda
+      purpose: Used to manage tested Python versions.
+    - name: poetry
+      purpose: Python dependency manager and build tool.

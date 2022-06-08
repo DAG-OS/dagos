@@ -1,4 +1,7 @@
 import dagos.platform.platform_utils as platform_utils
+from .command_runner import CommandRunner
+from .command_runner import ContainerCommandRunner
+from .command_runner import LocalCommandRunner
 from .platform_domain import CommandNotAvailableIssue
 from .platform_domain import OperatingSystem
 from .platform_domain import PlatformIssue

@@ -1,6 +1,5 @@
 FROM dagos-test-environment
 
-ENV PATH="/root/.local/bin:${PATH}"
 WORKDIR /root/dagos
 COPY pyproject.toml poetry.lock ./
 RUN poetry install

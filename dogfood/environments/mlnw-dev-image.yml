@@ -1,0 +1,46 @@
+environment:
+  name: mlnw-dev-image
+  description: A typical environment used by MLNW to develop software.
+  platform:
+    packages:
+      - packages:
+          - curl
+          - git
+          - git-lfs
+          - gitk
+          - podman
+          - tmux
+          - tmuxinator
+          - vim
+          - unzip
+          - zip
+          - zsh
+      - manager: pip
+        packages:
+          - pre-commit
+          - tldr
+      - manager: sdk
+        dependency: sdkman
+        packages:
+          - java
+          - kotlin
+          - gradle
+    env:
+      - name: PATH
+        value: "/root/.local/bin:${PATH}"
+      - name: DEBIAN_FRONTEND
+        # TODO: Don't persist this value
+        value: noninteractive
+    images:
+      - id: ubuntu:hirsute
+        packages:
+          - python3
+          - python3-pip
+          - python3-venv
+  components:
+    - name: sdkman
+    - name: vale
+    - name: dive
+    - name: structurizr
+    - name: miniconda
+    - name: poetry

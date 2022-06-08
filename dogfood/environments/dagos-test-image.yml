@@ -2,28 +2,28 @@ environment:
   name: dagos-test-environment
   description: An environment for testing the DAG-OS CLI.
   platform:
-    os: linux
-    # TODO: Allow configuration common to all images
+    packages:
+      - curl
+      - git
+      - unzip
+      - zip
+    env:
+      - name: PATH
+        value: "/root/.local/bin:${PATH}"
+      - name: DEBIAN_FRONTEND
+        # TODO: Don't persist this value
+        value: noninteractive
     images:
-      - id: ubuntu
+      - id: ubuntu:hirsute
         # TODO: Configure workdir
         # TODO: Configure entrypoint
         # TODO: Copy poetry config files and install dependencies
         # TODO: Add sudo user for user tests
-        # TODO: Configure ENV, e.g., add ~/.local/bin to PATH
         packages:
-          - curl
-          - git
           - python3
           - python3-pip
           - python3-venv
-          - unzip
-          - zip
       - id: python:3-slim
-        packages:
-          - git
-          - unzip
-          - zip
   components:
     - name: miniconda
       purpose: Used to manage tested Python versions.

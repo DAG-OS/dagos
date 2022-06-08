@@ -1,16 +1,23 @@
+import typing as t
 from pathlib import Path
 
 import click
+import rich
 from loguru import logger
 
 import dagos.containers.buildah as buildah
 from dagos.core.commands import CommandType
+from dagos.core.components import SoftwareComponent
 from dagos.core.environments import Image
+from dagos.core.environments import Packages
 from dagos.core.environments import SoftwareEnvironment
 from dagos.core.environments import SoftwareEnvironmentBuilder
 from dagos.core.package_managers import PackageManager
 from dagos.core.package_managers import PackageManagerRegistry
 from dagos.exceptions import DagosException
+from dagos.platform import CommandRunner
+from dagos.platform import ContainerCommandRunner
+from dagos.platform.command_runner import LocalCommandRunner
 
 
 @click.command()
@@ -35,6 +42,7 @@ from dagos.exceptions import DagosException
 def deploy(container: bool, image: str, file: Path):
     """Deploy a provided environment."""
     environment = SoftwareEnvironmentBuilder.from_file(file)
+    components = environment.collect_components()
 
     if container:
         chosen_image = _get_image(image, environment)
@@ -43,42 +51,57 @@ def deploy(container: bool, image: str, file: Path):
             environment.name,
             chosen_image.id,
         )
+        _deploy_to_container(environment, components, chosen_image)
     else:
         logger.info("Deploying environment '{}'", environment.name)
-
-    if container:
-        _deploy_to_container(environment, chosen_image)
-    else:
-        _deploy_locally(environment)
+        _deploy_locally(environment, components)
 
 
 def _get_image(image_option: str, environment: SoftwareEnvironment) -> Image:
     if image_option:
         return Image(id=image_option)
     if len(environment.platform.images) > 0:
+        # TODO: Allow choosing which image to deploy to?
         return environment.platform.images[0]
     raise DagosException(
         f"For deploying an environment to a container a valid base image is required!"
     )
 
 
-def _deploy_locally(environment: SoftwareEnvironment) -> None:
-    for component in environment.collect_components():
+def _deploy_locally(
+    environment: SoftwareEnvironment, components: t.List[SoftwareComponent]
+) -> None:
+    # TODO: Ensure environment variables are persisted
+
+    def install_component(component: SoftwareComponent):
         logger.info("Deploying component '{}'", component.name)
         install_command = component.commands[CommandType.INSTALL.name]
         install_command.execute()
 
+    _install_packages_and_components(
+        LocalCommandRunner(),
+        environment.platform.packages,
+        components,
+        install_component,
+    )
 
-def _deploy_to_container(environment: SoftwareEnvironment, image: Image) -> None:
-    components = environment.collect_components()
+
+def _deploy_to_container(
+    environment: SoftwareEnvironment,
+    components: t.List[SoftwareComponent],
+    image: Image,
+) -> None:
     container = buildah.create_container(image.id)
+    command_runner = ContainerCommandRunner(container)
 
     try:
-        _install_packages(container, image)
-
-        # Ensure dagos is installed
-        if not buildah.check_command(container, "dagos"):
-            container = _bootstrap_container(container, image)
+        buildah.config(
+            container,
+            # TODO: Persist environment variables exactly as in local deployment
+            # as the resulting image may be used to import into WSL
+            env_vars={x.name: x.value for x in environment.platform.env},
+            entrypoint="/bin/bash",
+        )
 
         # Copy software components to container
         component_dir = Path("/root/.dagos/components")
@@ -89,40 +112,86 @@ def _deploy_to_container(environment: SoftwareEnvironment, image: Image) -> None
                 component_dir / component.folders[0].name,
             )
 
-        # Install components
-        for component in components:
+        def install_component(component: SoftwareComponent):
+            if not command_runner.check_command("dagos"):
+                _bootstrap_container(container)
             # TODO: Use the same verbosity as the CLI was initially called with
-            buildah.run(container, f"dagos install {component.name}")
+            command_runner.run(f"dagos install {component.name}")
             # TODO: The components are removed to ensure dagos CLI tests use the correct components
             #   Users may want to keep the copied components on the containers?
-            buildah.run(
-                container, f"rm -rf {component_dir / component.folders[0].name}"
-            )
+            command_runner.run(f"rm -rf {component_dir / component.folders[0].name}")
+
+        _install_packages_and_components(
+            command_runner,
+            environment.platform.packages + image.packages,
+            components,
+            install_component,
+        )
 
         buildah.commit(container, environment.name)
     finally:
         buildah.rm(container)
 
 
-def _install_packages(container: str, image: Image) -> None:
-    if len(image.packages) > 0:
-        if image.package_manager is not None:
-            package_manager = PackageManagerRegistry.find(image.package_manager)
+def _install_packages_and_components(
+    command_runner: CommandRunner,
+    packages_to_install: t.List[Packages],
+    components: t.List[SoftwareComponent],
+    # TODO: Add type hint
+    install_component,
+) -> None:
+    # It's important to group packages by manager since there may be several
+    # packages defined for a single manager in various places, e.g., general and
+    # image related.
+    package_bundles: t.Dict[str, Packages] = {}
+    for package in packages_to_install:
+        if package.manager not in package_bundles:
+            package_bundles[package.manager] = None
+        if package_bundles[package.manager] is None:
+            package_bundles[package.manager] = package
         else:
-            # TODO: Analyze platform first and get information from there?
-            package_manager = _select_package_manager(container)
-        install_command = package_manager.install(image.packages)
-        if isinstance(install_command, str):
-            buildah.run(container, install_command)
+            package_bundles[package.manager].package_list.extend(package.package_list)
+
+    # TODO: Sort by package manager? For now sorting manually through YAML
+    # First system, and named system managers, then anything else
+    # What about managers that are installed via components? E.g. SDKMAN?
+
+    for manager, packages in package_bundles.items():
+        if manager == "system":
+            package_manager = _select_package_manager(command_runner)
         else:
-            for command in install_command:
-                buildah.run(container, command)
-        clean_command = package_manager.clean()
-        if clean_command:
-            buildah.run(container, clean_command)
+            package_manager = PackageManagerRegistry.find(manager)
+            # TODO: Create adhoc manager from name (and options) for unknown managers
+
+        if packages.dependency:
+            component = [x for x in components if x.name == packages.dependency]
+            if len(component) == 1:
+                component = component[0]
+                install_component(component)
+                components.remove(component)
+            elif len(component) == 0:
+                raise DagosException(
+                    f"""Unable to satisfy dependency '{packages.dependency}'
+                    as there is no such component mentioned in this environment."""
+                )
+            else:
+                raise DagosException(
+                    f"""Unable to satisfy dependency '{packages.dependency}'
+                    as there are too many components with the same name mentioned."""
+                )
+
+        if package_manager is None:
+            command_runner.run(f"{manager} install {' '.join(packages.package_list)}")
+        else:
+            package_manager.install(packages.package_list, command_runner)
+            package_manager.clean(command_runner)
+
+    # Install remaining components
+    for component in components:
+        install_component(component)
 
 
-def _bootstrap_container(container: str, image: Image) -> str:
+def _bootstrap_container(container: str) -> None:
     """Install dagos on the container."""
     # TODO: How important is it to have the exact same version of dagos installed?
     # TODO: Include dagos wheel within dagos to skip git installation and
@@ -135,15 +204,10 @@ def _bootstrap_container(container: str, image: Image) -> str:
         "python3 -m pip install git+https://github.com/DAG-OS/dagos.git#egg=dagos",
     )
 
-    # Committing the base image with dagos installed so that users may
-    # continue from this image to save time during debugging.
-    intermediate_image = buildah.commit(container, f"{image.id}-with-dagos", rm=True)
-    return buildah.create_container(intermediate_image)
 
-
-def _select_package_manager(container: str) -> PackageManager:
+def _select_package_manager(command_runner: CommandRunner) -> PackageManager:
     for package_manager in PackageManagerRegistry.managers:
-        if buildah.check_command(container, package_manager.name()):
+        if command_runner.check_command(package_manager.name()):
             return package_manager
     supported_managers = [x.name() for x in PackageManagerRegistry.managers]
     raise DagosException(

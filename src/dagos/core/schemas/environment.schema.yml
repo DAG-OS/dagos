@@ -5,25 +5,39 @@
 environment:
   name: str()
   description: str(required=False)
-  platform: include('platform')
+  platform: include('platform', required=False)
   components: list(include('component'))
+
 ---
+
 platform:
-  os: any(include('os'), list(include('os')))
+  env: list(include('variable'), required=False)
+  packages: include('packages', required=False)
   images: list(include('image'), required=False)
-os: enum('linux', 'windows')
+
+variable:
+  name: str()
+  value: str()
+
+# Either a list of packages to install with the system package manager or a list
+# of package managers with which to install packages.
+packages: any(list(str()), list(include('package_manager')))
+package_manager:
+  # A hint for dagos for which package manager to use. If none is provided it
+  # defaults to `system` and dagos checks if a supported system package manager
+  # is installed with which it installs the packages.
+  manager: str(required=False)
+  # A software component that DAGOS needs to install before installing the list
+  # of packages.
+  dependency: str(required=False)
+  # A list of packages to install with the package manager
+  packages: list(str())
 
 image:
   # The fully qualifying ID of the image used for pulling it
   id: str(min=1, multiline=False)
-  # A hint for dagos for which package manager to use. If none is provided dagos
-  # checks if one of a list of supported ones is installed and uses those to
-  # install any packages provided below.
-  package_manager: str(required=False)
-  # A list of packages to install with the system package manager
+  # Packages to install specific to this image
   packages: include('packages', required=False)
-
-packages: list(str())
 
 component:
   name: str()

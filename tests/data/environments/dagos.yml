@@ -3,8 +3,6 @@ environment:
   name: "dagos"
   description: "An environment used to develop the DAG-OS CLI."
   platform:
-    os:
-      - linux
     images:
       - id: ubuntu
   components:

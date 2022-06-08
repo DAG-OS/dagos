@@ -11,11 +11,14 @@ def test_constructor_with_basic_env(test_data_dir: Path):
 
     assert result.name == "basic"
     assert result.description != None
-    assert result.platform.os == ["linux"]
+    assert result.platform.packages[0].package_list == ["git"]
     assert len(result.platform.images) == 2
     assert result.platform.images[0].id == "rockylinux"
-    assert result.platform.images[0].package_manager == "dnf"
-    assert result.platform.images[0].packages == ["git", "python38", "python38-pip"]
+    assert result.platform.images[0].packages[0].manager == "dnf"
+    assert result.platform.images[0].packages[0].package_list == [
+        "python38",
+        "python38-pip",
+    ]
     assert len(result.components) == 1
     assert result.components[0].name == "vale"
     assert result.components[0].purpose == "Lint some documents."
