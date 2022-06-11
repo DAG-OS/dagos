@@ -103,7 +103,7 @@ def _deploy_to_container(
         )
 
         # Copy software components to container
-        component_dir = Path("/root/.dagos/components")
+        component_dir = Path("/opt/dagos/components")
         for component in components:
             buildah.copy(
                 container,
@@ -116,9 +116,6 @@ def _deploy_to_container(
                 _bootstrap_container(container)
             # TODO: Use the same verbosity as the CLI was initially called with
             command_runner.run(f"dagos install {component.name}")
-            # TODO: The components are removed to ensure dagos CLI tests use the correct components
-            #   Users may want to keep the copied components on the containers?
-            command_runner.run(f"rm -rf {component_dir / component.folders[0].name}")
 
         _install_packages_and_components(
             command_runner,
