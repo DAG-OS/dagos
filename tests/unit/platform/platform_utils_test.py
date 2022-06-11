@@ -1,7 +1,11 @@
+import subprocess
 from contextlib import contextmanager
+from unittest.mock import ANY
 
 import pytest
+from loguru import logger
 
+from dagos.logging import LogLevel
 from dagos.platform import OperatingSystem
 from dagos.platform import platform_utils
 from dagos.platform import UnsupportedOperatingSystemException
@@ -117,3 +121,66 @@ def test_assert_root_privileges(mocker, system, effective_uid, expectation):
     mocker.patch("os.geteuid", return_value=effective_uid)
     with expectation:
         platform_utils.assert_root_privileges()
+
+
+@pytest.mark.parametrize(
+    "command,shell,capture_stdout,capture_stderr,stdout,stderr,encoding,log_level",
+    [
+        ("command", True, None, None, None, None, None, LogLevel.ERROR),
+        (["command"], False, None, None, None, None, None, LogLevel.WARNING),
+        (
+            ["command"],
+            False,
+            True,
+            None,
+            subprocess.PIPE,
+            None,
+            None,
+            LogLevel.INFO,
+        ),
+        (
+            ["command"],
+            False,
+            False,
+            True,
+            None,
+            subprocess.PIPE,
+            None,
+            LogLevel.SUCCESS,
+        ),
+        (["command"], False, True, True, subprocess.PIPE, subprocess.PIPE, None, None),
+    ],
+)
+def test_private_run(
+    mocker,
+    command,
+    shell,
+    capture_stdout,
+    capture_stderr,
+    stdout,
+    stderr,
+    encoding,
+    log_level,
+):
+    mocker.patch("loguru.logger.log")
+    mocker.patch("subprocess.run")
+
+    platform_utils.run_command(
+        command,
+        capture_stdout,
+        capture_stderr,
+        ignore_failure=True,
+        encoding=encoding,
+        log_level=log_level,
+    )
+
+    if log_level is not None:
+        logger.log.assert_called_once_with(log_level.value, "Running command: {}", ANY)
+    subprocess.run.assert_called_once_with(
+        command,
+        shell=shell,
+        stdout=stdout,
+        stderr=stderr,
+        text=True,
+        encoding=encoding,
+    )

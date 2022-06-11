@@ -1,6 +1,7 @@
 import os
 import platform
 import shutil
+import subprocess
 import typing as t
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from .platform_domain import OperatingSystem
 from .platform_domain import PlatformScope
 from .platform_exceptions import UnsupportedOperatingSystemException
 from .platform_exceptions import UnsupportedPlatformException
+from dagos.exceptions import DagosException
+from dagos.logging import LogLevel
 
 
 def is_operating_system(system: OperatingSystem) -> bool:
@@ -88,3 +91,49 @@ def add_binary_to_path(
         Path("~/.local/bin") if scope == PlatformScope.USER else Path("/usr/local/bin")
     )
     return file_utils.create_symlink(dir_on_path / binary_name, binary, force)
+
+
+def run_command(
+    command: t.Union[str, t.List[str]],
+    capture_stdout: t.Optional[bool] = False,
+    capture_stderr: t.Optional[bool] = False,
+    encoding: t.Optional[str] = "utf-8",
+    ignore_failure: t.Optional[bool] = False,
+    log_level: t.Optional[LogLevel] = LogLevel.INFO,
+) -> subprocess.CompletedProcess:
+    """Run provided command via the subprocess module.
+
+    Args:
+        command (t.Union[str, t.List[str]]): The command to run.
+        capture_stdout (t.Optional[bool], optional): If True stdout is captured. Defaults to False.
+        capture_stderr (t.Optional[bool], optional): If True stderr is captured. Defaults to False.
+        encoding (t.Optional[str], optional): Determine the encoding of the captured text. Defaults to utf-8.
+        ignore_failure (t.Optional[bool], optional): If True any failure is ignored. Defaults to False.
+        log_level (t.Optional[LogLevel], optional): Determine log level for logging the run command.
+            If None is provided no log message is generated. Defaults to LogLevel.INFO.
+
+    Raises:
+        DagosException: If there is a failure and ignore_failure is False.
+
+    Returns:
+        subprocess.CompletedProcess: The completed process.
+    """
+    if log_level is not None:
+        logger.log(
+            log_level.value,
+            "Running command: {}",
+            command if isinstance(command, str) else " ".join(command),
+        )
+
+    result = subprocess.run(
+        command,
+        shell=True if isinstance(command, str) else False,
+        stdout=subprocess.PIPE if capture_stdout else None,
+        stderr=subprocess.PIPE if capture_stderr else None,
+        text=True,
+        encoding=encoding,
+    )
+
+    if not ignore_failure and result.returncode != 0:
+        raise DagosException(f"Command failed with code {result.returncode}!")
+    return result

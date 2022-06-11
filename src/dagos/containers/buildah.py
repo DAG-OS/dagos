@@ -4,34 +4,8 @@ from pathlib import Path
 
 from loguru import logger
 
-from dagos.exceptions import DagosException
 from dagos.logging import LogLevel
-
-
-def _run(
-    command: t.Union[str, t.List[str]],
-    capture_stdout=False,
-    capture_stderr=False,
-    ignore_failure=False,
-    log_level: LogLevel = LogLevel.INFO,
-) -> subprocess.CompletedProcess:
-    logger.log(
-        log_level.value,
-        "Running command: {}",
-        command if isinstance(command, str) else " ".join(command),
-    )
-
-    result = subprocess.run(
-        command,
-        shell=True if isinstance(command, str) else False,
-        stdout=subprocess.PIPE if capture_stdout else None,
-        stderr=subprocess.PIPE if capture_stderr else None,
-        text=True,
-    )
-
-    if not ignore_failure and result.returncode != 0:
-        raise DagosException(f"Command failed with code {result.returncode}!")
-    return result
+from dagos.platform import platform_utils
 
 
 def _unwind_dict(arg: str, dict: t.Dict[str, str]) -> t.List[str]:
@@ -70,7 +44,7 @@ def create_container(
         args.extend(_unwind_list("--volume", volumes))
 
     command = ["buildah", "from"] + args + [container_image]
-    result = _run(command, capture_stdout=True)
+    result = platform_utils.run_command(command, capture_stdout=True)
     container = result.stdout.strip()
     logger.success(f"Created '{container}' from image '{container_image}'")
     return container
@@ -104,7 +78,7 @@ def commit(
     if image_name:
         command.append(image_name)
 
-    result = _run(command, capture_stdout=True)
+    result = platform_utils.run_command(command, capture_stdout=True)
     image = result.stdout.strip()
     logger.info(f"Committed image '{image_name if image_name else image}'")
     return image_name if image_name else image
@@ -170,7 +144,7 @@ def config(
 
     if args:
         command = ["buildah", "config"] + args + [container]
-        _run(command)
+        platform_utils.run_command(command)
 
 
 def copy(
@@ -196,7 +170,7 @@ def copy(
     command.extend([container, path_to_str(src)])
     if dst:
         command.append(path_to_str(dst))
-    _run(command)
+    platform_utils.run_command(command)
 
 
 def rm(container: str) -> None:
@@ -205,7 +179,7 @@ def rm(container: str) -> None:
     Args:
         container (str): The container to remove.
     """
-    _run(["buildah", "rm", container], capture_stdout=True)
+    platform_utils.run_command(["buildah", "rm", container], capture_stdout=True)
 
 
 def run(
@@ -214,6 +188,7 @@ def run(
     user: t.Optional[str] = None,
     capture_stdout: t.Optional[bool] = False,
     capture_stderr: t.Optional[bool] = False,
+    encoding: t.Optional[str] = "utf-8",
     ignore_failure: t.Optional[bool] = False,
     log_level: t.Optional[LogLevel] = LogLevel.INFO,
 ) -> subprocess.CompletedProcess:
@@ -223,10 +198,11 @@ def run(
 
     Args:
         container (str): The container to run the command in.
-        command (t.Union[str, t.List[str]]): The command to run.
+        command (str | List[str]): The command to run.
         user (str, optional): The user[:group] to run the command as.
         capture_stdout (bool, optional): If True, capture stdout for later retrieval. Defaults to False.
         capture_stderr (bool, optional): If True, capture stderr for later retrieval. Defaults to False.
+        encoding (str, optional): Determine the encoding of the captured text. Defaults to utf-8.
         ignore_failure (bool, optional): If True, do not fail if the command fails. Defaults to False.
         log_level (LogLevel, optional): The log level to use for logging the run command. Defaults to LogLevel.INFO.
 
@@ -242,7 +218,14 @@ def run(
         run_command = " ".join(run_command)
     else:
         run_command.extend(command)
-    return _run(run_command, capture_stdout, capture_stderr, ignore_failure, log_level)
+    return platform_utils.run_command(
+        command=run_command,
+        capture_stdout=capture_stdout,
+        capture_stderr=capture_stderr,
+        encoding=encoding,
+        ignore_failure=ignore_failure,
+        log_level=log_level,
+    )
 
 
 def check_command(container: str, command: str, user: t.Optional[str] = None) -> bool:

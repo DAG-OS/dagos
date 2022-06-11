@@ -1,4 +1,3 @@
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,9 +17,9 @@ class WslDistro:
 
 def get_installed_distros():
     """Get list of installed distros for further consumption."""
-    distro_list = subprocess.run(
-        ["wsl", "-l", "-v"], capture_output=True
-    ).stdout.decode("utf-16")
+    distro_list = platform_utils.run_command(
+        ["wsl", "-l", "-v"], capture_stdout=True, capture_stderr=True, encoding="utf-16"
+    ).stdout
     distros = []
     # Skip header line
     for line in distro_list.splitlines()[1:]:
@@ -40,22 +39,21 @@ def get_installed_distros():
 
 
 def unregister_distro(name):
-    run_result = subprocess.run(
+    run_result = platform_utils.run_command(
         ["wsl", "--unregister", name],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        capture_stdout=True,
+        capture_stderr=True,
+        ignore_failure=True,
     )
     if run_result.returncode != 0:
-        logger.error(
-            f"Failed to unregister '{name}' distro:\n{run_result.stderr.decode('utf-8')}"
-        )
+        logger.error(f"Failed to unregister '{name}' distro:\n{run_result.stderr}")
         exit(1)
 
 
 def import_distro(name: str, install_location: Path, archive: Path, version: int):
     logger.info("Starting the WSL import")
     with spinner("Importing..."):
-        run_result = subprocess.run(
+        run_result = platform_utils.run_command(
             [
                 "wsl",
                 "--import",

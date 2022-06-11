@@ -2,7 +2,6 @@ import typing as t
 from pathlib import Path
 
 import click
-import rich
 from loguru import logger
 
 import dagos.containers.buildah as buildah

@@ -5,38 +5,7 @@ import pytest
 
 import dagos.containers.buildah as buildah
 from dagos.logging import LogLevel
-
-
-@pytest.mark.parametrize(
-    "command,shell,capture_stdout,capture_stderr,stdout,stderr",
-    [
-        ("command", True, None, None, None, None),
-        (["command"], False, None, None, None, None),
-        (["command"], False, True, None, subprocess.PIPE, None),
-        (["command"], False, False, True, None, subprocess.PIPE),
-        (["command"], False, True, True, subprocess.PIPE, subprocess.PIPE),
-    ],
-)
-def test_private_run(
-    mocker,
-    command,
-    shell,
-    capture_stdout,
-    capture_stderr,
-    stdout,
-    stderr,
-):
-    mocker.patch("subprocess.run")
-
-    buildah._run(command, capture_stdout, capture_stderr, ignore_failure=True)
-
-    subprocess.run.assert_called_once_with(
-        command,
-        shell=shell,
-        stdout=stdout,
-        stderr=stderr,
-        text=True,
-    )
+from dagos.platform import platform_utils
 
 
 @pytest.mark.parametrize(
@@ -54,13 +23,13 @@ def test_private_run(
     ],
 )
 def test_create_container(mocker, image, name, volumes, expectation):
-    mocker.patch("dagos.containers.buildah._run")
+    mocker.patch("dagos.platform.platform_utils.run_command")
     expectation = ["buildah", "from"] + expectation
 
     result = buildah.create_container(image, name, volumes)
 
     assert result
-    buildah._run.assert_called_once_with(expectation, capture_stdout=True)
+    platform_utils.run_command.assert_called_once_with(expectation, capture_stdout=True)
 
 
 @pytest.mark.parametrize(
@@ -79,12 +48,12 @@ def test_create_container(mocker, image, name, volumes, expectation):
     ],
 )
 def test_commit(mocker, image_name, rm, squash, expectation):
-    mocker.patch("dagos.containers.buildah._run")
+    mocker.patch("dagos.platform.platform_utils.run_command")
     expectation = ["buildah", "commit"] + expectation
 
     image = buildah.commit("container", image_name=image_name, rm=rm, squash=squash)
 
-    buildah._run.assert_called_once_with(expectation, capture_stdout=True)
+    platform_utils.run_command.assert_called_once_with(expectation, capture_stdout=True)
     assert image
 
 
@@ -106,20 +75,20 @@ def test_commit(mocker, image_name, rm, squash, expectation):
     ],
 )
 def test_config(mocker, args, expectation):
-    mocker.patch("dagos.containers.buildah._run")
+    mocker.patch("dagos.platform.platform_utils.run_command")
     expectation = ["buildah", "config"] + expectation + ["container"]
 
     buildah.config("container", **args)
 
-    buildah._run.assert_called_once_with(expectation)
+    platform_utils.run_command.assert_called_once_with(expectation)
 
 
 def test_config_no_args(mocker):
-    mocker.patch("dagos.containers.buildah._run")
+    mocker.patch("dagos.platform.platform_utils.run_command")
 
     buildah.config("container")
 
-    buildah._run.assert_not_called()
+    platform_utils.run_command.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -146,33 +115,34 @@ def test_config_no_args(mocker):
     ],
 )
 def test_copy(mocker, src, dst, chown, expectation):
-    mocker.patch("dagos.containers.buildah._run")
+    mocker.patch("dagos.platform.platform_utils.run_command")
     expectation = ["buildah", "copy"] + expectation
 
     buildah.copy("container", src, dst, chown)
 
-    buildah._run.assert_called_once_with(expectation)
+    platform_utils.run_command.assert_called_once_with(expectation)
 
 
 def test_rm(mocker):
-    mocker.patch("dagos.containers.buildah._run")
+    mocker.patch("dagos.platform.platform_utils.run_command")
 
     buildah.rm("container")
 
-    buildah._run.assert_called_once_with(
+    platform_utils.run_command.assert_called_once_with(
         ["buildah", "rm", "container"], capture_stdout=True
     )
 
 
 @pytest.mark.parametrize(
-    "command,user,capture_stdout,capture_stderr,ignore_failure,log_level,expectation",
+    "command,user,capture_stdout,capture_stderr,encoding,ignore_failure,log_level,expectation",
     [
-        ("ls -la", None, True, False, False, None, "container -- ls -la"),
+        ("ls -la", None, True, False, None, False, None, "container -- ls -la"),
         (
             ["ls", "-la"],
             None,
             False,
             True,
+            None,
             False,
             LogLevel.DEBUG,
             ["container", "--", "ls", "-la"],
@@ -182,6 +152,7 @@ def test_rm(mocker):
             "d:d",
             False,
             False,
+            None,
             False,
             LogLevel.ERROR,
             "--user d:d container -- ls",
@@ -191,6 +162,7 @@ def test_rm(mocker):
             None,
             False,
             False,
+            None,
             True,
             LogLevel.WARNING,
             ["container", "--", "xxxxx"],
@@ -203,11 +175,12 @@ def test_run(
     user,
     capture_stdout,
     capture_stderr,
+    encoding,
     ignore_failure,
     log_level,
     expectation,
 ):
-    mocker.patch("dagos.containers.buildah._run")
+    mocker.patch("dagos.platform.platform_utils.run_command")
     if isinstance(expectation, str):
         expectation = "buildah run " + expectation
     else:
@@ -219,12 +192,18 @@ def test_run(
         user=user,
         capture_stdout=capture_stdout,
         capture_stderr=capture_stderr,
+        encoding=encoding,
         ignore_failure=ignore_failure,
         log_level=log_level,
     )
 
-    buildah._run.assert_called_once_with(
-        expectation, capture_stdout, capture_stderr, ignore_failure, log_level
+    platform_utils.run_command.assert_called_once_with(
+        command=expectation,
+        capture_stdout=capture_stdout,
+        capture_stderr=capture_stderr,
+        encoding=encoding,
+        ignore_failure=ignore_failure,
+        log_level=log_level,
     )
 
 
@@ -261,6 +240,38 @@ def test_check_command(mocker, command, user):
                 capture_stdout=True,
                 capture_stderr=True,
                 ignore_failure=True,
+            ),
+        ],
+    )
+
+
+def test_check_command_which(mocker):
+    mock = mocker.patch("dagos.containers.buildah.run")
+    mock.side_effect = [
+        subprocess.CompletedProcess("cmd", returncode=1),
+        subprocess.CompletedProcess("cmd", returncode=0),
+    ]
+    command = "ls"
+
+    buildah.check_command("container", command)
+
+    buildah.run.assert_has_calls(
+        [
+            call(
+                "container",
+                "command",
+                capture_stdout=True,
+                capture_stderr=True,
+                ignore_failure=True,
+                user=None,
+            ),
+            call(
+                "container",
+                f"which {command}",
+                capture_stdout=True,
+                capture_stderr=True,
+                ignore_failure=True,
+                user=None,
             ),
         ],
     )
