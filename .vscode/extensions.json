@@ -3,6 +3,7 @@
         "alexkrechik.cucumberautocomplete",
         "asciidoctor.asciidoctor-vscode",
         "bungcip.better-toml",
+        "davidanson.vscode-markdownlint",
         "errata-ai.vale-server",
         "esbenp.prettier-vscode",
         "hbenl.vscode-test-explorer",

@@ -1,0 +1,9 @@
+# Schema: https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.yaml
+
+default: true
+extends: null
+
+MD013: false
+
+MD031:
+  list_items: false
