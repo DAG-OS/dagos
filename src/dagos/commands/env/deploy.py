@@ -141,8 +141,7 @@ def _install_packages_and_components(
     command_runner: CommandRunner,
     packages_to_install: t.List[Packages],
     components: t.List[SoftwareComponent],
-    # TODO: Add type hint
-    install_component,
+    install_component: t.Callable[[SoftwareComponent], None],
 ) -> None:
     # It's important to group packages by manager since there may be several
     # packages defined for a single manager in various places, e.g., general and
