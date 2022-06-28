@@ -7,6 +7,7 @@ from loguru import logger
 import dagos.containers.buildah as buildah
 from dagos.core.commands import CommandType
 from dagos.core.components import SoftwareComponent
+from dagos.core.configuration import DagosConfiguration
 from dagos.core.environments import Image
 from dagos.core.environments import Packages
 from dagos.core.environments import SoftwareEnvironment
@@ -111,11 +112,18 @@ def _deploy_to_container(
                 component_dir / component.folders[0].name,
             )
 
+        verbosity = DagosConfiguration().verbosity
+        if verbosity == 0:
+            verbosity_switch = " "
+        elif verbosity == 1:
+            verbosity_switch = " -v "
+        else:
+            verbosity_switch = " -vv "
+
         def install_component(component: SoftwareComponent):
             if not command_runner.check_command("dagos"):
                 _bootstrap_container(container)
-            # TODO: Use the same verbosity as the CLI was initially called with
-            command_runner.run(f"dagos install {component.name}")
+            command_runner.run(f"dagos{verbosity_switch}install {component.name}")
 
         _install_packages_and_components(
             command_runner,

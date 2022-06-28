@@ -73,18 +73,23 @@ def dagos_cli(ctx: click.Context, verbose: int, timer: bool):
 
 def dagos():
     try:
-        use_config_log_level = False
+        use_verbosity_from_configuration = False
         arguments = sys.argv[1:]
+
+        verbosity = 0
         if len(arguments) > 0 and "-v" == arguments[0]:
-            configure_logging(1)
+            verbosity = 1
         elif len(arguments) > 0 and "-vv" == arguments[0]:
-            configure_logging(2)
+            verbosity = 2
         else:
-            use_config_log_level = True
-            configure_logging(0)
+            use_verbosity_from_configuration = True
+        configure_logging(verbosity)
+
         configuration = ConfigurationScanner().scan()
-        if use_config_log_level:
+        if use_verbosity_from_configuration:
             configure_logging(configuration.verbosity)
+        else:
+            configuration.verbosity = verbosity
 
         SoftwareComponentScanner().scan(configuration.component_search_paths)
         SoftwareEnvironmentScanner().scan(configuration.environment_search_paths)
