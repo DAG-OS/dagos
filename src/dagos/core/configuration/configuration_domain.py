@@ -42,31 +42,23 @@ class DagosConfiguration:
     __instance = None
 
     def __new__(cls):
-        if DagosConfiguration.__instance is None:
-            DagosConfiguration.__instance = object.__new__(cls)
-        return DagosConfiguration.__instance
-
-    # TODO: Handle environment variables?
-    def __init__(
-        self,
-        verbosity: int = default(0),
-        search_paths: t.List[Path] = default(
-            [
-                # User
-                Path.home() / ".dagos",
-                # System (linux)
-                Path("/opt/dagos"),
-                # dagos internal
-                Path(dagos.__file__).parent,
-            ]
-        ),
-        component_search_paths: t.List[Path] = default([]),
-        environment_search_paths: t.List[Path] = default([]),
-    ) -> None:
-        self._verbosity = verbosity
-        self._search_paths = search_paths
-        self._component_search_paths = component_search_paths
-        self._environment_search_paths = environment_search_paths
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+            # TODO: Handle environment variables?
+            cls.__instance._verbosity = default(0)
+            cls.__instance._search_paths = default(
+                [
+                    # User
+                    Path.home() / ".dagos",
+                    # System (linux)
+                    Path("/opt/dagos"),
+                    # dagos internal
+                    Path(dagos.__file__).parent,
+                ]
+            )
+            cls.__instance._component_search_paths = default([])
+            cls.__instance._environment_search_paths = default([])
+        return cls.__instance.__instance
 
     @property
     def verbosity(self) -> int:
