@@ -6,10 +6,24 @@ from pytest import fail
 from pytest_bdd import parsers
 from pytest_bdd import then
 
+from dagos.containers import buildah
+
 
 @then(parsers.parse('"{command}" is installed'))
 def command_shoud_be_installed(command):
     assert shutil.which(command) != None
+
+
+@then(parsers.parse('I start container from "{image}"'), target_fixture="container")
+def start_container_from_image(image):
+    container = buildah.create_container(image)
+    yield container
+    buildah.rm(container)
+
+
+@then(parsers.parse('"{command}" is installed in container'))
+def command_should_be_installed_in_container(container, command):
+    buildah.check_command(container, command)
 
 
 @then(parsers.parse('"{file}" is created'))
