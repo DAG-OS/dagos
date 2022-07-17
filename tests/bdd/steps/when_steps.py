@@ -6,8 +6,6 @@ from pytest import fail
 from pytest_bdd import parsers
 from pytest_bdd import when
 
-from .utils import yield_step
-
 
 @when(parsers.parse('I store this file at "{destination}"'))
 @when(parsers.parse('I store this folder at "{destination}"'))
@@ -26,7 +24,6 @@ def i_store_file_at_destination(file: Path, destination: str):
 @when(
     parsers.parse('I store this text at "{destination}"'), target_fixture="destination"
 )
-@yield_step
 def i_store_text_at_destination(text: str, destination: str):
     path = Path(destination).expanduser()
     backup = None
@@ -40,7 +37,6 @@ def i_store_text_at_destination(text: str, destination: str):
     else:
         shutil.copy(backup, path)
         Path(backup).unlink()
-    yield
 
 
 @when(parsers.parse('I run "{command}"'), target_fixture="command_output")

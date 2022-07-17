@@ -4,7 +4,6 @@ from pytest_bdd import given
 from pytest_bdd import parsers
 
 import dagos.containers.utils as container_utils
-from .utils import yield_step
 from dagos.platform import platform_utils
 
 
@@ -28,9 +27,7 @@ def i_have_text(test_data_dir: Path, text: str):
 
 
 @given(parsers.parse('I have a running container named "{container_name}"'))
-@yield_step
 def i_have_container(container_name: str):
     container_id = container_utils.start_container("busybox", container_name)
     yield
     container_utils.remove_container(container_id)
-    yield
