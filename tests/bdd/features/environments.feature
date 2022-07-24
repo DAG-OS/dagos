@@ -7,7 +7,7 @@ Feature: Manage software environments
 
         When I store this file at "~/.dagos/environments/basic.yml"
         # TODO: Scan for environments and provide as options in CLI
-        And run "dagos -v env deploy ~/.dagos/environments/basic.yml"
+        And run "dagos -vv env deploy ~/.dagos/environments/basic.yml"
 
         Then I see "Deploying environment 'basic'"
         And "vale" is installed
@@ -17,7 +17,7 @@ Feature: Manage software environments
         Given I have a file "environments/basic.yml"
 
         When I store this file at "~/.dagos/environments/basic.yml"
-        And run "dagos -v env deploy --container ~/.dagos/environments/basic.yml"
+        And run "dagos -vv env deploy --container ~/.dagos/environments/basic.yml"
 
         Then I see "Deploying environment 'basic' into 'rockylinux' container image"
         And I see "Committed image 'basic'"
